@@ -1,0 +1,49 @@
+==============================================================================
+ SYMBOL-LEVEL DELTA (self overhead %, sampled profile)
+==============================================================================
+Note: percentages are shares of each profile, so they sum to ~100 in
+both columns. A symbol dropping to 0.00 means it was eliminated.
+
+symbol                                            base%     opt%     delta
+------------------------------------------------------------------------------
+[.] _PyEval_EvalFrameDefault                      26.38    26.45     +0.07
+[.] call_function.lto_priv.0                       3.47     4.67     +1.20
+[.] frame_dealloc.lto_priv.0                       3.66     4.11     +0.45
+[.] _PyEval_MakeFrameVector                        2.35     3.08     +0.73
+[.] binary_op1                                     3.19     1.78     -1.41
+[.] _PyType_Lookup                                 1.97     2.52     +0.55
+[.] PyTuple_GetItem                                2.54     1.78     -0.76
+[.] _PyDict_GetItemHint                            1.97     1.87     -0.10
+[.] _PyObject_GetMethod                            2.07     1.50     -0.57
+[.] _PyObject_VectorcallTstate.lto_priv.10         1.69     1.87     +0.18
+[.] lookdict_split.lto_priv.0                      1.97     1.50     -0.47
+[.] _PyMem_DebugCheckAddress                       1.60     1.59     -0.01
+[.] _PyFunction_Vectorcall                         1.31     1.21     -0.10
+[.] _PyFrame_New_NoTrack                           1.31     1.21     -0.10
+[.] _Py_NewReference                               1.22     1.12     -0.10
+[.] subtype_dealloc.lto_priv.0                     1.13     1.12     -0.01
+[.] _Py_CheckFunctionResult                        1.03     1.12     +0.09
+[.] PyFloat_FromDouble                             1.31     0.84     -0.47
+[.] float_dealloc.lto_priv.0                       0.56     1.50     +0.94
+[.] read_size_t                                    0.94     1.03     +0.09
+[.] lookdict_unicode_nodummy                       0.94     0.93     -0.01
+[.] _PyUnicode_FromId                              0.85     0.93     +0.08
+[.] float_mul.lto_priv.0                           0.85     0.75     -0.10
+[.] PyDict_Contains                                0.66     0.93     +0.27
+[.] _PyEval_Vector                                 1.03     0.56     -0.47
+[.] _PyObject_Malloc                               0.75     0.84     +0.09
+[.] PyObject_SetAttr                               0.75     0.84     +0.09
+[.] PyDict_GetItemWithError                        0.94     0.65     -0.29
+[.] pthread_getspecific@@GLIBC_2.34                0.47     1.03     +0.56
+[.] PyDict_SetItem                                 1.03     0.47     -0.56
+[.] insertdict                                     1.03     0.47     -0.56
+[.] frame_alloc                                    0.56     0.84     +0.28
+[.] PyGILState_Check                               0.47     0.93     +0.46
+[.] _PyObject_MakeTpCall                           0.66     0.65     -0.01
+[.] binary_op                                      0.66     0.65     -0.01
+[.] is_tstate_valid.lto_priv.0                     0.66     0.56     -0.10
+[.] float_add.lto_priv.0                           0.38     0.84     +0.46
+[.] PyType_IsSubtype                               0.85     0.37     -0.48
+[.] _Py_Dealloc                                    0.75     0.47     -0.28
+[.] _PyDict_CheckConsistency                       0.75     0.37     -0.38
+

@@ -1,0 +1,2 @@
+elapsed=2.176470 s  2176.470 ms/frame
+RESULT total_sec=2.176470 loops=1 ms_per_frame=2176.4696 krays_per_sec=4.5946

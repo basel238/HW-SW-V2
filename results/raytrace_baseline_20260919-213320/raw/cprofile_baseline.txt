@@ -1,0 +1,158 @@
+# cProfile for raytrace/baseline
+# LOOPS IN THIS PROFILE: 1
+#
+# Divide ncalls and tottime by 1 for per-unit figures.
+# Comparing raw totals against another variant is INVALID unless
+# both were profiled with the same loop count.
+#
+# cProfile TIMING is inflated 2-5x by tracing overhead. Use this
+# file for CALL COUNTS only; quote timing from timing/clean_*.
+
+======================================================================
+TOP 40 BY TOTTIME (self time, excludes subcalls)
+======================================================================
+Sat Sep 19 21:54:05 2026    /root/HW-SW-V2/results/raytrace_baseline_20260919-213320/raw/cprofile_baseline.pstats
+
+         3092298 function calls (3085287 primitive calls) in 1.949 seconds
+
+   Ordered by: internal time
+   List reduced from 414 to 40 due to restriction <40>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   509873    0.327    0.000    0.394    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:51(dot)
+   277865    0.282    0.000    0.423    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:113(__sub__)
+   179457    0.228    0.000    0.775    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:142(intersectionTime)
+   452955    0.164    0.000    0.164    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:24(__init__)
+    10666    0.122    0.000    0.897    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:283(_lightIsVisible)
+   149747    0.096    0.000    0.150    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:48(scale)
+   109887    0.083    0.000    0.365    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:61(normalized)
+   109887    0.072    0.000    0.173    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:35(magnitude)
+   520543    0.069    0.000    0.069    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:76(mustBeVector)
+    15265    0.066    0.000    0.550    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:271(<listcomp>)
+    98172    0.058    0.000    0.385    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:177(__init__)
+5333/3789    0.048    0.000    1.325    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:315(colourAt)
+        1    0.044    0.044    1.928    1.928 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:245(render)
+   277865    0.040    0.000    0.040    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:122(isPoint)
+15333/10000    0.038    0.000    1.744    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:266(rayColour)
+    10000    0.029    0.000    0.045    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:200(plot)
+    20000    0.022    0.000    0.032    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:38(__add__)
+    15265    0.019    0.000    0.019    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:213(firstIntersection)
+    25501    0.017    0.000    0.036    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:164(intersectionTime)
+   116822    0.015    0.000    0.015    0.000 {built-in method math.sqrt}
+     3857    0.012    0.000    0.023    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:346(baseColourAt)
+     5333    0.011    0.000    0.910    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:290(visibleLights)
+    15999    0.011    0.000    0.011    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:298(addColours)
+    35377    0.011    0.000    0.011    0.000 {built-in method builtins.min}
+     5335    0.009    0.000    0.033    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:82(reflectThrough)
+    30033    0.008    0.000    0.008    0.000 {built-in method builtins.max}
+     5333    0.006    0.000    0.009    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:109(__add__)
+     5335    0.006    0.000    0.008    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:44(__sub__)
+     5333    0.006    0.000    0.020    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:184(pointAtTime)
+        1    0.004    0.004    0.004    0.004 {built-in method builtins.compile}
+        1    0.003    0.003    0.003    0.003 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:193(__init__)
+    20000    0.003    0.000    0.003    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:73(isPoint)
+     5346    0.002    0.000    0.002    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:98(__init__)
+    11571    0.002    0.000    0.002    0.000 {built-in method builtins.abs}
+    10470    0.002    0.000    0.002    0.000 {method 'append' of 'list' objects}
+        3    0.002    0.001    0.002    0.001 {built-in method _imp.exec_dynamic}
+     1476    0.001    0.000    0.009    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:151(normalAt)
+        3    0.001    0.000    0.001    0.000 {built-in method _imp.create_dynamic}
+       10    0.001    0.000    0.001    0.000 {built-in method marshal.loads}
+     3857    0.001    0.000    0.001    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:171(normalAt)
+
+
+======================================================================
+TOP 25 BY CUMTIME (includes subcalls)
+======================================================================
+Sat Sep 19 21:54:05 2026    /root/HW-SW-V2/results/raytrace_baseline_20260919-213320/raw/cprofile_baseline.pstats
+
+         3092298 function calls (3085287 primitive calls) in 1.949 seconds
+
+   Ordered by: cumulative time
+   List reduced from 414 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     12/1    0.000    0.000    1.949    1.949 {built-in method builtins.exec}
+        1    0.000    0.000    1.949    1.949 /root/HW-SW-V2/bench/bm_raytrace_upstream.py:1(<module>)
+        1    0.000    0.000    1.939    1.939 /root/HW-SW-V2/bench/bm_raytrace_upstream.py:156(main)
+        1    0.000    0.000    1.932    1.932 /root/HW-SW-V2/bench/bm_raytrace_upstream.py:108(benchmark)
+        1    0.000    0.000    1.932    1.932 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:357(bench_raytrace)
+        1    0.044    0.044    1.928    1.928 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:245(render)
+15333/10000    0.038    0.000    1.744    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:266(rayColour)
+5333/3789    0.048    0.000    1.325    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:315(colourAt)
+     5333    0.011    0.000    0.910    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:290(visibleLights)
+    10666    0.122    0.000    0.897    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:283(_lightIsVisible)
+   179457    0.228    0.000    0.775    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:142(intersectionTime)
+    15265    0.066    0.000    0.550    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:271(<listcomp>)
+   277865    0.282    0.000    0.423    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:113(__sub__)
+   509873    0.327    0.000    0.394    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:51(dot)
+    98172    0.058    0.000    0.385    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:177(__init__)
+   109887    0.083    0.000    0.365    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:61(normalized)
+   109887    0.072    0.000    0.173    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:35(magnitude)
+   452955    0.164    0.000    0.164    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:24(__init__)
+   149747    0.096    0.000    0.150    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:48(scale)
+   520543    0.069    0.000    0.069    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:76(mustBeVector)
+    10000    0.029    0.000    0.045    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:200(plot)
+   277865    0.040    0.000    0.040    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:122(isPoint)
+    25501    0.017    0.000    0.036    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:164(intersectionTime)
+     5335    0.009    0.000    0.033    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:82(reflectThrough)
+    20000    0.022    0.000    0.032    0.000 /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:38(__add__)
+
+
+======================================================================
+CALLEES OF THE 15 HOTTEST FUNCTIONS
+======================================================================
+   Ordered by: internal time
+   List reduced from 414 to 15 due to restriction <15>
+
+Function                                                                        called...
+                                                                                    ncalls  tottime  cumtime
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:51(dot)                ->  509873    0.068    0.068  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:76(mustBeVector)
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:113(__sub__)           ->  277865    0.101    0.101  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:24(__init__)
+                                                                                    277865    0.040    0.040  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:122(isPoint)
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:142(intersectionTime)  ->  358914    0.228    0.275  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:51(dot)
+                                                                                    179457    0.180    0.271  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:113(__sub__)
+                                                                                      6934    0.001    0.001  {built-in method math.sqrt}
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:24(__init__)           -> 
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:283(_lightIsVisible)   ->   82838    0.085    0.127  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:113(__sub__)
+                                                                                     72602    0.094    0.313  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:142(intersectionTime)
+                                                                                     10236    0.007    0.015  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:164(intersectionTime)
+                                                                                     82838    0.048    0.320  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:177(__init__)
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:48(scale)              ->  149747    0.054    0.054  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:24(__init__)
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:61(normalized)         ->  109887    0.072    0.173  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:35(magnitude)
+                                                                                    109887    0.069    0.109  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:48(scale)
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:35(magnitude)          ->  109887    0.072    0.087  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:51(dot)
+                                                                                    109887    0.014    0.014  {built-in method math.sqrt}
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:76(mustBeVector)       -> 
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:271(<listcomp>)        ->  106855    0.134    0.462  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:142(intersectionTime)
+                                                                                     15265    0.010    0.021  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:164(intersectionTime)
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:177(__init__)          ->   98172    0.074    0.327  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:61(normalized)
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:315(colourAt)          ->   10236    0.007    0.008  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:51(dot)
+                                                                                     10236    0.007    0.033  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:61(normalized)
+                                                                                      5333    0.009    0.033  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:82(reflectThrough)
+                                                                                     10236    0.011    0.016  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:113(__sub__)
+                                                                                      5333    0.003    0.022  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:177(__init__)
+                                                                                 5333/3789    0.013    0.527  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:266(rayColour)
+                                                                                      5333    0.011    0.910  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:290(visibleLights)
+                                                                                     15999    0.011    0.011  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:298(addColours)
+                                                                                      1476    0.000    0.000  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:312(baseColourAt)
+                                                                                      3857    0.012    0.023  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:346(baseColourAt)
+                                                                                      5333    0.003    0.003  {built-in method builtins.min}
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:245(render)            ->   20000    0.022    0.032  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:38(__add__)
+                                                                                     20000    0.013    0.021  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:48(scale)
+                                                                                         2    0.000    0.000  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:55(cross)
+                                                                                         2    0.000    0.000  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:61(normalized)
+                                                                                         1    0.000    0.000  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:113(__sub__)
+                                                                                     10001    0.006    0.043  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:177(__init__)
+                                                                                     10000    0.029    0.045  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:200(plot)
+                                                                                     10000    0.025    1.744  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:266(rayColour)
+                                                                                         1    0.000    0.000  {built-in method math.tan}
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:122(isPoint)           -> 
+/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:266(rayColour)         ->    1476    0.001    0.009  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:151(normalAt)
+                                                                                      3857    0.001    0.001  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:171(normalAt)
+                                                                                      5333    0.006    0.020  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:184(pointAtTime)
+                                                                                     15265    0.019    0.019  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:213(firstIntersection)
+                                                                                     15265    0.066    0.550  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:271(<listcomp>)
+                                                                                 5333/3789    0.048    1.325  /root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py:315(colourAt)
+
+

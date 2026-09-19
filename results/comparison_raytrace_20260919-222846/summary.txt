@@ -1,0 +1,10 @@
+==========================================================================
+                     PERFORMANCE COMPARISON — raytrace                    
+==========================================================================
+
+Source: clean-timing phase only (no profiler attached).
+Statistic: MEDIAN of independent processes — robust to host hiccups.
+
+!! CANNOT PRODUCE A VALID COMPARISON
+   baseline  usable samples: 0  (raw rows: 0, loops: 4)
+   optimized usable samples: 0  (raw rows: 0, loops: 4)

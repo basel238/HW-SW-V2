@@ -1,0 +1,26 @@
+# started on Sat Sep 19 18:19:48 2026
+
+
+ Performance counter stats for 'taskset -c 0 python3 /root/HW-SW-V2/bench/bm_nbody_upstream.py --mode raw --loops 16 --no-gc' (5 runs):
+
+           3772.19 msec task-clock                #    0.993 CPUs utilized            ( +-  0.73% )
+              1712      page-faults               #  451.550 /sec                     ( +-  0.09% )
+              1712      minor-faults              #  451.550 /sec                     ( +-  0.09% )
+                 0      major-faults              #    0.000 /sec                   
+                37      context-switches          #    9.759 /sec                     ( +-  6.64% )
+                 0      cpu-migrations            #    0.000 /sec                   
+        8800443066      cycles                    #    2.321 GHz                      ( +-  0.81% )  (49.81%)
+       27083066320      instructions              #    3.07  insn per cycle           ( +-  0.04% )  (59.87%)
+        3098997225      branches                  #  817.380 M/sec                    ( +-  0.11% )  (59.98%)
+          10687203      branch-misses             #    0.35% of all branches          ( +-  2.77% )  (60.07%)
+           2204697      cache-references          #  581.502 K/sec                    ( +-  2.63% )  (60.16%)
+            127863      cache-misses              #    6.248 % of all cache refs      ( +- 11.66% )  (60.16%)
+        8565914132      L1-dcache-loads           #    2.259 G/sec                    ( +-  0.06% )  (40.02%)
+           4204400      L1-dcache-load-misses     #    0.05% of all L1-dcache accesses  ( +-  7.00% )  (39.93%)
+   <not supported>      LLC-loads                                                   
+   <not supported>      LLC-load-misses                                             
+        4271893987      dTLB-loads                #    1.127 G/sec                    ( +-  0.06% )  (39.84%)
+            654507      dTLB-load-misses          #    0.02% of all dTLB cache accesses  ( +- 12.32% )  (39.84%)
+
+            3.7982 +- 0.0273 seconds time elapsed  ( +-  0.72% )
+

@@ -1,0 +1,77 @@
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.153837 s  788.459 ms/frame
+primary_rays=40000  12.68 kray/s
+RESULT total_sec=3.153837 loops=4 ms_per_frame=788.4593 krays_per_sec=12.6830
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.206850 s  801.713 ms/frame
+primary_rays=40000  12.47 kray/s
+RESULT total_sec=3.206850 loops=4 ms_per_frame=801.7126 krays_per_sec=12.4733
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.167449 s  791.862 ms/frame
+primary_rays=40000  12.63 kray/s
+RESULT total_sec=3.167449 loops=4 ms_per_frame=791.8623 krays_per_sec=12.6285
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.187760 s  796.940 ms/frame
+primary_rays=40000  12.55 kray/s
+RESULT total_sec=3.187760 loops=4 ms_per_frame=796.9401 krays_per_sec=12.5480
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.204436 s  801.109 ms/frame
+primary_rays=40000  12.48 kray/s
+RESULT total_sec=3.204436 loops=4 ms_per_frame=801.1089 krays_per_sec=12.4827
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.176054 s  794.013 ms/frame
+primary_rays=40000  12.59 kray/s
+RESULT total_sec=3.176054 loops=4 ms_per_frame=794.0135 krays_per_sec=12.5942
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.207852 s  801.963 ms/frame
+primary_rays=40000  12.47 kray/s
+RESULT total_sec=3.207852 loops=4 ms_per_frame=801.9629 krays_per_sec=12.4694
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.162333 s  790.583 ms/frame
+primary_rays=40000  12.65 kray/s
+RESULT total_sec=3.162333 loops=4 ms_per_frame=790.5832 krays_per_sec=12.6489
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.167541 s  791.885 ms/frame
+primary_rays=40000  12.63 kray/s
+RESULT total_sec=3.167541 loops=4 ms_per_frame=791.8852 krays_per_sec=12.6281
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.231262 s  807.816 ms/frame
+primary_rays=40000  12.38 kray/s
+RESULT total_sec=3.231262 loops=4 ms_per_frame=807.8155 krays_per_sec=12.3791
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=4
+elapsed=3.180653 s  795.163 ms/frame
+primary_rays=40000  12.58 kray/s
+RESULT total_sec=3.180653 loops=4 ms_per_frame=795.1633 krays_per_sec=12.5760

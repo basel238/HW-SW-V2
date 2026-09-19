@@ -1,0 +1,7 @@
+UPSTREAM pyperformance raytrace kernel (unmodified)
+  source: upstream/bm_raytrace_upstream.py
+  sha256: 88ef4d9060d8e8f6ce40f376477aaf89
+resolution=100x100 loops=1
+elapsed=1.923339 s  1923.339 ms/frame
+primary_rays=10000  5.20 kray/s
+RESULT total_sec=1.923339 loops=1 ms_per_frame=1923.3390 krays_per_sec=5.1993

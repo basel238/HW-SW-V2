@@ -1,0 +1,6 @@
+reference (upstream advance), iterations=20000
+  energy = -0.16908926275527172
+  sqrt      energy rel_diff=9.521e-15 OK | state max_abs=6.847e-12 rel=2.391e-13 OK
+  hoist     energy rel_diff=0.000e+00 OK | state max_abs=0.000e+00 rel=0.000e+00 OK
+  full      energy rel_diff=9.521e-15 OK | state max_abs=6.847e-12 rel=2.391e-13 OK
+verify: OK  all kernels agree with upstream within 1e-9 relative

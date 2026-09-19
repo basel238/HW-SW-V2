@@ -1,0 +1,2248 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cycles'
+# Event count (approx.): 5315000000
+#
+# Overhead  Command      Shared Object         Symbol                                    
+# ........  ...........  ....................  ..........................................
+#
+    29.63%  python3-dbg  python3.10d           [.] _PyEval_EvalFrameDefault
+            |          
+            |--23.61%--_PyEval_EvalFrameDefault
+            |          _PyEval_EvalFrame (inlined)
+            |          _PyEval_Vector
+            |          _PyFunction_Vectorcall
+            |          |          
+            |          |--19.85%--_PyObject_VectorcallTstate (inlined)
+            |          |          |          
+            |          |          |--14.68%--PyObject_Vectorcall (inlined)
+            |          |          |          call_function (inlined)
+            |          |          |          _PyEval_EvalFrameDefault
+            |          |          |          _PyEval_EvalFrame (inlined)
+            |          |          |          _PyEval_Vector
+            |          |          |          _PyFunction_Vectorcall
+            |          |          |          |          
+            |          |          |           --14.30%--_PyObject_VectorcallTstate (inlined)
+            |          |          |                     |          
+            |          |          |                      --14.02%--PyObject_Vectorcall (inlined)
+            |          |          |                                call_function (inlined)
+            |          |          |                                _PyEval_EvalFrameDefault
+            |          |          |                                _PyEval_EvalFrame (inlined)
+            |          |          |                                _PyEval_Vector
+            |          |          |                                _PyFunction_Vectorcall
+            |          |          |                                |          
+            |          |          |                                |--12.89%--_PyObject_VectorcallTstate (inlined)
+            |          |          |                                |          PyObject_Vectorcall (inlined)
+            |          |          |                                |          call_function (inlined)
+            |          |          |                                |          _PyEval_EvalFrameDefault
+            |          |          |                                |          _PyEval_EvalFrame (inlined)
+            |          |          |                                |          _PyEval_Vector
+            |          |          |                                |          _PyFunction_Vectorcall
+            |          |          |                                |          |          
+            |          |          |                                |          |--12.04%--_PyObject_VectorcallTstate (inlined)
+            |          |          |                                |          |          PyObject_Vectorcall (inlined)
+            |          |          |                                |          |          call_function (inlined)
+            |          |          |                                |          |          _PyEval_EvalFrameDefault
+            |          |          |                                |          |          _PyEval_EvalFrame (inlined)
+            |          |          |                                |          |          _PyEval_Vector
+            |          |          |                                |          |          |          
+            |          |          |                                |          |           --11.76%--_PyFunction_Vectorcall
+            |          |          |                                |          |                     |          
+            |          |          |                                |          |                      --11.38%--_PyObject_VectorcallTstate (inlined)
+            |          |          |                                |          |                                PyObject_Vectorcall (inlined)
+            |          |          |                                |          |                                call_function (inlined)
+            |          |          |                                |          |                                _PyEval_EvalFrameDefault
+            |          |          |                                |          |                                _PyEval_EvalFrame (inlined)
+            |          |          |                                |          |                                _PyEval_Vector
+            |          |          |                                |          |                                |          
+            |          |          |                                |          |                                 --10.91%--_PyFunction_Vectorcall
+            |          |          |                                |          |                                           _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |          |                                           PyObject_Vectorcall (inlined)
+            |          |          |                                |          |                                           call_function (inlined)
+            |          |          |                                |          |                                           _PyEval_EvalFrameDefault
+            |          |          |                                |          |                                           _PyEval_EvalFrame (inlined)
+            |          |          |                                |          |                                           _PyEval_Vector
+            |          |          |                                |          |                                           |          
+            |          |          |                                |          |                                           |--10.16%--_PyFunction_Vectorcall
+            |          |          |                                |          |                                           |          _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |          |                                           |          PyObject_Vectorcall (inlined)
+            |          |          |                                |          |                                           |          call_function (inlined)
+            |          |          |                                |          |                                           |          _PyEval_EvalFrameDefault
+            |          |          |                                |          |                                           |          _PyEval_EvalFrame (inlined)
+            |          |          |                                |          |                                           |          _PyEval_Vector
+            |          |          |                                |          |                                           |          |          
+            |          |          |                                |          |                                           |          |--8.37%--_PyFunction_Vectorcall
+            |          |          |                                |          |                                           |          |          _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |          |                                           |          |          PyObject_Vectorcall (inlined)
+            |          |          |                                |          |                                           |          |          call_function (inlined)
+            |          |          |                                |          |                                           |          |          _PyEval_EvalFrameDefault
+            |          |          |                                |          |                                           |          |          _PyEval_EvalFrame (inlined)
+            |          |          |                                |          |                                           |          |          _PyEval_Vector
+            |          |          |                                |          |                                           |          |          |          
+            |          |          |                                |          |                                           |          |          |--5.74%--_PyFunction_Vectorcall
+            |          |          |                                |          |                                           |          |          |          _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |          |                                           |          |          |          PyObject_Vectorcall (inlined)
+            |          |          |                                |          |                                           |          |          |          call_function (inlined)
+            |          |          |                                |          |                                           |          |          |          _PyEval_EvalFrameDefault
+            |          |          |                                |          |                                           |          |          |          _PyEval_EvalFrame (inlined)
+            |          |          |                                |          |                                           |          |          |          _PyEval_Vector
+            |          |          |                                |          |                                           |          |          |          |          
+            |          |          |                                |          |                                           |          |          |          |--3.95%--_PyFunction_Vectorcall
+            |          |          |                                |          |                                           |          |          |          |          _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |          |                                           |          |          |          |          PyObject_Vectorcall (inlined)
+            |          |          |                                |          |                                           |          |          |          |          call_function (inlined)
+            |          |          |                                |          |                                           |          |          |          |          _PyEval_EvalFrameDefault
+            |          |          |                                |          |                                           |          |          |          |          _PyEval_EvalFrame (inlined)
+            |          |          |                                |          |                                           |          |          |          |          _PyEval_Vector
+            |          |          |                                |          |                                           |          |          |          |          |          
+            |          |          |                                |          |                                           |          |          |          |          |--2.54%--PyEval_EvalCode
+            |          |          |                                |          |                                           |          |          |          |          |          run_eval_code_obj
+            |          |          |                                |          |                                           |          |          |          |          |          run_mod
+            |          |          |                                |          |                                           |          |          |          |          |          pyrun_file
+            |          |          |                                |          |                                           |          |          |          |          |          _PyRun_SimpleFileObject
+            |          |          |                                |          |                                           |          |          |          |          |          _PyRun_AnyFileObject
+            |          |          |                                |          |                                           |          |          |          |          |          pymain_run_file_obj
+            |          |          |                                |          |                                           |          |          |          |          |          pymain_run_file
+            |          |          |                                |          |                                           |          |          |          |          |          pymain_run_python
+            |          |          |                                |          |                                           |          |          |          |          |          Py_RunMain
+            |          |          |                                |          |                                           |          |          |          |          |          pymain_main
+            |          |          |                                |          |                                           |          |          |          |          |          Py_BytesMain
+            |          |          |                                |          |                                           |          |          |          |          |          main
+            |          |          |                                |          |                                           |          |          |          |          |          __libc_start_call_main
+            |          |          |                                |          |                                           |          |          |          |          |          __libc_start_main_impl (inlined)
+            |          |          |                                |          |                                           |          |          |          |          |          _start
+            |          |          |                                |          |                                           |          |          |          |          |          
+            |          |          |                                |          |                                           |          |          |          |           --1.41%--_PyFunction_Vectorcall
+            |          |          |                                |          |                                           |          |          |          |                     _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |          |                                           |          |          |          |                     PyObject_Vectorcall (inlined)
+            |          |          |                                |          |                                           |          |          |          |                     call_function (inlined)
+            |          |          |                                |          |                                           |          |          |          |                     _PyEval_EvalFrameDefault
+            |          |          |                                |          |                                           |          |          |          |                     _PyEval_EvalFrame (inlined)
+            |          |          |                                |          |                                           |          |          |          |                     _PyEval_Vector
+            |          |          |                                |          |                                           |          |          |          |                     |          
+            |          |          |                                |          |                                           |          |          |          |                      --1.03%--_PyFunction_Vectorcall
+            |          |          |                                |          |                                           |          |          |          |                                _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |          |                                           |          |          |          |                                PyObject_Vectorcall (inlined)
+            |          |          |                                |          |                                           |          |          |          |                                call_function (inlined)
+            |          |          |                                |          |                                           |          |          |          |                                _PyEval_EvalFrameDefault
+            |          |          |                                |          |                                           |          |          |          |                                _PyEval_EvalFrame (inlined)
+            |          |          |                                |          |                                           |          |          |          |                                _PyEval_Vector
+            |          |          |                                |          |                                           |          |          |          |                                |          
+            |          |          |                                |          |                                           |          |          |          |                                 --0.75%--PyEval_EvalCode
+            |          |          |                                |          |                                           |          |          |          |                                           run_eval_code_obj
+            |          |          |                                |          |                                           |          |          |          |                                           run_mod
+            |          |          |                                |          |                                           |          |          |          |                                           pyrun_file
+            |          |          |                                |          |                                           |          |          |          |                                           _PyRun_SimpleFileObject
+            |          |          |                                |          |                                           |          |          |          |                                           _PyRun_AnyFileObject
+            |          |          |                                |          |                                           |          |          |          |                                           pymain_run_file_obj
+            |          |          |                                |          |                                           |          |          |          |                                           pymain_run_file
+            |          |          |                                |          |                                           |          |          |          |                                           pymain_run_python
+            |          |          |                                |          |                                           |          |          |          |                                           Py_RunMain
+            |          |          |                                |          |                                           |          |          |          |                                           pymain_main
+            |          |          |                                |          |                                           |          |          |          |                                           Py_BytesMain
+            |          |          |                                |          |                                           |          |          |          |                                           main
+            |          |          |                                |          |                                           |          |          |          |                                           __libc_start_call_main
+            |          |          |                                |          |                                           |          |          |          |                                           __libc_start_main_impl (inlined)
+            |          |          |                                |          |                                           |          |          |          |                                           0xffffffffffffffff
+            |          |          |                                |          |                                           |          |          |          |          
+            |          |          |                                |          |                                           |          |          |           --1.79%--PyEval_EvalCode
+            |          |          |                                |          |                                           |          |          |                     run_eval_code_obj
+            |          |          |                                |          |                                           |          |          |                     run_mod
+            |          |          |                                |          |                                           |          |          |                     pyrun_file
+            |          |          |                                |          |                                           |          |          |                     _PyRun_SimpleFileObject
+            |          |          |                                |          |                                           |          |          |                     _PyRun_AnyFileObject
+            |          |          |                                |          |                                           |          |          |                     pymain_run_file_obj
+            |          |          |                                |          |                                           |          |          |                     pymain_run_file
+            |          |          |                                |          |                                           |          |          |                     pymain_run_python
+            |          |          |                                |          |                                           |          |          |                     Py_RunMain
+            |          |          |                                |          |                                           |          |          |                     pymain_main
+            |          |          |                                |          |                                           |          |          |                     Py_BytesMain
+            |          |          |                                |          |                                           |          |          |                     main
+            |          |          |                                |          |                                           |          |          |                     __libc_start_call_main
+            |          |          |                                |          |                                           |          |          |                     __libc_start_main_impl (inlined)
+            |          |          |                                |          |                                           |          |          |                     _start
+            |          |          |                                |          |                                           |          |          |          
+            |          |          |                                |          |                                           |          |           --2.63%--PyEval_EvalCode
+            |          |          |                                |          |                                           |          |                     run_eval_code_obj
+            |          |          |                                |          |                                           |          |                     run_mod
+            |          |          |                                |          |                                           |          |                     pyrun_file
+            |          |          |                                |          |                                           |          |                     _PyRun_SimpleFileObject
+            |          |          |                                |          |                                           |          |                     _PyRun_AnyFileObject
+            |          |          |                                |          |                                           |          |                     pymain_run_file_obj
+            |          |          |                                |          |                                           |          |                     pymain_run_file
+            |          |          |                                |          |                                           |          |                     pymain_run_python
+            |          |          |                                |          |                                           |          |                     Py_RunMain
+            |          |          |                                |          |                                           |          |                     pymain_main
+            |          |          |                                |          |                                           |          |                     Py_BytesMain
+            |          |          |                                |          |                                           |          |                     main
+            |          |          |                                |          |                                           |          |                     __libc_start_call_main
+            |          |          |                                |          |                                           |          |                     __libc_start_main_impl (inlined)
+            |          |          |                                |          |                                           |          |                     _start
+            |          |          |                                |          |                                           |          |          
+            |          |          |                                |          |                                           |           --1.79%--PyEval_EvalCode
+            |          |          |                                |          |                                           |                     run_eval_code_obj
+            |          |          |                                |          |                                           |                     run_mod
+            |          |          |                                |          |                                           |                     pyrun_file
+            |          |          |                                |          |                                           |                     _PyRun_SimpleFileObject
+            |          |          |                                |          |                                           |                     _PyRun_AnyFileObject
+            |          |          |                                |          |                                           |                     pymain_run_file_obj
+            |          |          |                                |          |                                           |                     pymain_run_file
+            |          |          |                                |          |                                           |                     pymain_run_python
+            |          |          |                                |          |                                           |                     Py_RunMain
+            |          |          |                                |          |                                           |                     pymain_main
+            |          |          |                                |          |                                           |                     Py_BytesMain
+            |          |          |                                |          |                                           |                     main
+            |          |          |                                |          |                                           |                     __libc_start_call_main
+            |          |          |                                |          |                                           |                     __libc_start_main_impl (inlined)
+            |          |          |                                |          |                                           |                     _start
+            |          |          |                                |          |                                           |          
+            |          |          |                                |          |                                            --0.75%--PyEval_EvalCode
+            |          |          |                                |          |                                                      run_eval_code_obj
+            |          |          |                                |          |                                                      run_mod
+            |          |          |                                |          |                                                      pyrun_file
+            |          |          |                                |          |                                                      _PyRun_SimpleFileObject
+            |          |          |                                |          |                                                      _PyRun_AnyFileObject
+            |          |          |                                |          |                                                      pymain_run_file_obj
+            |          |          |                                |          |                                                      pymain_run_file
+            |          |          |                                |          |                                                      pymain_run_python
+            |          |          |                                |          |                                                      Py_RunMain
+            |          |          |                                |          |                                                      pymain_main
+            |          |          |                                |          |                                                      Py_BytesMain
+            |          |          |                                |          |                                                      main
+            |          |          |                                |          |                                                      __libc_start_call_main
+            |          |          |                                |          |                                                      __libc_start_main_impl (inlined)
+            |          |          |                                |          |                                                      _start
+            |          |          |                                |          |          
+            |          |          |                                |           --0.85%--_PyObject_FastCallDictTstate
+            |          |          |                                |                     _PyObject_Call_Prepend
+            |          |          |                                |                     slot_tp_init
+            |          |          |                                |                     type_call (inlined)
+            |          |          |                                |                     _PyObject_MakeTpCall
+            |          |          |                                |                     _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |                     PyObject_Vectorcall (inlined)
+            |          |          |                                |                     call_function (inlined)
+            |          |          |                                |                     _PyEval_EvalFrameDefault
+            |          |          |                                |                     _PyEval_EvalFrame (inlined)
+            |          |          |                                |                     _PyEval_Vector
+            |          |          |                                |                     _PyFunction_Vectorcall
+            |          |          |                                |                     _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |                     PyObject_Vectorcall (inlined)
+            |          |          |                                |                     call_function (inlined)
+            |          |          |                                |                     _PyEval_EvalFrameDefault
+            |          |          |                                |                     _PyEval_EvalFrame (inlined)
+            |          |          |                                |                     _PyEval_Vector
+            |          |          |                                |                     _PyFunction_Vectorcall
+            |          |          |                                |                     _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |                     PyObject_Vectorcall (inlined)
+            |          |          |                                |                     call_function (inlined)
+            |          |          |                                |                     _PyEval_EvalFrameDefault
+            |          |          |                                |                     _PyEval_EvalFrame (inlined)
+            |          |          |                                |                     _PyEval_Vector
+            |          |          |                                |                     _PyFunction_Vectorcall
+            |          |          |                                |                     _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |                     PyObject_Vectorcall (inlined)
+            |          |          |                                |                     call_function (inlined)
+            |          |          |                                |                     _PyEval_EvalFrameDefault
+            |          |          |                                |                     _PyEval_EvalFrame (inlined)
+            |          |          |                                |                     _PyEval_Vector
+            |          |          |                                |                     _PyFunction_Vectorcall
+            |          |          |                                |                     _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |                     PyObject_Vectorcall (inlined)
+            |          |          |                                |                     call_function (inlined)
+            |          |          |                                |                     _PyEval_EvalFrameDefault
+            |          |          |                                |                     _PyEval_EvalFrame (inlined)
+            |          |          |                                |                     _PyEval_Vector
+            |          |          |                                |                     |          
+            |          |          |                                |                      --0.66%--_PyFunction_Vectorcall
+            |          |          |                                |                                _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |                                PyObject_Vectorcall (inlined)
+            |          |          |                                |                                call_function (inlined)
+            |          |          |                                |                                _PyEval_EvalFrameDefault
+            |          |          |                                |                                _PyEval_EvalFrame (inlined)
+            |          |          |                                |                                _PyEval_Vector
+            |          |          |                                |                                _PyFunction_Vectorcall
+            |          |          |                                |                                _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |                                PyObject_Vectorcall (inlined)
+            |          |          |                                |                                call_function (inlined)
+            |          |          |                                |                                _PyEval_EvalFrameDefault
+            |          |          |                                |                                _PyEval_EvalFrame (inlined)
+            |          |          |                                |                                _PyEval_Vector
+            |          |          |                                |                                _PyFunction_Vectorcall
+            |          |          |                                |                                _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |                                PyObject_Vectorcall (inlined)
+            |          |          |                                |                                call_function (inlined)
+            |          |          |                                |                                _PyEval_EvalFrameDefault
+            |          |          |                                |                                _PyEval_EvalFrame (inlined)
+            |          |          |                                |                                _PyEval_Vector
+            |          |          |                                |                                _PyFunction_Vectorcall
+            |          |          |                                |                                _PyObject_VectorcallTstate (inlined)
+            |          |          |                                |                                PyObject_Vectorcall (inlined)
+            |          |          |                                |                                call_function (inlined)
+            |          |          |                                |                                _PyEval_EvalFrameDefault
+            |          |          |                                |                                _PyEval_EvalFrame (inlined)
+            |          |          |                                |                                _PyEval_Vector
+            |          |          |                                |                                |          
+            |          |          |                                |                                 --0.56%--PyEval_EvalCode
+            |          |          |                                |                                           run_eval_code_obj
+            |          |          |                                |                                           run_mod
+            |          |          |                                |                                           pyrun_file
+            |          |          |                                |                                           _PyRun_SimpleFileObject
+            |          |          |                                |                                           _PyRun_AnyFileObject
+            |          |          |                                |                                           pymain_run_file_obj
+            |          |          |                                |                                           0xffffffffffffffff
+            |          |          |                                |          
+            |          |          |                                 --1.13%--_PyObject_FastCallDictTstate
+            |          |          |                                           _PyObject_Call_Prepend
+            |          |          |                                           slot_tp_init
+            |          |          |                                           type_call (inlined)
+            |          |          |                                           _PyObject_MakeTpCall
+            |          |          |                                           _PyObject_VectorcallTstate (inlined)
+            |          |          |                                           PyObject_Vectorcall (inlined)
+            |          |          |                                           call_function (inlined)
+            |          |          |                                           _PyEval_EvalFrameDefault
+            |          |          |                                           _PyEval_EvalFrame (inlined)
+            |          |          |                                           _PyEval_Vector
+            |          |          |                                           _PyFunction_Vectorcall
+            |          |          |                                           _PyObject_VectorcallTstate (inlined)
+            |          |          |                                           PyObject_Vectorcall (inlined)
+            |          |          |                                           call_function (inlined)
+            |          |          |                                           _PyEval_EvalFrameDefault
+            |          |          |                                           _PyEval_EvalFrame (inlined)
+            |          |          |                                           _PyEval_Vector
+            |          |          |                                           _PyFunction_Vectorcall
+            |          |          |                                           _PyObject_VectorcallTstate (inlined)
+            |          |          |                                           PyObject_Vectorcall (inlined)
+            |          |          |                                           call_function (inlined)
+            |          |          |                                           _PyEval_EvalFrameDefault
+            |          |          |                                           _PyEval_EvalFrame (inlined)
+            |          |          |                                           _PyEval_Vector
+            |          |          |                                           _PyFunction_Vectorcall
+            |          |          |                                           _PyObject_VectorcallTstate (inlined)
+            |          |          |                                           PyObject_Vectorcall (inlined)
+            |          |          |                                           call_function (inlined)
+            |          |          |                                           _PyEval_EvalFrameDefault
+            |          |          |                                           _PyEval_EvalFrame (inlined)
+            |          |          |                                           _PyEval_Vector
+            |          |          |                                           _PyFunction_Vectorcall
+            |          |          |                                           _PyObject_VectorcallTstate (inlined)
+            |          |          |                                           PyObject_Vectorcall (inlined)
+            |          |          |                                           call_function (inlined)
+            |          |          |                                           _PyEval_EvalFrameDefault
+            |          |          |                                           _PyEval_EvalFrame (inlined)
+            |          |          |                                           _PyEval_Vector
+            |          |          |                                           |          
+            |          |          |                                            --1.03%--_PyFunction_Vectorcall
+            |          |          |                                                      _PyObject_VectorcallTstate (inlined)
+            |          |          |                                                      PyObject_Vectorcall (inlined)
+            |          |          |                                                      call_function (inlined)
+            |          |          |                                                      _PyEval_EvalFrameDefault
+            |          |          |                                                      _PyEval_EvalFrame (inlined)
+            |          |          |                                                      _PyEval_Vector
+            |          |          |                                                      _PyFunction_Vectorcall
+            |          |          |                                                      _PyObject_VectorcallTstate (inlined)
+            |          |          |                                                      PyObject_Vectorcall (inlined)
+            |          |          |                                                      call_function (inlined)
+            |          |          |                                                      _PyEval_EvalFrameDefault
+            |          |          |                                                      _PyEval_EvalFrame (inlined)
+            |          |          |                                                      _PyEval_Vector
+            |          |          |                                                      _PyFunction_Vectorcall
+            |          |          |                                                      _PyObject_VectorcallTstate (inlined)
+            |          |          |                                                      PyObject_Vectorcall (inlined)
+            |          |          |                                                      call_function (inlined)
+            |          |          |                                                      _PyEval_EvalFrameDefault
+            |          |          |                                                      _PyEval_EvalFrame (inlined)
+            |          |          |                                                      _PyEval_Vector
+            |          |          |                                                      _PyFunction_Vectorcall
+            |          |          |                                                      _PyObject_VectorcallTstate (inlined)
+            |          |          |                                                      PyObject_Vectorcall (inlined)
+            |          |          |                                                      call_function (inlined)
+            |          |          |                                                      _PyEval_EvalFrameDefault
+            |          |          |                                                      _PyEval_EvalFrame (inlined)
+            |          |          |                                                      _PyEval_Vector
+            |          |          |                                                      |          
+            |          |          |                                                       --0.56%--PyEval_EvalCode
+            |          |          |                                                                 run_eval_code_obj
+            |          |          |                                                                 run_mod
+            |          |          |                                                                 pyrun_file
+            |          |          |                                                                 _PyRun_SimpleFileObject
+            |          |          |                                                                 _PyRun_AnyFileObject
+            |          |          |                                                                 pymain_run_file_obj
+            |          |          |                                                                 pymain_run_file
+            |          |          |                                                                 pymain_run_python
+            |          |          |                                                                 Py_RunMain
+            |          |          |                                                                 pymain_main
+            |          |          |                                                                 Py_BytesMain
+            |          |          |                                                                 main
+            |          |          |                                                                 __libc_start_call_main
+            |          |          |                                                                 __libc_start_main_impl (inlined)
+            |          |          |                                                                 _start
+            |          |          |          
+            |          |           --4.80%--vectorcall_unbound (inlined)
+            |          |                     vectorcall_maybe (inlined)
+            |          |                     |          
+            |          |                      --4.33%--slot_nb_subtract
+            |          |                                binary_op1
+            |          |                                binary_op
+            |          |                                PyNumber_Subtract
+            |          |                                _PyEval_EvalFrameDefault
+            |          |                                _PyEval_EvalFrame (inlined)
+            |          |                                _PyEval_Vector
+            |          |                                _PyFunction_Vectorcall
+            |          |                                _PyObject_VectorcallTstate (inlined)
+            |          |                                PyObject_Vectorcall (inlined)
+            |          |                                call_function (inlined)
+            |          |                                _PyEval_EvalFrameDefault
+            |          |                                _PyEval_EvalFrame (inlined)
+            |          |                                _PyEval_Vector
+            |          |                                _PyFunction_Vectorcall
+            |          |                                _PyObject_VectorcallTstate (inlined)
+            |          |                                PyObject_Vectorcall (inlined)
+            |          |                                call_function (inlined)
+            |          |                                _PyEval_EvalFrameDefault
+            |          |                                _PyEval_EvalFrame (inlined)
+            |          |                                _PyEval_Vector
+            |          |                                _PyFunction_Vectorcall
+            |          |                                _PyObject_VectorcallTstate (inlined)
+            |          |                                PyObject_Vectorcall (inlined)
+            |          |                                call_function (inlined)
+            |          |                                _PyEval_EvalFrameDefault
+            |          |                                _PyEval_EvalFrame (inlined)
+            |          |                                _PyEval_Vector
+            |          |                                _PyFunction_Vectorcall
+            |          |                                _PyObject_VectorcallTstate (inlined)
+            |          |                                PyObject_Vectorcall (inlined)
+            |          |                                call_function (inlined)
+            |          |                                _PyEval_EvalFrameDefault
+            |          |                                _PyEval_EvalFrame (inlined)
+            |          |                                _PyEval_Vector
+            |          |                                _PyFunction_Vectorcall
+            |          |                                _PyObject_VectorcallTstate (inlined)
+            |          |                                PyObject_Vectorcall (inlined)
+            |          |                                call_function (inlined)
+            |          |                                _PyEval_EvalFrameDefault
+            |          |                                _PyEval_EvalFrame (inlined)
+            |          |                                _PyEval_Vector
+            |          |                                _PyFunction_Vectorcall
+            |          |                                _PyObject_VectorcallTstate (inlined)
+            |          |                                PyObject_Vectorcall (inlined)
+            |          |                                call_function (inlined)
+            |          |                                _PyEval_EvalFrameDefault
+            |          |                                _PyEval_EvalFrame (inlined)
+            |          |                                _PyEval_Vector
+            |          |                                _PyFunction_Vectorcall
+            |          |                                _PyObject_VectorcallTstate (inlined)
+            |          |                                PyObject_Vectorcall (inlined)
+            |          |                                call_function (inlined)
+            |          |                                _PyEval_EvalFrameDefault
+            |          |                                _PyEval_EvalFrame (inlined)
+            |          |                                _PyEval_Vector
+            |          |                                |          
+            |          |                                |--3.39%--_PyFunction_Vectorcall
+            |          |                                |          _PyObject_VectorcallTstate (inlined)
+            |          |                                |          PyObject_Vectorcall (inlined)
+            |          |                                |          call_function (inlined)
+            |          |                                |          _PyEval_EvalFrameDefault
+            |          |                                |          _PyEval_EvalFrame (inlined)
+            |          |                                |          _PyEval_Vector
+            |          |                                |          |          
+            |          |                                |           --3.10%--_PyFunction_Vectorcall
+            |          |                                |                     _PyObject_VectorcallTstate (inlined)
+            |          |                                |                     PyObject_Vectorcall (inlined)
+            |          |                                |                     call_function (inlined)
+            |          |                                |                     _PyEval_EvalFrameDefault
+            |          |                                |                     _PyEval_EvalFrame (inlined)
+            |          |                                |                     _PyEval_Vector
+            |          |                                |                     |          
+            |          |                                |                     |--1.98%--PyEval_EvalCode
+            |          |                                |                     |          run_eval_code_obj
+            |          |                                |                     |          run_mod
+            |          |                                |                     |          pyrun_file
+            |          |                                |                     |          _PyRun_SimpleFileObject
+            |          |                                |                     |          _PyRun_AnyFileObject
+            |          |                                |                     |          pymain_run_file_obj
+            |          |                                |                     |          pymain_run_file
+            |          |                                |                     |          pymain_run_python
+            |          |                                |                     |          Py_RunMain
+            |          |                                |                     |          pymain_main
+            |          |                                |                     |          Py_BytesMain
+            |          |                                |                     |          main
+            |          |                                |                     |          __libc_start_call_main
+            |          |                                |                     |          __libc_start_main_impl (inlined)
+            |          |                                |                     |          _start
+            |          |                                |                     |          
+            |          |                                |                      --1.13%--_PyFunction_Vectorcall
+            |          |                                |                                _PyObject_VectorcallTstate (inlined)
+            |          |                                |                                PyObject_Vectorcall (inlined)
+            |          |                                |                                call_function (inlined)
+            |          |                                |                                _PyEval_EvalFrameDefault
+            |          |                                |                                _PyEval_EvalFrame (inlined)
+            |          |                                |                                _PyEval_Vector
+            |          |                                |                                |          
+            |          |                                |                                 --0.85%--_PyFunction_Vectorcall
+            |          |                                |                                           _PyObject_VectorcallTstate (inlined)
+            |          |                                |                                           PyObject_Vectorcall (inlined)
+            |          |                                |                                           call_function (inlined)
+            |          |                                |                                           _PyEval_EvalFrameDefault
+            |          |                                |                                           _PyEval_EvalFrame (inlined)
+            |          |                                |                                           _PyEval_Vector
+            |          |                                |          
+            |          |                                 --0.94%--PyEval_EvalCode
+            |          |                                           run_eval_code_obj
+            |          |                                           run_mod
+            |          |                                           pyrun_file
+            |          |                                           _PyRun_SimpleFileObject
+            |          |                                           _PyRun_AnyFileObject
+            |          |                                           pymain_run_file_obj
+            |          |                                           pymain_run_file
+            |          |                                           pymain_run_python
+            |          |                                           Py_RunMain
+            |          |                                           pymain_main
+            |          |                                           Py_BytesMain
+            |          |                                           main
+            |          |                                           __libc_start_call_main
+            |          |                                           __libc_start_main_impl (inlined)
+            |          |                                           _start
+            |          |          
+            |           --3.76%--_PyObject_FastCallDictTstate
+            |                     _PyObject_Call_Prepend
+            |                     slot_tp_init
+            |                     type_call (inlined)
+            |                     _PyObject_MakeTpCall
+            |                     _PyObject_VectorcallTstate (inlined)
+            |                     PyObject_Vectorcall (inlined)
+            |                     call_function (inlined)
+            |                     _PyEval_EvalFrameDefault
+            |                     _PyEval_EvalFrame (inlined)
+            |                     _PyEval_Vector
+            |                     _PyFunction_Vectorcall
+            |                     _PyObject_VectorcallTstate (inlined)
+            |                     |          
+            |                     |--1.98%--vectorcall_unbound (inlined)
+            |                     |          vectorcall_maybe (inlined)
+            |                     |          |          
+            |                     |           --1.88%--slot_nb_subtract
+            |                     |                     binary_op1
+            |                     |                     binary_op
+            |                     |                     PyNumber_Subtract
+            |                     |                     _PyEval_EvalFrameDefault
+            |                     |                     _PyEval_EvalFrame (inlined)
+            |                     |                     _PyEval_Vector
+            |                     |                     _PyFunction_Vectorcall
+            |                     |                     _PyObject_VectorcallTstate (inlined)
+            |                     |                     PyObject_Vectorcall (inlined)
+            |                     |                     call_function (inlined)
+            |                     |                     _PyEval_EvalFrameDefault
+            |                     |                     _PyEval_EvalFrame (inlined)
+            |                     |                     _PyEval_Vector
+            |                     |                     _PyFunction_Vectorcall
+            |                     |                     _PyObject_VectorcallTstate (inlined)
+            |                     |                     PyObject_Vectorcall (inlined)
+            |                     |                     call_function (inlined)
+            |                     |                     _PyEval_EvalFrameDefault
+            |                     |                     _PyEval_EvalFrame (inlined)
+            |                     |                     _PyEval_Vector
+            |                     |                     _PyFunction_Vectorcall
+            |                     |                     _PyObject_VectorcallTstate (inlined)
+            |                     |                     PyObject_Vectorcall (inlined)
+            |                     |                     call_function (inlined)
+            |                     |                     _PyEval_EvalFrameDefault
+            |                     |                     _PyEval_EvalFrame (inlined)
+            |                     |                     _PyEval_Vector
+            |                     |                     _PyFunction_Vectorcall
+            |                     |                     _PyObject_VectorcallTstate (inlined)
+            |                     |                     PyObject_Vectorcall (inlined)
+            |                     |                     call_function (inlined)
+            |                     |                     _PyEval_EvalFrameDefault
+            |                     |                     _PyEval_EvalFrame (inlined)
+            |                     |                     _PyEval_Vector
+            |                     |                     _PyFunction_Vectorcall
+            |                     |                     _PyObject_VectorcallTstate (inlined)
+            |                     |                     PyObject_Vectorcall (inlined)
+            |                     |                     call_function (inlined)
+            |                     |                     _PyEval_EvalFrameDefault
+            |                     |                     _PyEval_EvalFrame (inlined)
+            |                     |                     _PyEval_Vector
+            |                     |                     _PyFunction_Vectorcall
+            |                     |                     _PyObject_VectorcallTstate (inlined)
+            |                     |                     PyObject_Vectorcall (inlined)
+            |                     |                     call_function (inlined)
+            |                     |                     _PyEval_EvalFrameDefault
+            |                     |                     _PyEval_EvalFrame (inlined)
+            |                     |                     _PyEval_Vector
+            |                     |                     _PyFunction_Vectorcall
+            |                     |                     _PyObject_VectorcallTstate (inlined)
+            |                     |                     PyObject_Vectorcall (inlined)
+            |                     |                     call_function (inlined)
+            |                     |                     _PyEval_EvalFrameDefault
+            |                     |                     _PyEval_EvalFrame (inlined)
+            |                     |                     _PyEval_Vector
+            |                     |                     |          
+            |                     |                      --1.60%--_PyFunction_Vectorcall
+            |                     |                                _PyObject_VectorcallTstate (inlined)
+            |                     |                                PyObject_Vectorcall (inlined)
+            |                     |                                call_function (inlined)
+            |                     |                                _PyEval_EvalFrameDefault
+            |                     |                                _PyEval_EvalFrame (inlined)
+            |                     |                                _PyEval_Vector
+            |                     |                                |          
+            |                     |                                 --1.51%--_PyFunction_Vectorcall
+            |                     |                                           _PyObject_VectorcallTstate (inlined)
+            |                     |                                           PyObject_Vectorcall (inlined)
+            |                     |                                           call_function (inlined)
+            |                     |                                           _PyEval_EvalFrameDefault
+            |                     |                                           _PyEval_EvalFrame (inlined)
+            |                     |                                           _PyEval_Vector
+            |                     |                                           |          
+            |                     |                                           |--0.94%--PyEval_EvalCode
+            |                     |                                           |          run_eval_code_obj
+            |                     |                                           |          run_mod
+            |                     |                                           |          pyrun_file
+            |                     |                                           |          _PyRun_SimpleFileObject
+            |                     |                                           |          _PyRun_AnyFileObject
+            |                     |                                           |          pymain_run_file_obj
+            |                     |                                           |          pymain_run_file
+            |                     |                                           |          pymain_run_python
+            |                     |                                           |          Py_RunMain
+            |                     |                                           |          pymain_main
+            |                     |                                           |          Py_BytesMain
+            |                     |                                           |          main
+            |                     |                                           |          __libc_start_call_main
+            |                     |                                           |          0xffffffffffffffff
+            |                     |                                           |          
+            |                     |                                            --0.56%--_PyFunction_Vectorcall
+            |                     |                                                      _PyObject_VectorcallTstate (inlined)
+            |                     |                                                      PyObject_Vectorcall (inlined)
+            |                     |                                                      call_function (inlined)
+            |                     |                                                      _PyEval_EvalFrameDefault
+            |                     |                                                      _PyEval_EvalFrame (inlined)
+            |                     |                                                      _PyEval_Vector
+            |                     |          
+            |                      --1.79%--PyObject_Vectorcall (inlined)
+            |                                call_function (inlined)
+            |                                _PyEval_EvalFrameDefault
+            |                                _PyEval_EvalFrame (inlined)
+            |                                _PyEval_Vector
+            |                                _PyFunction_Vectorcall
+            |                                _PyObject_VectorcallTstate (inlined)
+            |                                PyObject_Vectorcall (inlined)
+            |                                call_function (inlined)
+            |                                _PyEval_EvalFrameDefault
+            |                                _PyEval_EvalFrame (inlined)
+            |                                _PyEval_Vector
+            |                                _PyFunction_Vectorcall
+            |                                |          
+            |                                 --1.41%--_PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           _PyFunction_Vectorcall
+            |                                           _PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           |          
+            |                                            --1.22%--_PyFunction_Vectorcall
+            |                                                      _PyObject_VectorcallTstate (inlined)
+            |                                                      PyObject_Vectorcall (inlined)
+            |                                                      call_function (inlined)
+            |                                                      _PyEval_EvalFrameDefault
+            |                                                      _PyEval_EvalFrame (inlined)
+            |                                                      _PyEval_Vector
+            |                                                      |          
+            |                                                       --1.03%--_PyFunction_Vectorcall
+            |                                                                 _PyObject_VectorcallTstate (inlined)
+            |                                                                 PyObject_Vectorcall (inlined)
+            |                                                                 call_function (inlined)
+            |                                                                 _PyEval_EvalFrameDefault
+            |                                                                 _PyEval_EvalFrame (inlined)
+            |                                                                 _PyEval_Vector
+            |                                                                 _PyFunction_Vectorcall
+            |                                                                 _PyObject_VectorcallTstate (inlined)
+            |                                                                 PyObject_Vectorcall (inlined)
+            |                                                                 call_function (inlined)
+            |                                                                 _PyEval_EvalFrameDefault
+            |                                                                 _PyEval_EvalFrame (inlined)
+            |                                                                 _PyEval_Vector
+            |                                                                 _PyFunction_Vectorcall
+            |                                                                 _PyObject_VectorcallTstate (inlined)
+            |                                                                 PyObject_Vectorcall (inlined)
+            |                                                                 call_function (inlined)
+            |                                                                 _PyEval_EvalFrameDefault
+            |                                                                 _PyEval_EvalFrame (inlined)
+            |                                                                 _PyEval_Vector
+            |                                                                 |          
+            |                                                                  --0.75%--PyEval_EvalCode
+            |                                                                            run_eval_code_obj
+            |                                                                            run_mod
+            |                                                                            pyrun_file
+            |                                                                            _PyRun_SimpleFileObject
+            |                                                                            _PyRun_AnyFileObject
+            |                                                                            pymain_run_file_obj
+            |                                                                            pymain_run_file
+            |                                                                            pymain_run_python
+            |                                                                            Py_RunMain
+            |                                                                            pymain_main
+            |                                                                            Py_BytesMain
+            |                                                                            main
+            |                                                                            __libc_start_call_main
+            |                                                                            __libc_start_main_impl (inlined)
+            |                                                                            _start
+            |          
+            |--3.10%--_Py_DECREF (inlined)
+            |          _PyEval_EvalFrameDefault
+            |          _PyEval_EvalFrame (inlined)
+            |          _PyEval_Vector
+            |          _PyFunction_Vectorcall
+            |          |          
+            |           --2.92%--_PyObject_VectorcallTstate (inlined)
+            |                     |          
+            |                     |--2.16%--PyObject_Vectorcall (inlined)
+            |                     |          call_function (inlined)
+            |                     |          _PyEval_EvalFrameDefault
+            |                     |          _PyEval_EvalFrame (inlined)
+            |                     |          _PyEval_Vector
+            |                     |          _PyFunction_Vectorcall
+            |                     |          |          
+            |                     |           --1.98%--_PyObject_VectorcallTstate (inlined)
+            |                     |                     PyObject_Vectorcall (inlined)
+            |                     |                     call_function (inlined)
+            |                     |                     _PyEval_EvalFrameDefault
+            |                     |                     _PyEval_EvalFrame (inlined)
+            |                     |                     _PyEval_Vector
+            |                     |                     _PyFunction_Vectorcall
+            |                     |                     |          
+            |                     |                      --1.88%--_PyObject_VectorcallTstate (inlined)
+            |                     |                                PyObject_Vectorcall (inlined)
+            |                     |                                call_function (inlined)
+            |                     |                                _PyEval_EvalFrameDefault
+            |                     |                                _PyEval_EvalFrame (inlined)
+            |                     |                                _PyEval_Vector
+            |                     |                                _PyFunction_Vectorcall
+            |                     |                                |          
+            |                     |                                 --1.79%--_PyObject_VectorcallTstate (inlined)
+            |                     |                                           PyObject_Vectorcall (inlined)
+            |                     |                                           call_function (inlined)
+            |                     |                                           _PyEval_EvalFrameDefault
+            |                     |                                           _PyEval_EvalFrame (inlined)
+            |                     |                                           _PyEval_Vector
+            |                     |                                           _PyFunction_Vectorcall
+            |                     |                                           _PyObject_VectorcallTstate (inlined)
+            |                     |                                           PyObject_Vectorcall (inlined)
+            |                     |                                           call_function (inlined)
+            |                     |                                           _PyEval_EvalFrameDefault
+            |                     |                                           _PyEval_EvalFrame (inlined)
+            |                     |                                           _PyEval_Vector
+            |                     |                                           |          
+            |                     |                                            --1.69%--_PyFunction_Vectorcall
+            |                     |                                                      _PyObject_VectorcallTstate (inlined)
+            |                     |                                                      PyObject_Vectorcall (inlined)
+            |                     |                                                      call_function (inlined)
+            |                     |                                                      _PyEval_EvalFrameDefault
+            |                     |                                                      _PyEval_EvalFrame (inlined)
+            |                     |                                                      _PyEval_Vector
+            |                     |                                                      |          
+            |                     |                                                       --1.41%--_PyFunction_Vectorcall
+            |                     |                                                                 _PyObject_VectorcallTstate (inlined)
+            |                     |                                                                 PyObject_Vectorcall (inlined)
+            |                     |                                                                 call_function (inlined)
+            |                     |                                                                 _PyEval_EvalFrameDefault
+            |                     |                                                                 _PyEval_EvalFrame (inlined)
+            |                     |                                                                 _PyEval_Vector
+            |                     |                                                                 |          
+            |                     |                                                                  --1.22%--_PyFunction_Vectorcall
+            |                     |                                                                            _PyObject_VectorcallTstate (inlined)
+            |                     |                                                                            PyObject_Vectorcall (inlined)
+            |                     |                                                                            call_function (inlined)
+            |                     |                                                                            _PyEval_EvalFrameDefault
+            |                     |                                                                            _PyEval_EvalFrame (inlined)
+            |                     |                                                                            _PyEval_Vector
+            |                     |                                                                            |          
+            |                     |                                                                             --0.85%--_PyFunction_Vectorcall
+            |                     |                                                                                       _PyObject_VectorcallTstate (inlined)
+            |                     |                                                                                       PyObject_Vectorcall (inlined)
+            |                     |                                                                                       call_function (inlined)
+            |                     |                                                                                       _PyEval_EvalFrameDefault
+            |                     |                                                                                       _PyEval_EvalFrame (inlined)
+            |                     |                                                                                       _PyEval_Vector
+            |                     |                                                                                       |          
+            |                     |                                                                                        --0.66%--_PyFunction_Vectorcall
+            |                     |                                                                                                  _PyObject_VectorcallTstate (inlined)
+            |                     |                                                                                                  PyObject_Vectorcall (inlined)
+            |                     |                                                                                                  call_function (inlined)
+            |                     |                                                                                                  _PyEval_EvalFrameDefault
+            |                     |                                                                                                  _PyEval_EvalFrame (inlined)
+            |                     |                                                                                                  _PyEval_Vector
+            |                     |                                                                                                  |          
+            |                     |                                                                                                   --0.56%--PyEval_EvalCode
+            |                     |                                                                                                             run_eval_code_obj
+            |                     |                                                                                                             run_mod
+            |                     |                                                                                                             pyrun_file
+            |                     |                                                                                                             _PyRun_SimpleFileObject
+            |                     |                                                                                                             _PyRun_AnyFileObject
+            |                     |                                                                                                             pymain_run_file_obj
+            |                     |                                                                                                             pymain_run_file
+            |                     |                                                                                                             pymain_run_python
+            |                     |                                                                                                             Py_RunMain
+            |                     |                                                                                                             pymain_main
+            |                     |                                                                                                             Py_BytesMain
+            |                     |                                                                                                             main
+            |                     |                                                                                                             __libc_start_call_main
+            |                     |                                                                                                             __libc_start_main_impl (inlined)
+            |                     |                                                                                                             _start
+            |                     |          
+            |                      --0.75%--vectorcall_unbound (inlined)
+            |                                vectorcall_maybe (inlined)
+            |                                |          
+            |                                 --0.66%--slot_nb_subtract
+            |                                           binary_op1
+            |                                           binary_op
+            |                                           PyNumber_Subtract
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           _PyFunction_Vectorcall
+            |                                           _PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           _PyFunction_Vectorcall
+            |                                           _PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           _PyFunction_Vectorcall
+            |                                           _PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           _PyFunction_Vectorcall
+            |                                           _PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           _PyFunction_Vectorcall
+            |                                           _PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           _PyFunction_Vectorcall
+            |                                           _PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           _PyFunction_Vectorcall
+            |                                           _PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |          
+             --2.35%--_Py_INCREF (inlined)
+                       _PyEval_EvalFrameDefault
+                       _PyEval_EvalFrame (inlined)
+                       _PyEval_Vector
+                       _PyFunction_Vectorcall
+                       |          
+                        --2.16%--_PyObject_VectorcallTstate (inlined)
+                                  |          
+                                   --1.88%--PyObject_Vectorcall (inlined)
+                                             call_function (inlined)
+                                             _PyEval_EvalFrameDefault
+                                             _PyEval_EvalFrame (inlined)
+                                             _PyEval_Vector
+                                             _PyFunction_Vectorcall
+                                             |          
+                                              --1.69%--_PyObject_VectorcallTstate (inlined)
+                                                        |          
+                                                         --1.60%--PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   _PyFunction_Vectorcall
+                                                                   _PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   _PyFunction_Vectorcall
+                                                                   _PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   _PyFunction_Vectorcall
+                                                                   _PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   _PyFunction_Vectorcall
+                                                                   _PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   |          
+                                                                    --1.51%--_PyFunction_Vectorcall
+                                                                              _PyObject_VectorcallTstate (inlined)
+                                                                              PyObject_Vectorcall (inlined)
+                                                                              call_function (inlined)
+                                                                              _PyEval_EvalFrameDefault
+                                                                              _PyEval_EvalFrame (inlined)
+                                                                              _PyEval_Vector
+                                                                              |          
+                                                                               --1.03%--_PyFunction_Vectorcall
+                                                                                         _PyObject_VectorcallTstate (inlined)
+                                                                                         PyObject_Vectorcall (inlined)
+                                                                                         call_function (inlined)
+                                                                                         _PyEval_EvalFrameDefault
+                                                                                         _PyEval_EvalFrame (inlined)
+                                                                                         _PyEval_Vector
+                                                                                         |          
+                                                                                          --0.56%--PyEval_EvalCode
+                                                                                                    run_eval_code_obj
+                                                                                                    run_mod
+                                                                                                    pyrun_file
+                                                                                                    _PyRun_SimpleFileObject
+                                                                                                    _PyRun_AnyFileObject
+                                                                                                    pymain_run_file_obj
+                                                                                                    pymain_run_file
+                                                                                                    pymain_run_python
+                                                                                                    Py_RunMain
+                                                                                                    pymain_main
+                                                                                                    Py_BytesMain
+                                                                                                    main
+                                                                                                    __libc_start_call_main
+                                                                                                    __libc_start_main_impl (inlined)
+                                                                                                    _start
+
+     3.48%  python3-dbg  python3.10d           [.] frame_dealloc.lto_priv.0
+            |          
+            |--1.88%--frame_dealloc (inlined)
+            |          _Py_Dealloc
+            |          _Py_DECREF (inlined)
+            |          _PyEval_Vector
+            |          _PyFunction_Vectorcall
+            |          |          
+            |          |--1.22%--_PyObject_VectorcallTstate
+            |          |          |          
+            |          |           --1.13%--PyObject_Vectorcall (inlined)
+            |          |                     call_function (inlined)
+            |          |                     _PyEval_EvalFrameDefault
+            |          |                     _PyEval_EvalFrame (inlined)
+            |          |                     _PyEval_Vector
+            |          |                     _PyFunction_Vectorcall
+            |          |                     _PyObject_VectorcallTstate (inlined)
+            |          |                     PyObject_Vectorcall (inlined)
+            |          |                     call_function (inlined)
+            |          |                     _PyEval_EvalFrameDefault
+            |          |                     _PyEval_EvalFrame (inlined)
+            |          |                     _PyEval_Vector
+            |          |                     _PyFunction_Vectorcall
+            |          |                     _PyObject_VectorcallTstate (inlined)
+            |          |                     PyObject_Vectorcall (inlined)
+            |          |                     call_function (inlined)
+            |          |                     _PyEval_EvalFrameDefault
+            |          |                     _PyEval_EvalFrame (inlined)
+            |          |                     _PyEval_Vector
+            |          |                     _PyFunction_Vectorcall
+            |          |                     |          
+            |          |                      --1.03%--_PyObject_VectorcallTstate (inlined)
+            |          |                                PyObject_Vectorcall (inlined)
+            |          |                                call_function (inlined)
+            |          |                                _PyEval_EvalFrameDefault
+            |          |                                _PyEval_EvalFrame (inlined)
+            |          |                                _PyEval_Vector
+            |          |                                _PyFunction_Vectorcall
+            |          |                                |          
+            |          |                                 --0.94%--_PyObject_VectorcallTstate (inlined)
+            |          |                                           PyObject_Vectorcall (inlined)
+            |          |                                           call_function (inlined)
+            |          |                                           _PyEval_EvalFrameDefault
+            |          |                                           _PyEval_EvalFrame (inlined)
+            |          |                                           _PyEval_Vector
+            |          |                                           _PyFunction_Vectorcall
+            |          |                                           _PyObject_VectorcallTstate (inlined)
+            |          |                                           PyObject_Vectorcall (inlined)
+            |          |                                           call_function (inlined)
+            |          |                                           _PyEval_EvalFrameDefault
+            |          |                                           _PyEval_EvalFrame (inlined)
+            |          |                                           _PyEval_Vector
+            |          |                                           _PyFunction_Vectorcall
+            |          |                                           _PyObject_VectorcallTstate (inlined)
+            |          |                                           PyObject_Vectorcall (inlined)
+            |          |                                           call_function (inlined)
+            |          |                                           _PyEval_EvalFrameDefault
+            |          |                                           _PyEval_EvalFrame (inlined)
+            |          |                                           _PyEval_Vector
+            |          |                                           _PyFunction_Vectorcall
+            |          |                                           _PyObject_VectorcallTstate (inlined)
+            |          |                                           PyObject_Vectorcall (inlined)
+            |          |                                           call_function (inlined)
+            |          |                                           _PyEval_EvalFrameDefault
+            |          |                                           _PyEval_EvalFrame (inlined)
+            |          |                                           _PyEval_Vector
+            |          |                                           |          
+            |          |                                            --0.85%--_PyFunction_Vectorcall
+            |          |                                                      _PyObject_VectorcallTstate (inlined)
+            |          |                                                      PyObject_Vectorcall (inlined)
+            |          |                                                      call_function (inlined)
+            |          |                                                      _PyEval_EvalFrameDefault
+            |          |                                                      _PyEval_EvalFrame (inlined)
+            |          |                                                      _PyEval_Vector
+            |          |                                                      |          
+            |          |                                                       --0.56%--_PyFunction_Vectorcall
+            |          |                                                                 _PyObject_VectorcallTstate (inlined)
+            |          |                                                                 PyObject_Vectorcall (inlined)
+            |          |                                                                 call_function (inlined)
+            |          |                                                                 _PyEval_EvalFrameDefault
+            |          |                                                                 _PyEval_EvalFrame (inlined)
+            |          |                                                                 _PyEval_Vector
+            |          |          
+            |           --0.66%--_PyObject_FastCallDictTstate
+            |                     _PyObject_Call_Prepend
+            |                     slot_tp_init
+            |                     type_call (inlined)
+            |                     _PyObject_MakeTpCall
+            |                     _PyObject_VectorcallTstate (inlined)
+            |                     PyObject_Vectorcall (inlined)
+            |                     call_function (inlined)
+            |                     _PyEval_EvalFrameDefault
+            |                     _PyEval_EvalFrame (inlined)
+            |                     _PyEval_Vector
+            |                     _PyFunction_Vectorcall
+            |                     _PyObject_VectorcallTstate (inlined)
+            |          
+             --1.60%--_Py_DECREF (inlined)
+                       |          
+                        --1.13%--frame_dealloc (inlined)
+                                  _Py_Dealloc
+                                  _Py_DECREF (inlined)
+                                  _PyEval_Vector
+                                  _PyFunction_Vectorcall
+                                  _PyObject_VectorcallTstate (inlined)
+                                  |          
+                                   --0.94%--PyObject_Vectorcall (inlined)
+                                             call_function (inlined)
+                                             _PyEval_EvalFrameDefault
+                                             _PyEval_EvalFrame (inlined)
+                                             _PyEval_Vector
+                                             _PyFunction_Vectorcall
+                                             |          
+                                              --0.85%--_PyObject_VectorcallTstate (inlined)
+                                                        PyObject_Vectorcall (inlined)
+                                                        call_function (inlined)
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+                                                        _PyFunction_Vectorcall
+                                                        |          
+                                                         --0.75%--_PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   _PyFunction_Vectorcall
+                                                                   _PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   _PyFunction_Vectorcall
+                                                                   _PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   _PyFunction_Vectorcall
+                                                                   _PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   _PyFunction_Vectorcall
+                                                                   _PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   |          
+                                                                    --0.66%--_PyFunction_Vectorcall
+                                                                              _PyObject_VectorcallTstate (inlined)
+                                                                              PyObject_Vectorcall (inlined)
+                                                                              call_function (inlined)
+                                                                              _PyEval_EvalFrameDefault
+                                                                              _PyEval_EvalFrame (inlined)
+                                                                              _PyEval_Vector
+
+     3.39%  python3-dbg  python3.10d           [.] _PyDict_GetItemHint
+            |
+            ---_PyDict_GetItemHint
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               |          
+               |--2.16%--PyObject_Vectorcall (inlined)
+               |          call_function (inlined)
+               |          _PyEval_EvalFrameDefault
+               |          _PyEval_EvalFrame (inlined)
+               |          _PyEval_Vector
+               |          _PyFunction_Vectorcall
+               |          _PyObject_VectorcallTstate (inlined)
+               |          PyObject_Vectorcall (inlined)
+               |          call_function (inlined)
+               |          _PyEval_EvalFrameDefault
+               |          _PyEval_EvalFrame (inlined)
+               |          _PyEval_Vector
+               |          _PyFunction_Vectorcall
+               |          |          
+               |           --1.88%--_PyObject_VectorcallTstate (inlined)
+               |                     PyObject_Vectorcall (inlined)
+               |                     call_function (inlined)
+               |                     _PyEval_EvalFrameDefault
+               |                     _PyEval_EvalFrame (inlined)
+               |                     _PyEval_Vector
+               |                     _PyFunction_Vectorcall
+               |                     |          
+               |                      --1.60%--_PyObject_VectorcallTstate (inlined)
+               |                                PyObject_Vectorcall (inlined)
+               |                                call_function (inlined)
+               |                                _PyEval_EvalFrameDefault
+               |                                _PyEval_EvalFrame (inlined)
+               |                                _PyEval_Vector
+               |                                _PyFunction_Vectorcall
+               |                                _PyObject_VectorcallTstate (inlined)
+               |                                PyObject_Vectorcall (inlined)
+               |                                call_function (inlined)
+               |                                _PyEval_EvalFrameDefault
+               |                                _PyEval_EvalFrame (inlined)
+               |                                _PyEval_Vector
+               |                                |          
+               |                                 --1.51%--_PyFunction_Vectorcall
+               |                                           _PyObject_VectorcallTstate (inlined)
+               |                                           PyObject_Vectorcall (inlined)
+               |                                           call_function (inlined)
+               |                                           _PyEval_EvalFrameDefault
+               |                                           _PyEval_EvalFrame (inlined)
+               |                                           _PyEval_Vector
+               |                                           _PyFunction_Vectorcall
+               |                                           _PyObject_VectorcallTstate (inlined)
+               |                                           PyObject_Vectorcall (inlined)
+               |                                           call_function (inlined)
+               |                                           _PyEval_EvalFrameDefault
+               |                                           _PyEval_EvalFrame (inlined)
+               |                                           _PyEval_Vector
+               |                                           |          
+               |                                            --1.41%--_PyFunction_Vectorcall
+               |                                                      _PyObject_VectorcallTstate (inlined)
+               |                                                      PyObject_Vectorcall (inlined)
+               |                                                      call_function (inlined)
+               |                                                      _PyEval_EvalFrameDefault
+               |                                                      _PyEval_EvalFrame (inlined)
+               |                                                      _PyEval_Vector
+               |                                                      |          
+               |                                                       --1.32%--_PyFunction_Vectorcall
+               |                                                                 _PyObject_VectorcallTstate (inlined)
+               |                                                                 PyObject_Vectorcall (inlined)
+               |                                                                 call_function (inlined)
+               |                                                                 _PyEval_EvalFrameDefault
+               |                                                                 _PyEval_EvalFrame (inlined)
+               |                                                                 _PyEval_Vector
+               |                                                                 |          
+               |                                                                 |--0.66%--PyEval_EvalCode
+               |                                                                 |          run_eval_code_obj
+               |                                                                 |          run_mod
+               |                                                                 |          pyrun_file
+               |                                                                 |          _PyRun_SimpleFileObject
+               |                                                                 |          _PyRun_AnyFileObject
+               |                                                                 |          pymain_run_file_obj
+               |                                                                 |          pymain_run_file
+               |                                                                 |          pymain_run_python
+               |                                                                 |          Py_RunMain
+               |                                                                 |          pymain_main
+               |                                                                 |          Py_BytesMain
+               |                                                                 |          main
+               |                                                                 |          __libc_start_call_main
+               |                                                                 |          __libc_start_main_impl (inlined)
+               |                                                                 |          _start
+               |                                                                 |          
+               |                                                                  --0.66%--_PyFunction_Vectorcall
+               |                                                                            _PyObject_VectorcallTstate (inlined)
+               |                                                                            PyObject_Vectorcall (inlined)
+               |                                                                            call_function (inlined)
+               |                                                                            _PyEval_EvalFrameDefault
+               |                                                                            _PyEval_EvalFrame (inlined)
+               |                                                                            _PyEval_Vector
+               |          
+                --1.03%--vectorcall_unbound (inlined)
+                          vectorcall_maybe (inlined)
+                          slot_nb_subtract
+                          binary_op1
+                          binary_op
+                          PyNumber_Subtract
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          _PyFunction_Vectorcall
+                          _PyObject_VectorcallTstate (inlined)
+                          PyObject_Vectorcall (inlined)
+                          call_function (inlined)
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          _PyFunction_Vectorcall
+                          _PyObject_VectorcallTstate (inlined)
+                          PyObject_Vectorcall (inlined)
+                          call_function (inlined)
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          _PyFunction_Vectorcall
+                          _PyObject_VectorcallTstate (inlined)
+                          PyObject_Vectorcall (inlined)
+                          call_function (inlined)
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          _PyFunction_Vectorcall
+                          _PyObject_VectorcallTstate (inlined)
+                          PyObject_Vectorcall (inlined)
+                          call_function (inlined)
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          _PyFunction_Vectorcall
+                          _PyObject_VectorcallTstate (inlined)
+                          PyObject_Vectorcall (inlined)
+                          call_function (inlined)
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          _PyFunction_Vectorcall
+                          _PyObject_VectorcallTstate (inlined)
+                          PyObject_Vectorcall (inlined)
+                          call_function (inlined)
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          |          
+                           --0.94%--_PyFunction_Vectorcall
+                                     _PyObject_VectorcallTstate (inlined)
+                                     PyObject_Vectorcall (inlined)
+                                     call_function (inlined)
+                                     _PyEval_EvalFrameDefault
+                                     _PyEval_EvalFrame (inlined)
+                                     _PyEval_Vector
+
+     3.29%  python3-dbg  python3.10d           [.] call_function.lto_priv.0
+            |          
+            |--1.79%--call_function (inlined)
+            |          _PyEval_EvalFrameDefault
+            |          _PyEval_EvalFrame (inlined)
+            |          _PyEval_Vector
+            |          _PyFunction_Vectorcall
+            |          |          
+            |           --1.51%--_PyObject_VectorcallTstate (inlined)
+            |                     |          
+            |                      --1.13%--PyObject_Vectorcall (inlined)
+            |                                call_function (inlined)
+            |                                _PyEval_EvalFrameDefault
+            |                                _PyEval_EvalFrame (inlined)
+            |                                _PyEval_Vector
+            |                                _PyFunction_Vectorcall
+            |                                |          
+            |                                 --1.03%--_PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           _PyFunction_Vectorcall
+            |                                           |          
+            |                                            --0.85%--_PyObject_VectorcallTstate (inlined)
+            |                                                      PyObject_Vectorcall (inlined)
+            |                                                      call_function (inlined)
+            |                                                      _PyEval_EvalFrameDefault
+            |                                                      _PyEval_EvalFrame (inlined)
+            |                                                      _PyEval_Vector
+            |                                                      _PyFunction_Vectorcall
+            |                                                      _PyObject_VectorcallTstate (inlined)
+            |                                                      PyObject_Vectorcall (inlined)
+            |                                                      call_function (inlined)
+            |                                                      _PyEval_EvalFrameDefault
+            |                                                      _PyEval_EvalFrame (inlined)
+            |                                                      _PyEval_Vector
+            |                                                      _PyFunction_Vectorcall
+            |                                                      _PyObject_VectorcallTstate (inlined)
+            |                                                      PyObject_Vectorcall (inlined)
+            |                                                      call_function (inlined)
+            |                                                      _PyEval_EvalFrameDefault
+            |                                                      _PyEval_EvalFrame (inlined)
+            |                                                      _PyEval_Vector
+            |                                                      _PyFunction_Vectorcall
+            |                                                      _PyObject_VectorcallTstate (inlined)
+            |                                                      PyObject_Vectorcall (inlined)
+            |                                                      call_function (inlined)
+            |                                                      _PyEval_EvalFrameDefault
+            |                                                      _PyEval_EvalFrame (inlined)
+            |                                                      _PyEval_Vector
+            |                                                      |          
+            |                                                       --0.75%--_PyFunction_Vectorcall
+            |                                                                 _PyObject_VectorcallTstate (inlined)
+            |                                                                 PyObject_Vectorcall (inlined)
+            |                                                                 call_function (inlined)
+            |                                                                 _PyEval_EvalFrameDefault
+            |                                                                 _PyEval_EvalFrame (inlined)
+            |                                                                 _PyEval_Vector
+            |                                                                 |          
+            |                                                                  --0.66%--_PyFunction_Vectorcall
+            |                                                                            _PyObject_VectorcallTstate (inlined)
+            |                                                                            PyObject_Vectorcall (inlined)
+            |                                                                            call_function (inlined)
+            |                                                                            _PyEval_EvalFrameDefault
+            |                                                                            _PyEval_EvalFrame (inlined)
+            |                                                                            _PyEval_Vector
+            |          
+             --1.22%--_Py_DECREF (inlined)
+                       call_function (inlined)
+                       _PyEval_EvalFrameDefault
+                       _PyEval_EvalFrame (inlined)
+                       _PyEval_Vector
+                       _PyFunction_Vectorcall
+                       |          
+                        --1.03%--_PyObject_VectorcallTstate (inlined)
+                                  |          
+                                   --0.85%--PyObject_Vectorcall (inlined)
+                                             call_function (inlined)
+                                             _PyEval_EvalFrameDefault
+                                             _PyEval_EvalFrame (inlined)
+                                             _PyEval_Vector
+                                             _PyFunction_Vectorcall
+                                             |          
+                                              --0.75%--_PyObject_VectorcallTstate (inlined)
+                                                        PyObject_Vectorcall (inlined)
+                                                        call_function (inlined)
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+                                                        _PyFunction_Vectorcall
+                                                        |          
+                                                         --0.66%--_PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   _PyFunction_Vectorcall
+                                                                   _PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   |          
+                                                                    --0.56%--_PyFunction_Vectorcall
+                                                                              _PyObject_VectorcallTstate (inlined)
+                                                                              PyObject_Vectorcall (inlined)
+                                                                              call_function (inlined)
+                                                                              _PyEval_EvalFrameDefault
+                                                                              _PyEval_EvalFrame (inlined)
+                                                                              _PyEval_Vector
+
+     3.20%  python3-dbg  python3.10d           [.] _PyEval_MakeFrameVector
+            |          
+             --2.82%--_PyEval_MakeFrameVector
+                       _PyEval_Vector
+                       _PyFunction_Vectorcall
+                       |          
+                        --2.54%--_PyObject_VectorcallTstate (inlined)
+                                  |          
+                                   --2.26%--PyObject_Vectorcall (inlined)
+                                             call_function (inlined)
+                                             _PyEval_EvalFrameDefault
+                                             _PyEval_EvalFrame (inlined)
+                                             _PyEval_Vector
+                                             _PyFunction_Vectorcall
+                                             _PyObject_VectorcallTstate (inlined)
+                                             |          
+                                              --1.79%--PyObject_Vectorcall (inlined)
+                                                        call_function (inlined)
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+                                                        _PyFunction_Vectorcall
+                                                        |          
+                                                         --1.32%--_PyObject_VectorcallTstate (inlined)
+                                                                   PyObject_Vectorcall (inlined)
+                                                                   call_function (inlined)
+                                                                   _PyEval_EvalFrameDefault
+                                                                   _PyEval_EvalFrame (inlined)
+                                                                   _PyEval_Vector
+                                                                   _PyFunction_Vectorcall
+                                                                   |          
+                                                                    --1.22%--_PyObject_VectorcallTstate (inlined)
+                                                                              PyObject_Vectorcall (inlined)
+                                                                              call_function (inlined)
+                                                                              _PyEval_EvalFrameDefault
+                                                                              _PyEval_EvalFrame (inlined)
+                                                                              _PyEval_Vector
+                                                                              _PyFunction_Vectorcall
+                                                                              _PyObject_VectorcallTstate (inlined)
+                                                                              PyObject_Vectorcall (inlined)
+                                                                              call_function (inlined)
+                                                                              _PyEval_EvalFrameDefault
+                                                                              _PyEval_EvalFrame (inlined)
+                                                                              _PyEval_Vector
+                                                                              _PyFunction_Vectorcall
+                                                                              _PyObject_VectorcallTstate (inlined)
+                                                                              PyObject_Vectorcall (inlined)
+                                                                              call_function (inlined)
+                                                                              _PyEval_EvalFrameDefault
+                                                                              _PyEval_EvalFrame (inlined)
+                                                                              _PyEval_Vector
+                                                                              _PyFunction_Vectorcall
+                                                                              _PyObject_VectorcallTstate (inlined)
+                                                                              PyObject_Vectorcall (inlined)
+                                                                              call_function (inlined)
+                                                                              _PyEval_EvalFrameDefault
+                                                                              _PyEval_EvalFrame (inlined)
+                                                                              _PyEval_Vector
+                                                                              |          
+                                                                               --1.13%--_PyFunction_Vectorcall
+                                                                                         _PyObject_VectorcallTstate (inlined)
+                                                                                         PyObject_Vectorcall (inlined)
+                                                                                         call_function (inlined)
+                                                                                         _PyEval_EvalFrameDefault
+                                                                                         _PyEval_EvalFrame (inlined)
+                                                                                         _PyEval_Vector
+                                                                                         |          
+                                                                                          --0.94%--_PyFunction_Vectorcall
+                                                                                                    _PyObject_VectorcallTstate (inlined)
+                                                                                                    PyObject_Vectorcall (inlined)
+                                                                                                    call_function (inlined)
+                                                                                                    _PyEval_EvalFrameDefault
+                                                                                                    _PyEval_EvalFrame (inlined)
+                                                                                                    _PyEval_Vector
+                                                                                                    |          
+                                                                                                     --0.66%--_PyFunction_Vectorcall
+                                                                                                               _PyObject_VectorcallTstate (inlined)
+                                                                                                               PyObject_Vectorcall (inlined)
+                                                                                                               call_function (inlined)
+                                                                                                               _PyEval_EvalFrameDefault
+                                                                                                               _PyEval_EvalFrame (inlined)
+                                                                                                               _PyEval_Vector
+
+     2.35%  python3-dbg  python3.10d           [.] _PyObject_GetMethod
+            |          
+            |--1.69%--_PyObject_GetMethod
+            |          _PyEval_EvalFrameDefault
+            |          _PyEval_EvalFrame (inlined)
+            |          _PyEval_Vector
+            |          _PyFunction_Vectorcall
+            |          _PyObject_VectorcallTstate (inlined)
+            |          |          
+            |           --1.60%--PyObject_Vectorcall (inlined)
+            |                     call_function (inlined)
+            |                     _PyEval_EvalFrameDefault
+            |                     _PyEval_EvalFrame (inlined)
+            |                     _PyEval_Vector
+            |                     _PyFunction_Vectorcall
+            |                     |          
+            |                      --1.41%--_PyObject_VectorcallTstate (inlined)
+            |                                PyObject_Vectorcall (inlined)
+            |                                call_function (inlined)
+            |                                _PyEval_EvalFrameDefault
+            |                                _PyEval_EvalFrame (inlined)
+            |                                _PyEval_Vector
+            |                                _PyFunction_Vectorcall
+            |                                |          
+            |                                 --1.22%--_PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           _PyFunction_Vectorcall
+            |                                           _PyObject_VectorcallTstate (inlined)
+            |                                           PyObject_Vectorcall (inlined)
+            |                                           call_function (inlined)
+            |                                           _PyEval_EvalFrameDefault
+            |                                           _PyEval_EvalFrame (inlined)
+            |                                           _PyEval_Vector
+            |                                           |          
+            |                                            --1.13%--_PyFunction_Vectorcall
+            |                                                      _PyObject_VectorcallTstate (inlined)
+            |                                                      PyObject_Vectorcall (inlined)
+            |                                                      call_function (inlined)
+            |                                                      _PyEval_EvalFrameDefault
+            |                                                      _PyEval_EvalFrame (inlined)
+            |                                                      _PyEval_Vector
+            |                                                      _PyFunction_Vectorcall
+            |                                                      _PyObject_VectorcallTstate (inlined)
+            |                                                      PyObject_Vectorcall (inlined)
+            |                                                      call_function (inlined)
+            |                                                      _PyEval_EvalFrameDefault
+            |                                                      _PyEval_EvalFrame (inlined)
+            |                                                      _PyEval_Vector
+            |                                                      |          
+            |                                                       --1.03%--_PyFunction_Vectorcall
+            |                                                                 _PyObject_VectorcallTstate (inlined)
+            |                                                                 PyObject_Vectorcall (inlined)
+            |                                                                 call_function (inlined)
+            |                                                                 _PyEval_EvalFrameDefault
+            |                                                                 _PyEval_EvalFrame (inlined)
+            |                                                                 _PyEval_Vector
+            |                                                                 |          
+            |                                                                  --0.85%--_PyFunction_Vectorcall
+            |                                                                            _PyObject_VectorcallTstate (inlined)
+            |                                                                            PyObject_Vectorcall (inlined)
+            |                                                                            call_function (inlined)
+            |                                                                            _PyEval_EvalFrameDefault
+            |                                                                            _PyEval_EvalFrame (inlined)
+            |                                                                            _PyEval_Vector
+            |          
+             --0.56%--_Py_INCREF (inlined)
+                       _PyObject_GetMethod
+                       _PyEval_EvalFrameDefault
+                       _PyEval_EvalFrame (inlined)
+                       _PyEval_Vector
+                       _PyFunction_Vectorcall
+                       _PyObject_VectorcallTstate (inlined)
+                       PyObject_Vectorcall (inlined)
+                       call_function (inlined)
+                       _PyEval_EvalFrameDefault
+                       _PyEval_EvalFrame (inlined)
+                       _PyEval_Vector
+                       _PyFunction_Vectorcall
+
+     2.35%  python3-dbg  python3.10d           [.] _PyObject_VectorcallTstate.lto_priv.10
+            |          
+             --2.16%--_PyObject_VectorcallTstate (inlined)
+                       PyObject_Vectorcall (inlined)
+                       call_function (inlined)
+                       _PyEval_EvalFrameDefault
+                       _PyEval_EvalFrame (inlined)
+                       _PyEval_Vector
+                       _PyFunction_Vectorcall
+                       |          
+                        --2.07%--_PyObject_VectorcallTstate (inlined)
+                                  |          
+                                  |--1.32%--PyObject_Vectorcall (inlined)
+                                  |          call_function (inlined)
+                                  |          _PyEval_EvalFrameDefault
+                                  |          _PyEval_EvalFrame (inlined)
+                                  |          _PyEval_Vector
+                                  |          _PyFunction_Vectorcall
+                                  |          |          
+                                  |           --1.13%--_PyObject_VectorcallTstate (inlined)
+                                  |                     PyObject_Vectorcall (inlined)
+                                  |                     call_function (inlined)
+                                  |                     _PyEval_EvalFrameDefault
+                                  |                     _PyEval_EvalFrame (inlined)
+                                  |                     _PyEval_Vector
+                                  |                     _PyFunction_Vectorcall
+                                  |                     |          
+                                  |                      --0.94%--_PyObject_VectorcallTstate (inlined)
+                                  |                                PyObject_Vectorcall (inlined)
+                                  |                                call_function (inlined)
+                                  |                                _PyEval_EvalFrameDefault
+                                  |                                _PyEval_EvalFrame (inlined)
+                                  |                                _PyEval_Vector
+                                  |                                _PyFunction_Vectorcall
+                                  |                                _PyObject_VectorcallTstate (inlined)
+                                  |                                PyObject_Vectorcall (inlined)
+                                  |                                call_function (inlined)
+                                  |                                _PyEval_EvalFrameDefault
+                                  |                                _PyEval_EvalFrame (inlined)
+                                  |                                _PyEval_Vector
+                                  |                                |          
+                                  |                                 --0.85%--_PyFunction_Vectorcall
+                                  |                                           _PyObject_VectorcallTstate (inlined)
+                                  |                                           PyObject_Vectorcall (inlined)
+                                  |                                           call_function (inlined)
+                                  |                                           _PyEval_EvalFrameDefault
+                                  |                                           _PyEval_EvalFrame (inlined)
+                                  |                                           _PyEval_Vector
+                                  |                                           |          
+                                  |                                            --0.75%--_PyFunction_Vectorcall
+                                  |                                                      _PyObject_VectorcallTstate (inlined)
+                                  |                                                      PyObject_Vectorcall (inlined)
+                                  |                                                      call_function (inlined)
+                                  |                                                      _PyEval_EvalFrameDefault
+                                  |                                                      _PyEval_EvalFrame (inlined)
+                                  |                                                      _PyEval_Vector
+                                  |                                                      _PyFunction_Vectorcall
+                                  |                                                      _PyObject_VectorcallTstate (inlined)
+                                  |                                                      PyObject_Vectorcall (inlined)
+                                  |                                                      call_function (inlined)
+                                  |                                                      _PyEval_EvalFrameDefault
+                                  |                                                      _PyEval_EvalFrame (inlined)
+                                  |                                                      _PyEval_Vector
+                                  |                                                      |          
+                                  |                                                       --0.56%--_PyFunction_Vectorcall
+                                  |                                                                 _PyObject_VectorcallTstate (inlined)
+                                  |                                                                 PyObject_Vectorcall (inlined)
+                                  |                                                                 call_function (inlined)
+                                  |                                                                 _PyEval_EvalFrameDefault
+                                  |                                                                 _PyEval_EvalFrame (inlined)
+                                  |                                                                 _PyEval_Vector
+                                  |          
+                                   --0.66%--vectorcall_unbound (inlined)
+                                             vectorcall_maybe (inlined)
+
+     2.35%  python3-dbg  python3.10d           [.] _PyType_Lookup
+            |
+            ---_PyType_Lookup
+               |          
+               |--1.13%--_PyObject_GenericSetAttrWithDict
+               |          PyObject_GenericSetAttr
+               |          PyObject_SetAttr
+               |          _PyEval_EvalFrameDefault
+               |          _PyEval_EvalFrame (inlined)
+               |          _PyEval_Vector
+               |          _PyFunction_Vectorcall
+               |          _PyObject_FastCallDictTstate
+               |          _PyObject_Call_Prepend
+               |          slot_tp_init
+               |          type_call (inlined)
+               |          _PyObject_MakeTpCall
+               |          _PyObject_VectorcallTstate (inlined)
+               |          PyObject_Vectorcall (inlined)
+               |          call_function (inlined)
+               |          _PyEval_EvalFrameDefault
+               |          _PyEval_EvalFrame (inlined)
+               |          _PyEval_Vector
+               |          _PyFunction_Vectorcall
+               |          _PyObject_VectorcallTstate (inlined)
+               |          |          
+               |           --0.66%--PyObject_Vectorcall (inlined)
+               |                     call_function (inlined)
+               |                     _PyEval_EvalFrameDefault
+               |                     _PyEval_EvalFrame (inlined)
+               |                     _PyEval_Vector
+               |                     _PyFunction_Vectorcall
+               |                     _PyObject_VectorcallTstate (inlined)
+               |                     PyObject_Vectorcall (inlined)
+               |                     call_function (inlined)
+               |                     _PyEval_EvalFrameDefault
+               |                     _PyEval_EvalFrame (inlined)
+               |                     _PyEval_Vector
+               |                     _PyFunction_Vectorcall
+               |          
+                --0.94%--_PyObject_GetMethod
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          _PyFunction_Vectorcall
+                          |          
+                           --0.66%--_PyObject_VectorcallTstate (inlined)
+                                     PyObject_Vectorcall (inlined)
+                                     call_function (inlined)
+                                     _PyEval_EvalFrameDefault
+                                     _PyEval_EvalFrame (inlined)
+                                     _PyEval_Vector
+                                     _PyFunction_Vectorcall
+                                     |          
+                                      --0.56%--_PyObject_VectorcallTstate (inlined)
+                                                PyObject_Vectorcall (inlined)
+                                                call_function (inlined)
+                                                _PyEval_EvalFrameDefault
+                                                _PyEval_EvalFrame (inlined)
+                                                _PyEval_Vector
+                                                _PyFunction_Vectorcall
+                                                _PyObject_VectorcallTstate (inlined)
+                                                PyObject_Vectorcall (inlined)
+                                                call_function (inlined)
+                                                _PyEval_EvalFrameDefault
+                                                _PyEval_EvalFrame (inlined)
+                                                _PyEval_Vector
+                                                _PyFunction_Vectorcall
+                                                _PyObject_VectorcallTstate (inlined)
+                                                PyObject_Vectorcall (inlined)
+                                                call_function (inlined)
+                                                _PyEval_EvalFrameDefault
+                                                _PyEval_EvalFrame (inlined)
+                                                _PyEval_Vector
+                                                _PyFunction_Vectorcall
+                                                _PyObject_VectorcallTstate (inlined)
+                                                PyObject_Vectorcall (inlined)
+                                                call_function (inlined)
+                                                _PyEval_EvalFrameDefault
+                                                _PyEval_EvalFrame (inlined)
+                                                _PyEval_Vector
+                                                _PyFunction_Vectorcall
+                                                _PyObject_VectorcallTstate (inlined)
+                                                PyObject_Vectorcall (inlined)
+                                                call_function (inlined)
+                                                _PyEval_EvalFrameDefault
+                                                _PyEval_EvalFrame (inlined)
+                                                _PyEval_Vector
+
+     2.16%  python3-dbg  python3.10d           [.] lookdict_split.lto_priv.0
+            |          
+             --1.88%--lookdict_split (inlined)
+                       |          
+                       |--0.94%--PyDict_GetItemWithError
+                       |          |          
+                       |           --0.85%--_PyObject_GetMethod
+                       |                     _PyEval_EvalFrameDefault
+                       |                     _PyEval_EvalFrame (inlined)
+                       |                     _PyEval_Vector
+                       |                     _PyFunction_Vectorcall
+                       |                     _PyObject_VectorcallTstate (inlined)
+                       |                     |          
+                       |                      --0.56%--PyObject_Vectorcall (inlined)
+                       |                                call_function (inlined)
+                       |                                _PyEval_EvalFrameDefault
+                       |                                _PyEval_EvalFrame (inlined)
+                       |                                _PyEval_Vector
+                       |                                _PyFunction_Vectorcall
+                       |          
+                        --0.94%--insertdict
+                                  PyDict_SetItem
+                                  _PyObjectDict_SetItem
+                                  _PyObject_GenericSetAttrWithDict
+                                  PyObject_GenericSetAttr
+                                  PyObject_SetAttr
+                                  _PyEval_EvalFrameDefault
+                                  _PyEval_EvalFrame (inlined)
+                                  _PyEval_Vector
+                                  _PyFunction_Vectorcall
+                                  _PyObject_FastCallDictTstate
+                                  _PyObject_Call_Prepend
+                                  slot_tp_init
+                                  type_call (inlined)
+                                  _PyObject_MakeTpCall
+                                  _PyObject_VectorcallTstate (inlined)
+                                  PyObject_Vectorcall (inlined)
+                                  call_function (inlined)
+                                  _PyEval_EvalFrameDefault
+                                  _PyEval_EvalFrame (inlined)
+                                  _PyEval_Vector
+                                  _PyFunction_Vectorcall
+                                  _PyObject_VectorcallTstate (inlined)
+                                  |          
+                                   --0.75%--vectorcall_unbound (inlined)
+                                             vectorcall_maybe (inlined)
+                                             |          
+                                              --0.66%--slot_nb_subtract
+                                                        binary_op1
+                                                        binary_op
+                                                        PyNumber_Subtract
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+                                                        _PyFunction_Vectorcall
+                                                        _PyObject_VectorcallTstate (inlined)
+                                                        PyObject_Vectorcall (inlined)
+                                                        call_function (inlined)
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+                                                        _PyFunction_Vectorcall
+                                                        _PyObject_VectorcallTstate (inlined)
+                                                        PyObject_Vectorcall (inlined)
+                                                        call_function (inlined)
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+                                                        _PyFunction_Vectorcall
+                                                        _PyObject_VectorcallTstate (inlined)
+                                                        PyObject_Vectorcall (inlined)
+                                                        call_function (inlined)
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+                                                        _PyFunction_Vectorcall
+                                                        _PyObject_VectorcallTstate (inlined)
+                                                        PyObject_Vectorcall (inlined)
+                                                        call_function (inlined)
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+                                                        _PyFunction_Vectorcall
+                                                        _PyObject_VectorcallTstate (inlined)
+                                                        PyObject_Vectorcall (inlined)
+                                                        call_function (inlined)
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+                                                        _PyFunction_Vectorcall
+                                                        _PyObject_VectorcallTstate (inlined)
+                                                        PyObject_Vectorcall (inlined)
+                                                        call_function (inlined)
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+                                                        _PyFunction_Vectorcall
+                                                        _PyObject_VectorcallTstate (inlined)
+                                                        PyObject_Vectorcall (inlined)
+                                                        call_function (inlined)
+                                                        _PyEval_EvalFrameDefault
+                                                        _PyEval_EvalFrame (inlined)
+                                                        _PyEval_Vector
+
+     1.98%  python3-dbg  python3.10d           [.] _PyMem_DebugCheckAddress
+            |
+            ---_PyMem_DebugCheckAddress
+               _PyMem_DebugRawFree
+               _PyMem_DebugFree
+               |          
+               |--1.13%--PyObject_Free
+               |          |          
+               |           --0.66%--PyObject_GC_Del
+               |                     |          
+               |                      --0.56%--object_dealloc (inlined)
+               |                                subtype_dealloc (inlined)
+               |                                _Py_Dealloc
+               |                                _Py_DECREF (inlined)
+               |          
+                --0.85%--PyMem_Free
+                          dict_dealloc (inlined)
+                          _Py_Dealloc
+                          _Py_DECREF (inlined)
+                          subtype_dealloc (inlined)
+                          _Py_Dealloc
+                          _Py_DECREF (inlined)
+
+     1.88%  python3-dbg  python3.10d           [.] binary_op1
+            |          
+             --1.60%--binary_op1
+                       |          
+                       |--0.75%--binary_op
+                       |          |          
+                       |           --0.66%--PyNumber_Subtract
+                       |                     _PyEval_EvalFrameDefault
+                       |                     _PyEval_EvalFrame (inlined)
+                       |                     _PyEval_Vector
+                       |                     _PyFunction_Vectorcall
+                       |                     _PyObject_VectorcallTstate (inlined)
+                       |          
+                        --0.66%--PyNumber_Multiply
+                                  _PyEval_EvalFrameDefault
+                                  _PyEval_EvalFrame (inlined)
+                                  _PyEval_Vector
+                                  _PyFunction_Vectorcall
+                                  _PyObject_VectorcallTstate (inlined)
+                                  PyObject_Vectorcall (inlined)
+                                  call_function (inlined)
+                                  _PyEval_EvalFrameDefault
+                                  _PyEval_EvalFrame (inlined)
+                                  _PyEval_Vector
+                                  _PyFunction_Vectorcall
+                                  _PyObject_VectorcallTstate (inlined)
+                                  PyObject_Vectorcall (inlined)
+                                  call_function (inlined)
+                                  _PyEval_EvalFrameDefault
+                                  _PyEval_EvalFrame (inlined)
+                                  _PyEval_Vector
+                                  _PyFunction_Vectorcall
+
+     1.69%  python3-dbg  python3.10d           [.] PyTuple_GetItem
+            |
+            ---PyTuple_GetItem
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               |          
+               |--1.03%--_PyObject_VectorcallTstate (inlined)
+               |          |          
+               |           --0.94%--PyObject_Vectorcall (inlined)
+               |                     call_function (inlined)
+               |                     _PyEval_EvalFrameDefault
+               |                     _PyEval_EvalFrame (inlined)
+               |                     _PyEval_Vector
+               |                     _PyFunction_Vectorcall
+               |                     |          
+               |                      --0.75%--_PyObject_VectorcallTstate (inlined)
+               |                                |          
+               |                                 --0.56%--PyObject_Vectorcall (inlined)
+               |                                           call_function (inlined)
+               |                                           _PyEval_EvalFrameDefault
+               |                                           _PyEval_EvalFrame (inlined)
+               |                                           _PyEval_Vector
+               |                                           _PyFunction_Vectorcall
+               |                                           _PyObject_VectorcallTstate (inlined)
+               |                                           PyObject_Vectorcall (inlined)
+               |                                           call_function (inlined)
+               |                                           _PyEval_EvalFrameDefault
+               |                                           _PyEval_EvalFrame (inlined)
+               |                                           _PyEval_Vector
+               |                                           _PyFunction_Vectorcall
+               |          
+                --0.66%--_PyObject_FastCallDictTstate
+                          _PyObject_Call_Prepend
+                          slot_tp_init
+                          type_call (inlined)
+                          _PyObject_MakeTpCall
+                          _PyObject_VectorcallTstate (inlined)
+                          PyObject_Vectorcall (inlined)
+                          call_function (inlined)
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          _PyFunction_Vectorcall
+                          _PyObject_VectorcallTstate (inlined)
+
+     1.60%  python3-dbg  python3.10d           [.] _PyEval_Vector
+            |          
+            |--0.85%--_PyEval_EvalFrame (inlined)
+            |          _PyEval_Vector
+            |          _PyFunction_Vectorcall
+            |          _PyObject_VectorcallTstate (inlined)
+            |          |          
+            |           --0.56%--PyObject_Vectorcall (inlined)
+            |                     call_function (inlined)
+            |                     _PyEval_EvalFrameDefault
+            |                     _PyEval_EvalFrame (inlined)
+            |                     _PyEval_Vector
+            |                     _PyFunction_Vectorcall
+            |                     _PyObject_VectorcallTstate (inlined)
+            |          
+             --0.75%--_PyEval_Vector
+                       _PyFunction_Vectorcall
+                       |          
+                        --0.66%--_PyObject_VectorcallTstate (inlined)
+                                  PyObject_Vectorcall (inlined)
+                                  call_function (inlined)
+                                  _PyEval_EvalFrameDefault
+                                  _PyEval_EvalFrame (inlined)
+                                  _PyEval_Vector
+                                  _PyFunction_Vectorcall
+
+     1.51%  python3-dbg  python3.10d           [.] _PyFunction_Vectorcall
+            |
+            ---_PyFunction_Vectorcall
+               |          
+                --1.03%--_PyObject_VectorcallTstate (inlined)
+                          |          
+                           --0.94%--PyObject_Vectorcall (inlined)
+                                     call_function (inlined)
+                                     _PyEval_EvalFrameDefault
+                                     _PyEval_EvalFrame (inlined)
+                                     _PyEval_Vector
+                                     _PyFunction_Vectorcall
+                                     _PyObject_VectorcallTstate (inlined)
+                                     |          
+                                      --0.75%--PyObject_Vectorcall (inlined)
+                                                call_function (inlined)
+                                                _PyEval_EvalFrameDefault
+                                                _PyEval_EvalFrame (inlined)
+                                                _PyEval_Vector
+                                                _PyFunction_Vectorcall
+                                                |          
+                                                 --0.66%--_PyObject_VectorcallTstate (inlined)
+                                                           PyObject_Vectorcall (inlined)
+                                                           call_function (inlined)
+                                                           _PyEval_EvalFrameDefault
+                                                           _PyEval_EvalFrame (inlined)
+                                                           _PyEval_Vector
+                                                           _PyFunction_Vectorcall
+                                                           |          
+                                                            --0.56%--_PyObject_VectorcallTstate (inlined)
+                                                                      PyObject_Vectorcall (inlined)
+                                                                      call_function (inlined)
+                                                                      _PyEval_EvalFrameDefault
+                                                                      _PyEval_EvalFrame (inlined)
+                                                                      _PyEval_Vector
+                                                                      _PyFunction_Vectorcall
+                                                                      _PyObject_VectorcallTstate (inlined)
+                                                                      PyObject_Vectorcall (inlined)
+                                                                      call_function (inlined)
+                                                                      _PyEval_EvalFrameDefault
+                                                                      _PyEval_EvalFrame (inlined)
+                                                                      _PyEval_Vector
+                                                                      _PyFunction_Vectorcall
+                                                                      _PyObject_VectorcallTstate (inlined)
+                                                                      PyObject_Vectorcall (inlined)
+                                                                      call_function (inlined)
+                                                                      _PyEval_EvalFrameDefault
+                                                                      _PyEval_EvalFrame (inlined)
+                                                                      _PyEval_Vector
+                                                                      _PyFunction_Vectorcall
+                                                                      _PyObject_VectorcallTstate (inlined)
+                                                                      PyObject_Vectorcall (inlined)
+                                                                      call_function (inlined)
+                                                                      _PyEval_EvalFrameDefault
+                                                                      _PyEval_EvalFrame (inlined)
+                                                                      _PyEval_Vector
+
+     1.51%  python3-dbg  python3.10d           [.] lookdict_unicode_nodummy
+            |
+            ---lookdict_unicode_nodummy
+               |          
+               |--0.75%--PyDict_Contains
+               |          _PyDict_ContainsId
+               |          _PyEval_EvalFrameDefault
+               |          _PyEval_EvalFrame (inlined)
+               |          _PyEval_Vector
+               |          _PyFunction_Vectorcall
+               |          |          
+               |           --0.66%--_PyObject_VectorcallTstate (inlined)
+               |          
+                --0.56%--PyDict_GetItemWithError
+
+     0.94%  python3-dbg  python3.10d           [.] _Py_NewReference
+            |          
+             --0.75%--_Py_NewReference
+
+     0.94%  python3-dbg  python3.10d           [.] float_dealloc.lto_priv.0
+            |          
+             --0.85%--float_dealloc (inlined)
+                       _Py_Dealloc
+                       _Py_DECREF (inlined)
+
+     0.94%  python3-dbg  python3.10d           [.] read_size_t
+            |
+            ---read_size_t
+
+     0.94%  python3-dbg  python3.10d           [.] tupledealloc.lto_priv.0
+            |          
+             --0.85%--tupledealloc (inlined)
+                       _Py_Dealloc
+                       _Py_DECREF (inlined)
+                       |          
+                        --0.56%--_PyObject_MakeTpCall
+                                  _PyObject_VectorcallTstate (inlined)
+                                  PyObject_Vectorcall (inlined)
+                                  call_function (inlined)
+                                  _PyEval_EvalFrameDefault
+                                  _PyEval_EvalFrame (inlined)
+                                  _PyEval_Vector
+                                  _PyFunction_Vectorcall
+                                  _PyObject_VectorcallTstate (inlined)
+
+     0.85%  python3-dbg  python3.10d           [.] _PyUnicode_FromId
+     0.85%  python3-dbg  python3.10d           [.] is_tstate_valid.lto_priv.0
+            |
+            ---_PyMem_IsPtrFreed (inlined)
+               is_tstate_valid (inlined)
+               _PyEval_MakeFrameVector
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               |          
+                --0.75%--_PyObject_VectorcallTstate (inlined)
+                          PyObject_Vectorcall (inlined)
+                          call_function (inlined)
+                          _PyEval_EvalFrameDefault
+                          _PyEval_EvalFrame (inlined)
+                          _PyEval_Vector
+                          _PyFunction_Vectorcall
+                          _PyObject_VectorcallTstate (inlined)
+
+     0.75%  python3-dbg  libc.so.6             [.] __memset_avx2_unaligned_erms
+            |
+            ---__memset_avx2_unaligned_erms
+               memset (inlined)
+               |          
+                --0.56%--_PyMem_DebugRawFree
+
+     0.75%  python3-dbg  python3.10d           [.] PyObject_SetAttr
+     0.75%  python3-dbg  python3.10d           [.] PyType_IsSubtype
+            |
+            ---PyType_IsSubtype
+
+     0.75%  python3-dbg  python3.10d           [.] _PyObject_Malloc
+            |
+            ---pymalloc_alloc (inlined)
+               _PyObject_Malloc
+               _PyMem_DebugRawAlloc
+               _PyMem_DebugRawMalloc
+               _PyMem_DebugMalloc
+               |          
+                --0.56%--PyObject_Malloc
+
+     0.75%  python3-dbg  python3.10d           [.] _Py_Dealloc
+            |
+            ---_Py_Dealloc
+               _Py_DECREF (inlined)
+
+     0.75%  python3-dbg  python3.10d           [.] dict_dealloc.lto_priv.0
+     0.75%  python3-dbg  python3.10d           [.] float_mul.lto_priv.0
+     0.66%  python3-dbg  python3.10d           [.] _Py_CheckFunctionResult
+            |
+            ---_Py_CheckFunctionResult
+
+     0.66%  python3-dbg  python3.10d           [.] frame_alloc
+            |
+            ---frame_alloc
+               _PyFrame_New_NoTrack
+               _PyEval_MakeFrameVector
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+
+     0.56%  python3-dbg  libc.so.6             [.] pthread_getspecific@@GLIBC_2.34
+            |
+            ---___pthread_getspecific (inlined)
+               PyThread_tss_get
+               _PyGILState_GetThisThreadState
+               PyGILState_Check
+               _PyMem_DebugCheckGIL (inlined)
+
+     0.56%  python3-dbg  python3.10d           [.] PyFloat_FromDouble
+            |
+            ---PyFloat_FromDouble
+
+     0.56%  python3-dbg  python3.10d           [.] _PyFrame_New_NoTrack
+     0.56%  python3-dbg  python3.10d           [.] _PyObject_MakeTpCall
+     0.56%  python3-dbg  python3.10d           [.] _PyTrash_end
+            |
+            ---_PyTrash_end
+
+     0.56%  python3-dbg  python3.10d           [.] float_add.lto_priv.0
+     0.56%  python3-dbg  python3.10d           [.] insertdict
+     0.47%  python3-dbg  python3.10d           [.] PyDict_GetItemWithError
+     0.47%  python3-dbg  python3.10d           [.] _PyObject_GenericGetAttrWithDict
+     0.47%  python3-dbg  python3.10d           [.] _PyObject_GenericSetAttrWithDict
+     0.47%  python3-dbg  python3.10d           [.] _PyTrash_cond
+     0.47%  python3-dbg  python3.10d           [.] _PyTuple_FromArray
+     0.47%  python3-dbg  python3.10d           [.] float_sub.lto_priv.0
+     0.47%  python3-dbg  python3.10d           [.] slot_nb_subtract
+     0.47%  python3-dbg  python3.10d           [.] tuple_alloc
+     0.47%  python3-dbg  python3.10d           [.] type_call.lto_priv.0
+     0.38%  python3-dbg  python3.10d           [.] PyDict_Contains
+     0.38%  python3-dbg  python3.10d           [.] PyGILState_Check
+     0.38%  python3-dbg  python3.10d           [.] PyObject_GC_Del
+     0.38%  python3-dbg  python3.10d           [.] _PyDict_CheckConsistency
+     0.38%  python3-dbg  python3.10d           [.] _PyObjectDict_SetItem
+     0.38%  python3-dbg  python3.10d           [.] _PyTrash_begin
+     0.38%  python3-dbg  python3.10d           [.] _Py_CheckSlotResult
+     0.38%  python3-dbg  python3.10d           [.] validate_list
+     0.28%  python3-dbg  python3.10d           [.] PyNumber_Subtract
+     0.28%  python3-dbg  python3.10d           [.] PyObject_GC_UnTrack
+     0.28%  python3-dbg  python3.10d           [.] PyType_GenericAlloc
+     0.28%  python3-dbg  python3.10d           [.] _PyMem_DebugRawAlloc
+     0.28%  python3-dbg  python3.10d           [.] _PyObject_Call_Prepend
+     0.28%  python3-dbg  python3.10d           [.] _PyObject_FastCallDictTstate
+     0.28%  python3-dbg  python3.10d           [.] _PyObject_Free
+     0.28%  python3-dbg  python3.10d           [.] _PyUnicode_CheckConsistency
+     0.28%  python3-dbg  python3.10d           [.] arena_map_is_used
+     0.28%  python3-dbg  python3.10d           [.] binary_op
+     0.28%  python3-dbg  python3.10d           [.] float_div.lto_priv.0
+     0.28%  python3-dbg  python3.10d           [.] get_tuple_state
+     0.28%  python3-dbg  python3.10d           [.] new_dict
+     0.28%  python3-dbg  python3.10d           [.] subtype_dealloc.lto_priv.0
+     0.28%  python3-dbg  python3.10d           [.] vectorcall_maybe.lto_priv.0
+     0.28%  python3-dbg  python3.10d           [.] write_size_t
+     0.19%  python3-dbg  libc.so.6             [.] __memmove_avx_unaligned_erms
+     0.19%  python3-dbg  python3.10d           [.] PyDict_SetItem
+     0.19%  python3-dbg  python3.10d           [.] PyErr_Occurred
+     0.19%  python3-dbg  python3.10d           [.] PyLong_FromLong
+     0.19%  python3-dbg  python3.10d           [.] PyObject_ClearWeakRefs
+     0.19%  python3-dbg  python3.10d           [.] PyObject_GetAttr
+     0.19%  python3-dbg  python3.10d           [.] PyUnicode_InternInPlace
+     0.19%  python3-dbg  python3.10d           [.] _PyDict_ContainsId
+     0.19%  python3-dbg  python3.10d           [.] _PyMem_DebugMalloc
+     0.19%  python3-dbg  python3.10d           [.] _PyObject_GC_Malloc
+     0.19%  python3-dbg  python3.10d           [.] _PyObject_GetDictPtr
+     0.19%  python3-dbg  python3.10d           [.] _PyObject_VectorcallTstate.lto_priv.6
+     0.19%  python3-dbg  python3.10d           [.] _PyPegen_expect_token
+     0.19%  python3-dbg  python3.10d           [.] arena_map_get
+     0.19%  python3-dbg  python3.10d           [.] float_richcompare.lto_priv.0
+     0.19%  python3-dbg  python3.10d           [.] get_float_state
+     0.19%  python3-dbg  python3.10d           [.] get_type_cache.lto_priv.0
+     0.19%  python3-dbg  python3.10d           [.] lookup_maybe_method.lto_priv.0
+     0.19%  python3-dbg  python3.10d           [.] math_1_to_whatever
+     0.19%  python3-dbg  python3.10d           [.] new_dict_with_shared_keys.lto_priv.0
+     0.19%  python3-dbg  python3.10d           [.] siphash24
+     0.19%  python3-dbg  python3.10d           [.] slot_tp_init
+     0.09%  python3-dbg  ld-linux-x86-64.so.2  [.] _dl_lookup_symbol_x
+     0.09%  python3-dbg  libc.so.6             [.] __strchr_avx2
+     0.09%  python3-dbg  libc.so.6             [.] __wcsrtombs
+     0.09%  python3-dbg  python3.10d           [.] PyCallable_Check
+     0.09%  python3-dbg  python3.10d           [.] PyCode_NewWithPosOnlyArgs
+     0.09%  python3-dbg  python3.10d           [.] PyDict_SetDefault
+     0.09%  python3-dbg  python3.10d           [.] PyFunction_NewWithQualName
+     0.09%  python3-dbg  python3.10d           [.] PyLong_AsDouble
+     0.09%  python3-dbg  python3.10d           [.] PyNumber_Add
+     0.09%  python3-dbg  python3.10d           [.] PyNumber_AsSsize_t
+     0.09%  python3-dbg  python3.10d           [.] PyNumber_Multiply
+     0.09%  python3-dbg  python3.10d           [.] PyObject_Hash
+     0.09%  python3-dbg  python3.10d           [.] PyObject_RichCompare
+     0.09%  python3-dbg  python3.10d           [.] PyObject_SetItem
+     0.09%  python3-dbg  python3.10d           [.] PyThreadState_Get
+     0.09%  python3-dbg  python3.10d           [.] PyThread_tss_get
+     0.09%  python3-dbg  python3.10d           [.] PyThread_tss_is_created
+     0.09%  python3-dbg  python3.10d           [.] PyTuple_New
+     0.09%  python3-dbg  python3.10d           [.] _PyGILState_GetThisThreadState
+     0.09%  python3-dbg  python3.10d           [.] _PyMem_DebugFree
+     0.09%  python3-dbg  python3.10d           [.] _PyMem_DebugRawFree
+     0.09%  python3-dbg  python3.10d           [.] _PyMem_DebugRawMalloc
+     0.09%  python3-dbg  python3.10d           [.] _PyMem_DebugRealloc
+     0.09%  python3-dbg  python3.10d           [.] _PyObject_CallFunctionVa
+     0.09%  python3-dbg  python3.10d           [.] _PyObject_Calloc
+     0.09%  python3-dbg  python3.10d           [.] _PyObject_GC_New
+     0.09%  python3-dbg  python3.10d           [.] _PyObject_IsFreed
+     0.09%  python3-dbg  python3.10d           [.] _PyTuple_MaybeUntrack
+     0.09%  python3-dbg  python3.10d           [.] _PyType_GetModuleByDef
+     0.09%  python3-dbg  python3.10d           [.] _PyUnicodeWriter_Init
+     0.09%  python3-dbg  python3.10d           [.] address_in_range
+     0.09%  python3-dbg  python3.10d           [.] all_name_chars
+     0.09%  python3-dbg  python3.10d           [.] assemble_jump_offsets
+     0.09%  python3-dbg  python3.10d           [.] astfold_expr
+     0.09%  python3-dbg  python3.10d           [.] cfunction_call.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] do_richcompare
+     0.09%  python3-dbg  python3.10d           [.] dotted_name_rule.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] get_gc_state
+     0.09%  python3-dbg  python3.10d           [.] list_dealloc.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] listiter_next.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] long_mul.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] meth_dealloc.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] module_getattro.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] object_dealloc.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] object_new.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] super_getattro.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] tuple_get_empty
+     0.09%  python3-dbg  python3.10d           [.] tuplesubscript.lto_priv.0
+     0.09%  python3-dbg  python3.10d           [.] update_refs
+     0.09%  python3-dbg  python3.10d           [.] 0x0000000000021100
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff93f23311
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff93f3eab5
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff93f6c0fa
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff93f78fe9
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff9406580b
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff940dd724
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff943401c0
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff9436f08e
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff94750dd8
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff94800be0
+     0.09%  python3-dbg  [unknown]             [k] 0xffffffff94800fa4
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#

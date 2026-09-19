@@ -1,0 +1,30 @@
+225 ms: 11 ##################################################
+227 ms: 15 ####################################################################
+228 ms:  2 #########
+230 ms: 13 ###########################################################
+231 ms:  9 #########################################
+233 ms:  2 #########
+234 ms:  1 #####
+236 ms:  1 #####
+237 ms:  1 #####
+239 ms:  2 #########
+240 ms:  0 |
+242 ms:  0 |
+243 ms:  0 |
+245 ms:  0 |
+246 ms:  0 |
+248 ms:  0 |
+250 ms:  0 |
+251 ms:  0 |
+253 ms:  0 |
+254 ms:  0 |
+256 ms:  2 #########
+257 ms:  1 #####
+
+WARNING: the benchmark result may be unstable
+* Not enough samples to get a stable result (95% certainly of less than 1% variation)
+
+Try to rerun the benchmark with more runs, values and/or loops.
+Run 'python -m pyperf system tune' command to reduce the system jitter.
+Use pyperf stats, pyperf dump and pyperf hist to analyze results.
+Use --quiet option to hide these warnings.

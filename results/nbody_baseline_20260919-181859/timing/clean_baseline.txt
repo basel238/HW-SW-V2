@@ -1,0 +1,88 @@
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.653394 s  228.337 ms/loop
+energy=-0.1690801979358367
+step_rate=87.59 ksteps/s
+RESULT total_sec=3.653394 loops=16 ms_per_loop=228.3371 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.653546 s  228.347 ms/loop
+energy=-0.1690801979358367
+step_rate=87.59 ksteps/s
+RESULT total_sec=3.653546 loops=16 ms_per_loop=228.3466 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.706767 s  231.673 ms/loop
+energy=-0.1690801979358367
+step_rate=86.33 ksteps/s
+RESULT total_sec=3.706767 loops=16 ms_per_loop=231.6729 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.656657 s  228.541 ms/loop
+energy=-0.1690801979358367
+step_rate=87.51 ksteps/s
+RESULT total_sec=3.656657 loops=16 ms_per_loop=228.5410 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.630298 s  226.894 ms/loop
+energy=-0.1690801979358367
+step_rate=88.15 ksteps/s
+RESULT total_sec=3.630298 loops=16 ms_per_loop=226.8936 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.704200 s  231.513 ms/loop
+energy=-0.1690801979358367
+step_rate=86.39 ksteps/s
+RESULT total_sec=3.704200 loops=16 ms_per_loop=231.5125 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.642188 s  227.637 ms/loop
+energy=-0.1690801979358367
+step_rate=87.86 ksteps/s
+RESULT total_sec=3.642188 loops=16 ms_per_loop=227.6367 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.672043 s  229.503 ms/loop
+energy=-0.1690801979358367
+step_rate=87.14 ksteps/s
+RESULT total_sec=3.672043 loops=16 ms_per_loop=229.5027 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.630645 s  226.915 ms/loop
+energy=-0.1690801979358367
+step_rate=88.14 ksteps/s
+RESULT total_sec=3.630645 loops=16 ms_per_loop=226.9153 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.695668 s  230.979 ms/loop
+energy=-0.1690801979358367
+step_rate=86.59 ksteps/s
+RESULT total_sec=3.695668 loops=16 ms_per_loop=230.9792 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.675105 s  229.694 ms/loop
+energy=-0.1690801979358367
+step_rate=87.07 ksteps/s
+RESULT total_sec=3.675105 loops=16 ms_per_loop=229.6941 energy=-0.1690801979358367 iterations=20000
