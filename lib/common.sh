@@ -276,7 +276,9 @@ run_clean_timing() {
     ${PIN[@]+"${PIN[@]}"} "$PY_REL" ${WL[@]+"${WL[@]}"} > "$RUN_DIR/timing/.rep$i" 2>&1 || {
       warn "rep $i failed"; cat "$RUN_DIR/timing/.rep$i" >&2; continue; }
     cat "$RUN_DIR/timing/.rep$i" >> "$out"
-    t="$(grep -oE 'total_sec=[0-9.]+' "$RUN_DIR/timing/.rep$i" | head -1 | cut -d= -f2)"
+    # NOTE: a `grep ... | head -1` here SIGPIPEs grep -> 141 -> set -e abort.
+    # Single-process awk reads the file directly and cannot short-circuit a pipe.
+    t="$(awk -F= '/total_sec=/{print $2; exit}' "$RUN_DIR/timing/.rep$i")"
     [[ -n "$t" ]] && { echo "$i,$t" >> "$csv"; printf '  rep %d: %s s\n' "$i" "$t"; }
     rm -f "$RUN_DIR/timing/.rep$i"
   done
@@ -396,19 +398,14 @@ run_perf_record() {
     warn "LOST SAMPLES detected -> flame graph may be skewed."
     warn "raise PERF_MMAP_PAGES (now $PERF_MMAP_PAGES) or lower SAMPLE_FREQ."
   fi
-  # perf prints "# Samples: 3K" -- the K/M/G suffix MUST be normalized or a
-  # healthy run reports "3 samples". Anchor on '^# Samples:' so we do not match
-  # the '# Total Lost Samples:' line that precedes it.
-  local raw nsamp
-  raw="$(perf report -i "$data" --stdio 2>/dev/null \
-         | grep -m1 -oE '^# Samples: [0-9.]+[KMG]?' | sed 's/^# Samples: //')"
-  case "$raw" in
-    *K) nsamp=$(awk -v v="${raw%K}" 'BEGIN{printf "%d", v*1000}') ;;
-    *M) nsamp=$(awk -v v="${raw%M}" 'BEGIN{printf "%d", v*1000000}') ;;
-    *G) nsamp=$(awk -v v="${raw%G}" 'BEGIN{printf "%d", v*1000000000}') ;;
-    "") nsamp=0 ;;
-    *)  nsamp="${raw%%.*}" ;;
-  esac
+  # Sample count via --stats, NOT --stdio. --stdio resolves and aggregates every
+  # dwarf callchain before it prints the '# Samples:' header, so reading that one
+  # integer cost ~196 s on this VM. --stats skips callchain work entirely and
+  # returns in ~0.03 s (measured). It also emits a plain integer: no K/M/G parsing.
+  local nsamp
+  perf report -i "$data" --stats > "$RUN_DIR/logs/${tag}_stats.txt" 2>/dev/null || true
+  nsamp="$(awk '/SAMPLE events:/ {print $3; exit}' "$RUN_DIR/logs/${tag}_stats.txt")"
+  : "${nsamp:=0}"
 
   # NO automatic event substitution. A flame graph silently built from a
   # different event than requested is worse than no flame graph, so this fails
@@ -430,24 +427,39 @@ run_perf_record() {
 
 make_reports() {
   local tag="$1" data="$2" rp="$RUN_DIR/perf"
-  log "generating perf reports"
-  # The exact command from the project brief:
+  # Each `perf report --stdio` re-resolves every dwarf callchain from scratch:
+  # ~3 min per pass for ~1000 samples on this VM. Five passes ran silently and
+  # took 15+ min. Only the two passes that actually PRESENT a call graph need
+  # that work; the flat ones get -g none and return in seconds. Every pass is
+  # announced so the phase can never look hung again.
+  log "generating perf reports (2 with callchains = slow, 3 flat = fast)"
+
+  # The exact command from the project brief. Needs callchains. SLOW.
+  log "  [1/5] full report (callchains) -- slowest pass"
   perf report --stdio -i "$data"                    > "$rp/report_${tag}.txt"          2>/dev/null || true
   # Flat/self profile: which single function burns the most cycles itself.
-  perf report --stdio --no-children -i "$data"      > "$rp/report_${tag}_self.txt"     2>/dev/null || true
-  # Inverted call graph: who is responsible for calling the hot leaf.
+  log "  [2/5] self (flat)"
+  perf report --stdio --no-children -g none -i "$data" > "$rp/report_${tag}_self.txt"  2>/dev/null || true
+  # Inverted call graph: who is responsible for calling the hot leaf. Needs callchains. SLOW.
+  log "  [3/5] callers (callchains) -- slow"
   perf report --stdio -g graph,0.5,caller -i "$data" > "$rp/report_${tag}_callers.txt" 2>/dev/null || true
   # Per-DSO: separates interpreter time from libm / kernel time.
-  perf report --stdio --sort dso -i "$data"         > "$rp/report_${tag}_dso.txt"      2>/dev/null || true
+  log "  [4/5] dso (flat)"
+  perf report --stdio --sort dso -g none -i "$data" > "$rp/report_${tag}_dso.txt"      2>/dev/null || true
   # Symbol CSV -> consumed by tools/compare.sh for before/after diffing.
-  perf report --stdio --no-children -i "$data" -F overhead,dso,symbol -t, 2>/dev/null \
+  log "  [5/5] symbols.csv (flat)"
+  perf report --stdio --no-children -g none -i "$data" -F overhead,dso,symbol -t, 2>/dev/null \
       | grep -v '^#' | sed '/^$/d' > "$rp/report_${tag}_symbols.csv" || true
-  # Raw samples -> input to stackcollapse. THIS IS THE SLOW STEP: DWARF
-  # unwinding is deferred to post-processing, measured at ~0.6 s/sample with a
-  # 16 KB stack slice on the target VM (halved by DWARF_STACK_BYTES=8192).
-  local est; est=$(awk -v n="${nsamp:-0}" 'BEGIN{printf "%d", n*0.3}')
-  log "perf script (DWARF unwind of ${nsamp:-?} samples, est. ~${est}s -- be patient)"
-  perf script -i "$data" > "$rp/${tag}_script.txt" 2>/dev/null || true
+
+  # Raw samples -> input to stackcollapse. NOT the slow step: --no-inline skips
+  # per-frame addr2line inline expansion, measured at 0.26 s for 73901 frames.
+  # stderr goes to a log, never /dev/null: a silent failure here yields an empty
+  # file, and both stackcollapse and flamegraph.pl `return 0` on empty input,
+  # so the run would report success while producing no SVG.
+  log "perf script (raw samples for stackcollapse)"
+  perf script -i "$data" --no-inline -F comm,pid,tid,time,event,ip,sym,dso \
+      > "$rp/${tag}_script.txt" 2>"$rp/${tag}_script.log" || true
+  [[ -s "$rp/${tag}_script.txt" ]] || warn "perf script produced no output -> see ${tag}_script.log"
   local avg
   avg=$(awk '/^$/{if(d){s+=d;n++;d=0};next} /^\t/{d++} END{if(n)printf "%.1f", s/n}' \
         "$rp/${tag}_script.txt" 2>/dev/null)
