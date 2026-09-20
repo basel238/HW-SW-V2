@@ -1,0 +1,92 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 726  of event 'cycles'
+# Event count (approx.): 3630000000
+#
+# Overhead  Command      Shared Object     Symbol                                    
+# ........  ...........  ................  ..........................................
+#
+    38.29%  python3-dbg  python3.10d       [.] _PyEval_EvalFrameDefault
+     8.40%  python3-dbg  python3.10d       [.] binary_op1
+     6.20%  python3-dbg  python3.10d       [.] float_dealloc.lto_priv.0
+     5.65%  python3-dbg  python3.10d       [.] float_mul.lto_priv.0
+     5.23%  python3-dbg  python3.10d       [.] PyFloat_FromDouble
+     3.44%  python3-dbg  python3.10d       [.] float_sub.lto_priv.0
+     2.89%  python3-dbg  python3.10d       [.] float_add.lto_priv.0
+     2.75%  python3-dbg  libm.so.6         [.] __ieee754_pow_fma
+     2.75%  python3-dbg  python3.10d       [.] PyNumber_Multiply
+     2.20%  python3-dbg  python3.10d       [.] binary_iop1
+     1.93%  python3-dbg  python3.10d       [.] get_float_state
+     1.79%  python3-dbg  python3.10d       [.] _Py_CheckSlotResult
+     1.65%  python3-dbg  python3.10d       [.] _Py_Dealloc
+     1.65%  python3-dbg  python3.10d       [.] _Py_NewReference
+     1.52%  python3-dbg  python3.10d       [.] float_pow.lto_priv.0
+     1.38%  python3-dbg  python3.10d       [.] ternary_op
+     0.96%  python3-dbg  python3.10d       [.] PyNumber_InPlaceAdd
+     0.69%  python3-dbg  python3.10d       [.] PyTuple_GetItem
+     0.55%  python3-dbg  python3.10d       [.] binary_iop
+     0.55%  python3-dbg  python3.10d       [.] read_size_t
+     0.41%  python3-dbg  libm.so.6         [.] pow@@GLIBC_2.29
+     0.41%  python3-dbg  python3.10d       [.] binary_op
+     0.28%  python3-dbg  libc.so.6         [.] pthread_getspecific@@GLIBC_2.34
+     0.28%  python3-dbg  python3.10d       [.] PyNumber_InPlaceSubtract
+     0.28%  python3-dbg  python3.10d       [.] PyNumber_Power
+     0.28%  python3-dbg  python3.10d       [.] PyObject_GC_Del
+     0.28%  python3-dbg  python3.10d       [.] _PyLong_New
+     0.28%  python3-dbg  python3.10d       [.] _PyMem_DebugCheckAddress
+     0.28%  python3-dbg  python3.10d       [.] _PyMem_DebugFree
+     0.28%  python3-dbg  python3.10d       [.] lookdict_unicode
+     0.28%  python3-dbg  python3.10d       [.] lookdict_unicode_nodummy
+     0.14%  python3-dbg  libc.so.6         [.] __errno_location
+     0.14%  python3-dbg  libc.so.6         [.] __memmove_avx_unaligned_erms
+     0.14%  python3-dbg  libc.so.6         [.] __memset_avx2_unaligned_erms
+     0.14%  python3-dbg  libc.so.6         [.] __strlen_avx2
+     0.14%  python3-dbg  libc.so.6         [.] malloc
+     0.14%  python3-dbg  libcrypto.so.3    [.] 0x000000000030a2f9
+     0.14%  python3-dbg  python3.10d       [.] PyDict_GetItemWithError
+     0.14%  python3-dbg  python3.10d       [.] PyErr_CheckSignals
+     0.14%  python3-dbg  python3.10d       [.] PyNumber_Add
+     0.14%  python3-dbg  python3.10d       [.] PyThread_tss_get
+     0.14%  python3-dbg  python3.10d       [.] PyType_IsSubtype
+     0.14%  python3-dbg  python3.10d       [.] PyUnicode_New
+     0.14%  python3-dbg  python3.10d       [.] _PyAST_Call
+     0.14%  python3-dbg  python3.10d       [.] _PyDict_CheckConsistency
+     0.14%  python3-dbg  python3.10d       [.] _PyEval_MakeFrameVector
+     0.14%  python3-dbg  python3.10d       [.] _PyEval_Vector
+     0.14%  python3-dbg  python3.10d       [.] _PyMem_DebugRawFree
+     0.14%  python3-dbg  python3.10d       [.] _PyObject_VectorcallTstate.lto_priv.10
+     0.14%  python3-dbg  python3.10d       [.] _PyPegen_update_memo
+     0.14%  python3-dbg  python3.10d       [.] _PyType_Lookup
+     0.14%  python3-dbg  python3.10d       [.] _PyUnicode_EqualToASCIIString
+     0.14%  python3-dbg  python3.10d       [.] all_name_chars
+     0.14%  python3-dbg  python3.10d       [.] analyze_cells
+     0.14%  python3-dbg  python3.10d       [.] arena_map_get
+     0.14%  python3-dbg  python3.10d       [.] arena_map_is_used
+     0.14%  python3-dbg  python3.10d       [.] block_alloc
+     0.14%  python3-dbg  python3.10d       [.] cm_traverse.lto_priv.0
+     0.14%  python3-dbg  python3.10d       [.] delete_garbage
+     0.14%  python3-dbg  python3.10d       [.] ensure_unicode.lto_priv.0
+     0.14%  python3-dbg  python3.10d       [.] find_empty_slot
+     0.14%  python3-dbg  python3.10d       [.] free_keys_object.lto_priv.0
+     0.14%  python3-dbg  python3.10d       [.] gc_collect_main
+     0.14%  python3-dbg  python3.10d       [.] list_traverse.lto_priv.0
+     0.14%  python3-dbg  python3.10d       [.] method_vectorcall_O
+     0.14%  python3-dbg  python3.10d       [.] move_unreachable
+     0.14%  python3-dbg  python3.10d       [.] new_dict
+     0.14%  python3-dbg  python3.10d       [.] posix_do_stat
+     0.14%  python3-dbg  python3.10d       [.] pymalloc_pool_extend
+     0.14%  python3-dbg  python3.10d       [.] r_object
+     0.14%  python3-dbg  python3.10d       [.] unsafe_latin_compare
+     0.14%  python3-dbg  python3.10d       [.] visit_reachable
+     0.14%  python3-dbg  [unknown]         [k] 0xffffffffab4be8bf
+     0.14%  python3-dbg  [unknown]         [k] 0xffffffffabe00225
+     0.14%  python3-dbg  [unknown]         [k] 0xffffffffabe00be0
+     0.14%  python3-dbg  [unknown]         [k] 0xffffffffac0026a0
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#

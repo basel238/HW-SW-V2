@@ -1,0 +1,77 @@
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.278906 s  142.432 ms/loop
+energy=-0.1690801979358367
+step_rate=140.42 ksteps/s
+RESULT total_sec=2.278906 loops=16 ms_per_loop=142.4316 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.379009 s  148.688 ms/loop
+energy=-0.1690801979358367
+step_rate=134.51 ksteps/s
+RESULT total_sec=2.379009 loops=16 ms_per_loop=148.6881 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.291247 s  143.203 ms/loop
+energy=-0.1690801979358367
+step_rate=139.66 ksteps/s
+RESULT total_sec=2.291247 loops=16 ms_per_loop=143.2029 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.279726 s  142.483 ms/loop
+energy=-0.1690801979358367
+step_rate=140.37 ksteps/s
+RESULT total_sec=2.279726 loops=16 ms_per_loop=142.4828 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.279601 s  142.475 ms/loop
+energy=-0.1690801979358367
+step_rate=140.38 ksteps/s
+RESULT total_sec=2.279601 loops=16 ms_per_loop=142.4751 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.462192 s  153.887 ms/loop
+energy=-0.1690801979358367
+step_rate=129.97 ksteps/s
+RESULT total_sec=2.462192 loops=16 ms_per_loop=153.8870 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.290025 s  143.127 ms/loop
+energy=-0.1690801979358367
+step_rate=139.74 ksteps/s
+RESULT total_sec=2.290025 loops=16 ms_per_loop=143.1266 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.276055 s  142.253 ms/loop
+energy=-0.1690801979358367
+step_rate=140.59 ksteps/s
+RESULT total_sec=2.276055 loops=16 ms_per_loop=142.2535 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.281622 s  142.601 ms/loop
+energy=-0.1690801979358367
+step_rate=140.25 ksteps/s
+RESULT total_sec=2.281622 loops=16 ms_per_loop=142.6014 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.278370 s  142.398 ms/loop
+energy=-0.1690801979358367
+step_rate=140.45 ksteps/s
+RESULT total_sec=2.278370 loops=16 ms_per_loop=142.3981 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.281254 s  142.578 ms/loop
+energy=-0.1690801979358367
+step_rate=140.27 ksteps/s
+RESULT total_sec=2.281254 loops=16 ms_per_loop=142.5784 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow

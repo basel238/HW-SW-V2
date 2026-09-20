@@ -1,0 +1,25 @@
+UPSTREAM raytrace — kernel=upstream (PASSTHROUGH, no optimizations)
+resolution=100x100 loops=4
+elapsed=3.230995 s  807.749 ms/frame
+primary_rays=40000  12.38 kray/s
+RESULT total_sec=3.230995 loops=4 ms_per_frame=807.7487 krays_per_sec=12.3801 kernel=upstream
+UPSTREAM raytrace — kernel=upstream (PASSTHROUGH, no optimizations)
+resolution=100x100 loops=4
+elapsed=3.237721 s  809.430 ms/frame
+primary_rays=40000  12.35 kray/s
+RESULT total_sec=3.237721 loops=4 ms_per_frame=809.4302 krays_per_sec=12.3544 kernel=upstream
+UPSTREAM raytrace — kernel=upstream (PASSTHROUGH, no optimizations)
+resolution=100x100 loops=4
+elapsed=3.235401 s  808.850 ms/frame
+primary_rays=40000  12.36 kray/s
+RESULT total_sec=3.235401 loops=4 ms_per_frame=808.8503 krays_per_sec=12.3632 kernel=upstream
+UPSTREAM raytrace — kernel=upstream (PASSTHROUGH, no optimizations)
+resolution=100x100 loops=4
+elapsed=3.227929 s  806.982 ms/frame
+primary_rays=40000  12.39 kray/s
+RESULT total_sec=3.227929 loops=4 ms_per_frame=806.9822 krays_per_sec=12.3918 kernel=upstream
+UPSTREAM raytrace — kernel=upstream (PASSTHROUGH, no optimizations)
+resolution=100x100 loops=4
+elapsed=3.251076 s  812.769 ms/frame
+primary_rays=40000  12.30 kray/s
+RESULT total_sec=3.251076 loops=4 ms_per_frame=812.7689 krays_per_sec=12.3036 kernel=upstream

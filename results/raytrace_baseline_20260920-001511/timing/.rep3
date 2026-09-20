@@ -1,0 +1,26 @@
+Traceback (most recent call last):
+  File "/root/HW-SW-V2/bench/bm_raytrace_upstream.py", line 209, in <module>
+    sys.exit(main())
+  File "/root/HW-SW-V2/bench/bm_raytrace_upstream.py", line 190, in main
+    elapsed, _ = benchmark(loops, a.width, a.height)
+  File "/root/HW-SW-V2/bench/bm_raytrace_upstream.py", line 117, in benchmark
+    elapsed = fn(loops, width, height, None)
+  File "/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py", line 374, in bench_raytrace
+    s.render(canvas)
+  File "/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py", line 263, in render
+    colour = self.rayColour(ray)
+  File "/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py", line 279, in rayColour
+    return s.colourAt(self, ray, p, o.normalAt(p))
+  File "/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py", line 326, in colourAt
+    for lightPoint in scene.visibleLights(p):
+  File "/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py", line 293, in visibleLights
+    if self._lightIsVisible(l, p):
+  File "/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py", line 285, in _lightIsVisible
+    t = o.intersectionTime(Ray(p, l - p))
+  File "/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py", line 179, in __init__
+    self.vector = vector.normalized()
+  File "/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py", line 62, in normalized
+    return self.scale(1.0 / self.magnitude())
+  File "/root/HW-SW-V2/bench/../upstream/bm_raytrace_upstream.py", line 49, in scale
+    return Vector(factor * self.x, factor * self.y, factor * self.z)
+KeyboardInterrupt

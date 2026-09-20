@@ -1,0 +1,2 @@
+elapsed=2.188912 s  2188.912 ms/frame
+RESULT total_sec=2.188912 loops=1 ms_per_frame=2188.9120 krays_per_sec=4.5685 kernel=upstream

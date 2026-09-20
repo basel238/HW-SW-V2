@@ -1,0 +1,6 @@
+verify: OK  iterations=20000
+  energy      = -0.16908926275527172
+  rel_drift   = 8.339e-05  (symplectic: bounded, not zero)
+  state deterministic over 30 values
+  |momentum|  = 2.051e-15
+  kernel source sha256 = d1385e816d7cfea361b7915e2cf70138

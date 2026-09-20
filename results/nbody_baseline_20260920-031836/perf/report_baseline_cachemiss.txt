@@ -1,0 +1,362 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 5  of event 'cache-misses'
+# Event count (approx.): 50000
+#
+# Overhead  Command      Shared Object         Symbol                            
+# ........  ...........  ....................  ..................................
+#
+    40.00%  python3-dbg  [unknown]             [k] 0xffffffffab986f27
+            |
+            ---0xffffffffab986f27
+               0xffffffffab6583ea
+               0xffffffffab65866d
+               0xffffffffab7ad3e6
+               0xffffffffab6ecda8
+               0xffffffffab6eda01
+               0xffffffffab6ef0a2
+               0xffffffffab6ef134
+               0xffffffffab403942
+               0xffffffffabd5004e
+               0xffffffffabe00124
+               __GI___libc_read (inlined)
+               read (inlined)
+               _Py_read
+               _io_FileIO_readall_impl
+               _io_FileIO_readall (inlined)
+               cfunction_vectorcall_NOARGS (inlined)
+               _PyObject_VectorcallTstate (inlined)
+               _PyObject_CallNoArg (inlined)
+               _bufferedreader_read_all (inlined)
+               _io__Buffered_read_impl (inlined)
+               _io__Buffered_read (inlined)
+               method_vectorcall_FASTCALL
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate
+               object_vacall
+               _PyObject_CallMethodIdObjArgs
+               import_find_and_load
+               PyImport_ImportModuleLevelObject
+               import_name (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               PyEval_EvalCode
+               builtin_exec_impl
+               builtin_exec
+               cfunction_vectorcall_FASTCALL (inlined)
+               PyVectorcall_Call
+               _PyObject_Call
+               PyObject_Call
+               do_call_core (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               0xffffffffffffffff
+
+    20.00%  python3-dbg  ld-linux-x86-64.so.2  [.] _dl_relocate_object
+            |
+            ---elf_machine_rela_relative (inlined)
+               elf_dynamic_do_Rela (inlined)
+               _dl_relocate_object
+               dl_open_worker_begin
+               __GI__dl_catch_exception (inlined)
+               dl_open_worker
+               __GI__dl_catch_exception (inlined)
+               _dl_open
+               dlopen_doit
+               __GI__dl_catch_exception (inlined)
+               __GI__dl_catch_error (inlined)
+               _dlerror_run
+               dlopen_implementation (inlined)
+               ___dlopen (inlined)
+               _PyImport_FindSharedFuncptr
+               _PyImport_LoadDynamicModuleWithSpec
+               _imp_create_dynamic_impl (inlined)
+               _imp_create_dynamic (inlined)
+               cfunction_vectorcall_FASTCALL (inlined)
+               PyVectorcall_Call
+               _PyObject_Call
+               PyObject_Call
+               do_call_core (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate
+               object_vacall
+               _PyObject_CallMethodIdObjArgs
+               import_find_and_load
+               PyImport_ImportModuleLevelObject
+               import_name (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               PyEval_EvalCode
+               builtin_exec_impl
+               builtin_exec
+               cfunction_vectorcall_FASTCALL (inlined)
+               PyVectorcall_Call
+               _PyObject_Call
+               PyObject_Call
+               do_call_core (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               0xffffffffffffffff
+
+    20.00%  python3-dbg  python3.10d           [.] _PyUnicode_FromUCS1.lto_priv.0
+            |
+            ---ucs1lib_find_max_char (inlined)
+               _PyUnicode_FromUCS1 (inlined)
+               PyUnicode_FromKindAndData
+               r_object
+               r_object
+               r_object
+               read_object
+               PyMarshal_ReadObjectFromString
+               PyImport_ImportFrozenModuleObject
+               PyImport_ImportFrozenModule
+               init_importlib
+               pycore_interp_init
+               pyinit_config
+               pyinit_core
+               Py_InitializeFromConfig
+               pymain_init
+               pymain_main
+               Py_BytesMain
+               main
+               __libc_start_call_main
+               __libc_start_main_impl (inlined)
+               _start
+
+    20.00%  python3-dbg  [unknown]             [k] 0xffffffffab9869b7
+            |
+            ---0xffffffffab9869b7
+               0xffffffffab6ad1ed
+               0xffffffffab6ade8a
+               0xffffffffab6c6228
+               0xffffffffab68b735
+               0xffffffffab68f6c7
+               0xffffffffab68fbe4
+               0xffffffffab68fd26
+               0xffffffffab4c435d
+               0xffffffffabd5258b
+               0xffffffffabe00c04
+               __memset_avx2_unaligned_erms
+               memset (inlined)
+               _PyMem_DebugRawAlloc
+               _PyMem_DebugRawMalloc
+               PyMem_RawMalloc
+               _PyObject_Malloc
+               _PyMem_DebugRawAlloc
+               _PyMem_DebugRawMalloc
+               _PyMem_DebugMalloc
+               PyObject_Malloc
+               new_keys_object (inlined)
+               dictresize
+               insertion_resize
+               PyDict_SetDefault
+               PyUnicode_InternInPlace
+               r_object
+               r_object
+               r_object
+               read_object
+               marshal_loads_impl
+               marshal_loads
+               cfunction_vectorcall_O (inlined)
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate
+               object_vacall
+               _PyObject_CallMethodIdObjArgs
+               import_find_and_load
+               PyImport_ImportModuleLevelObject
+               import_name (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               _PyEval_EvalFrameDefault
+               _PyEval_EvalFrame (inlined)
+               _PyEval_Vector
+               _PyFunction_Vectorcall
+               _PyObject_VectorcallTstate (inlined)
+               PyObject_Vectorcall (inlined)
+               call_function (inlined)
+               0xffffffffffffffff
+
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#

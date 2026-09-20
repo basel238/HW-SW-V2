@@ -1,0 +1,7 @@
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=1
+elapsed=0.205503 s  205.503 ms/loop
+energy=-0.16908926275527172
+step_rate=97.32 ksteps/s
+RESULT total_sec=0.205503 loops=1 ms_per_loop=205.5035 energy=-0.16908926275527172 iterations=20000 kernel=flat_pow

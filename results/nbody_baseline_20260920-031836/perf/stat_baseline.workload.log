@@ -1,0 +1,40 @@
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.698561 s  231.160 ms/loop
+energy=-0.1690801979358367
+step_rate=86.52 ksteps/s
+RESULT total_sec=3.698561 loops=16 ms_per_loop=231.1601 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.719590 s  232.474 ms/loop
+energy=-0.1690801979358367
+step_rate=86.03 ksteps/s
+RESULT total_sec=3.719590 loops=16 ms_per_loop=232.4744 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.747378 s  234.211 ms/loop
+energy=-0.1690801979358367
+step_rate=85.39 ksteps/s
+RESULT total_sec=3.747378 loops=16 ms_per_loop=234.2111 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.738703 s  233.669 ms/loop
+energy=-0.1690801979358367
+step_rate=85.59 ksteps/s
+RESULT total_sec=3.738703 loops=16 ms_per_loop=233.6690 energy=-0.1690801979358367 iterations=20000
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.699363 s  231.210 ms/loop
+energy=-0.1690801979358367
+step_rate=86.50 ksteps/s
+RESULT total_sec=3.699363 loops=16 ms_per_loop=231.2102 energy=-0.1690801979358367 iterations=20000

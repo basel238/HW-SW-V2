@@ -1,0 +1,2 @@
+elapsed=2.420679 s  484.136 ms/loop
+RESULT total_sec=2.420679 loops=5 ms_per_loop=484.1359 energy=-0.1690798593916718 iterations=20000

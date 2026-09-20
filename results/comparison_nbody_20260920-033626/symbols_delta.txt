@@ -1,0 +1,57 @@
+==============================================================================
+ SYMBOL-LEVEL DELTA (self overhead %, sampled profile)
+==============================================================================
+Note: percentages are shares of each profile, so they sum to ~100 in
+both columns. A symbol dropping to 0.00 means it was eliminated.
+
+symbol                                            base%     opt%     delta
+------------------------------------------------------------------------------
+[.] _PyEval_EvalFrameDefault                      43.53    38.29     -5.24
+[.] binary_op1                                     4.94     8.40     +3.46
+[.] float_mul.lto_priv.0                           5.11     5.65     +0.54
+[.] float_dealloc.lto_priv.0                       3.32     6.20     +2.88
+[.] PyFloat_FromDouble                             3.66     5.23     +1.57
+[.] float_sub.lto_priv.0                           2.39     3.44     +1.05
+[.] float_add.lto_priv.0                           2.56     2.89     +0.33
+[.] __ieee754_pow_fma                              1.62     2.75     +1.13
+[.] _Py_CheckSlotResult                            1.87     1.79     -0.08
+[.] binary_iop1                                    1.36     2.20     +0.84
+[.] PyNumber_Multiply                              0.77     2.75     +1.98
+[.] _Py_Dealloc                                    1.53     1.65     +0.12
+[.] list_ass_item.lto_priv.0                       3.15     0.00     -3.15
+[.] get_float_state                                1.19     1.93     +0.74
+[.] _Py_NewReference                               0.94     1.65     +0.71
+[.] PyNumber_AsSsize_t                             2.47     0.00     -2.47
+[.] PyObject_GetItem                               2.30     0.00     -2.30
+[.] list_ass_subscript.lto_priv.0                  2.13     0.00     -2.13
+[.] PyLong_AsSsize_t                               2.04     0.00     -2.04
+[.] PyTuple_GetItem                                1.19     0.69     -0.50
+[.] list_item.lto_priv.0                           1.70     0.00     -1.70
+[.] float_pow.lto_priv.0                           0.17     1.52     +1.35
+[.] ternary_op                                     0.26     1.38     +1.12
+[.] PyObject_SetItem                               1.62     0.00     -1.62
+[.] PyNumber_InPlaceAdd                            0.60     0.96     +0.36
+[.] _PyNumber_Index                                0.94     0.00     -0.94
+[.] list_subscript.lto_priv.0                      0.94     0.00     -0.94
+[.] listiter_next.lto_priv.0                       0.77     0.00     -0.77
+[.] read_size_t                                    0.17     0.55     +0.38
+[.] binary_op                                      0.26     0.41     +0.15
+[.] binary_iop                                     0.09     0.55     +0.46
+[.] _PyObject_Malloc                               0.60     0.00     -0.60
+[.] lookdict_unicode                               0.17     0.28     +0.11
+[.] _PyMem_DebugCheckAddress                       0.17     0.28     +0.11
+[.] lookdict_unicode_nodummy                       0.17     0.28     +0.11
+[.] pthread_getspecific@@GLIBC_2.34                0.17     0.28     +0.11
+[.] pow@@GLIBC_2.29                                0.00     0.41     +0.41
+[.] PyNumber_InPlaceSubtract                       0.09     0.28     +0.19
+[.] PyNumber_Power                                 0.09     0.28     +0.19
+[.] arena_map_is_used                              0.17     0.14     -0.03
+
+ELIMINATED (>=1% in baseline, absent from optimized):
+    3.15%  [.] list_ass_item.lto_priv.0
+    2.47%  [.] PyNumber_AsSsize_t
+    2.30%  [.] PyObject_GetItem
+    2.13%  [.] list_ass_subscript.lto_priv.0
+    2.04%  [.] PyLong_AsSsize_t
+    1.70%  [.] list_item.lto_priv.0
+    1.62%  [.] PyObject_SetItem

@@ -1,0 +1,36 @@
+===============================================================
+ PERF STAT COMPARISON — nbody
+===============================================================
+
+Counters come from perf stat COUNTING mode (~1% overhead), so the
+ratios below are valid even though absolute wall time in profiled
+phases is inflated.
+
+CRITICAL — PER-WORK NORMALIZATION:
+  Each variant is calibrated INDEPENDENTLY, so the two runs may execute
+  different amounts of work per process. Raw counter totals are
+  therefore NOT comparable, for exactly the same reason raw total_sec
+  is not. Every derived figure below is divided by the loop count.
+    baseline  loops = 16
+    optimized loops = 16
+
+--------------------------------------------------------------
+ baseline  (RAW totals as perf reported them — not comparable)
+--------------------------------------------------------------
+ (no perf stat data — was ENABLE_PERF_STAT=0, or no PMU?)
+
+--------------------------------------------------------------
+ optimized  (RAW totals as perf reported them — not comparable)
+--------------------------------------------------------------
+ (no perf stat data — was ENABLE_PERF_STAT=0, or no PMU?)
+
+--------------------------------------------------------------
+ PER-WORK counters and derived ratios
+--------------------------------------------------------------
+  [no comparable perf stat data]
+
+--------------------------------------------------------------
+ topdown breakdown (validity-checked)
+--------------------------------------------------------------
+ baseline: (no topdown data)
+ optimized: (no topdown data)
