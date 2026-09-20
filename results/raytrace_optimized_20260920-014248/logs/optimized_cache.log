@@ -1,0 +1,12 @@
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+UPSTREAM raytrace — kernel=shadow_ray (one shadow ray per visibility query)
+resolution=100x100 loops=1
+elapsed=1.619634 s  1619.634 ms/frame
+primary_rays=10000  6.17 kray/s
+RESULT total_sec=1.619634 loops=1 ms_per_frame=1619.6339 krays_per_sec=6.1742 kernel=shadow_ray
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.068 MB /root/HW-SW-V2/results/raytrace_optimized_20260920-014248/perf/optimized_cachemiss.data (6 samples) ]

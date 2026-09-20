@@ -1,0 +1,13 @@
+
+Aggregated stats:
+           TOTAL events:       1243
+            MMAP events:         13  ( 1.0%)
+            COMM events:          3  ( 0.2%)
+            EXIT events:          1  ( 0.1%)
+          SAMPLE events:       1073  (86.3%)
+           MMAP2 events:        149  (12.0%)
+  FINISHED_ROUND events:          2  ( 0.2%)
+      THREAD_MAP events:          1  ( 0.1%)
+         CPU_MAP events:          1  ( 0.1%)
+cycles stats:
+          SAMPLE events:       1073

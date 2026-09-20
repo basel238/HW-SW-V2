@@ -1,0 +1,23 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1K of event 'cycles'
+# Event count (approx.): 5365000000
+#
+# Children      Self  Shared Object                            
+# ........  ........  .........................................
+#
+   100.00%    97.58%  python3.10d                              
+    84.90%     1.40%  libc.so.6                                
+    21.16%     0.65%  [unknown]                                
+     0.19%     0.19%  libcrypto.so.3                           
+     0.09%     0.09%  ld-linux-x86-64.so.2                     
+     0.09%     0.09%  libm.so.6                                
+     0.09%     0.00%  _hashlib.cpython-310d-x86_64-linux-gnu.so
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#

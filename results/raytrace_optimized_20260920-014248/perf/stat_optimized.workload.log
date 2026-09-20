@@ -1,0 +1,25 @@
+UPSTREAM raytrace — kernel=shadow_ray (one shadow ray per visibility query)
+resolution=100x100 loops=4
+elapsed=2.521760 s  630.440 ms/frame
+primary_rays=40000  15.86 kray/s
+RESULT total_sec=2.521760 loops=4 ms_per_frame=630.4401 krays_per_sec=15.8619 kernel=shadow_ray
+UPSTREAM raytrace — kernel=shadow_ray (one shadow ray per visibility query)
+resolution=100x100 loops=4
+elapsed=2.504254 s  626.063 ms/frame
+primary_rays=40000  15.97 kray/s
+RESULT total_sec=2.504254 loops=4 ms_per_frame=626.0635 krays_per_sec=15.9728 kernel=shadow_ray
+UPSTREAM raytrace — kernel=shadow_ray (one shadow ray per visibility query)
+resolution=100x100 loops=4
+elapsed=2.519664 s  629.916 ms/frame
+primary_rays=40000  15.88 kray/s
+RESULT total_sec=2.519664 loops=4 ms_per_frame=629.9160 krays_per_sec=15.8751 kernel=shadow_ray
+UPSTREAM raytrace — kernel=shadow_ray (one shadow ray per visibility query)
+resolution=100x100 loops=4
+elapsed=2.495833 s  623.958 ms/frame
+primary_rays=40000  16.03 kray/s
+RESULT total_sec=2.495833 loops=4 ms_per_frame=623.9581 krays_per_sec=16.0267 kernel=shadow_ray
+UPSTREAM raytrace — kernel=shadow_ray (one shadow ray per visibility query)
+resolution=100x100 loops=4
+elapsed=2.511218 s  627.805 ms/frame
+primary_rays=40000  15.93 kray/s
+RESULT total_sec=2.511218 loops=4 ms_per_frame=627.8046 krays_per_sec=15.9285 kernel=shadow_ray

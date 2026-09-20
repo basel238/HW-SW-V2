@@ -1,0 +1,2 @@
+elapsed=1.659178 s  1659.178 ms/frame
+RESULT total_sec=1.659178 loops=1 ms_per_frame=1659.1784 krays_per_sec=6.0271 kernel=shadow_ray

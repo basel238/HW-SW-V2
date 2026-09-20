@@ -1,0 +1,13 @@
+  24x24   kernel=upstream   sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=guards     sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=shadow_ray sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=combined   sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  100x100  kernel=upstream   sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=guards     sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=shadow_ray sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=combined   sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  37x23   kernel=upstream   sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=guards     sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=shadow_ray sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=combined   sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+verify: OK  all kernels; baseline before and after each candidate

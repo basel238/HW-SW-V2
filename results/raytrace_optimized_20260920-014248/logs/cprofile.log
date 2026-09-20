@@ -1,0 +1,5 @@
+UPSTREAM raytrace — kernel=shadow_ray (one shadow ray per visibility query)
+resolution=100x100 loops=1
+elapsed=1.448997 s  1448.997 ms/frame
+primary_rays=10000  6.90 kray/s
+RESULT total_sec=1.448997 loops=1 ms_per_frame=1448.9974 krays_per_sec=6.9013 kernel=shadow_ray

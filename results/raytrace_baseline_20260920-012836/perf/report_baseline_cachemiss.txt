@@ -1,0 +1,43 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 1  of event 'cache-misses'
+# Event count (approx.): 10000
+#
+# Overhead  Command      Shared Object  Symbol              
+# ........  ...........  .............  ....................
+#
+   100.00%  python3-dbg  python3.10d    [.] _PyObject_Malloc
+            |
+            ---pymalloc_alloc (inlined)
+               _PyObject_Malloc
+               _PyMem_DebugRawAlloc
+               _PyMem_DebugRawMalloc
+               _PyMem_DebugMalloc
+               PyObject_Malloc
+               PyUnicode_New
+               unicode_decode_utf8 (inlined)
+               PyUnicode_DecodeUTF8Stateful
+               PyUnicode_FromString
+               PyDict_SetItemString
+               _PyBuiltins_AddExceptions
+               pycore_init_builtins
+               pycore_interp_init
+               pyinit_config
+               pyinit_core
+               Py_InitializeFromConfig
+               pymain_init
+               pymain_main
+               Py_BytesMain
+               main
+               __libc_start_call_main
+               __libc_start_main_impl (inlined)
+               _start
+
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#
