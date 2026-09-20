@@ -1,0 +1,25 @@
+UPSTREAM raytrace — kernel=full (all exact pure-Python optimizations)
+resolution=100x100 loops=4
+elapsed=1.856012 s  464.003 ms/frame
+primary_rays=40000  21.55 kray/s
+RESULT total_sec=1.856012 loops=4 ms_per_frame=464.0030 krays_per_sec=21.5516 kernel=full
+UPSTREAM raytrace — kernel=full (all exact pure-Python optimizations)
+resolution=100x100 loops=4
+elapsed=1.858799 s  464.700 ms/frame
+primary_rays=40000  21.52 kray/s
+RESULT total_sec=1.858799 loops=4 ms_per_frame=464.6997 krays_per_sec=21.5193 kernel=full
+UPSTREAM raytrace — kernel=full (all exact pure-Python optimizations)
+resolution=100x100 loops=4
+elapsed=1.873467 s  468.367 ms/frame
+primary_rays=40000  21.35 kray/s
+RESULT total_sec=1.873467 loops=4 ms_per_frame=468.3666 krays_per_sec=21.3508 kernel=full
+UPSTREAM raytrace — kernel=full (all exact pure-Python optimizations)
+resolution=100x100 loops=4
+elapsed=1.864737 s  466.184 ms/frame
+primary_rays=40000  21.45 kray/s
+RESULT total_sec=1.864737 loops=4 ms_per_frame=466.1842 krays_per_sec=21.4507 kernel=full
+UPSTREAM raytrace — kernel=full (all exact pure-Python optimizations)
+resolution=100x100 loops=4
+elapsed=1.852735 s  463.184 ms/frame
+primary_rays=40000  21.59 kray/s
+RESULT total_sec=1.852735 loops=4 ms_per_frame=463.1837 krays_per_sec=21.5897 kernel=full

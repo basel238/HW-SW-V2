@@ -1,0 +1,90 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 725  of event 'cycles'
+# Event count (approx.): 3625000000
+#
+# Overhead  Command      Shared Object     Symbol                          
+# ........  ...........  ................  ................................
+#
+    39.31%  python3-dbg  python3.10d       [.] _PyEval_EvalFrameDefault
+     8.83%  python3-dbg  python3.10d       [.] binary_op1
+     6.90%  python3-dbg  python3.10d       [.] PyFloat_FromDouble
+     4.83%  python3-dbg  python3.10d       [.] float_mul.lto_priv.0
+     3.86%  python3-dbg  python3.10d       [.] float_dealloc.lto_priv.0
+     3.59%  python3-dbg  python3.10d       [.] float_sub.lto_priv.0
+     2.76%  python3-dbg  python3.10d       [.] get_float_state
+     2.62%  python3-dbg  libm.so.6         [.] __ieee754_pow_fma
+     2.48%  python3-dbg  python3.10d       [.] _Py_CheckSlotResult
+     2.48%  python3-dbg  python3.10d       [.] float_add.lto_priv.0
+     2.34%  python3-dbg  python3.10d       [.] _Py_NewReference
+     1.93%  python3-dbg  python3.10d       [.] float_pow.lto_priv.0
+     1.79%  python3-dbg  python3.10d       [.] _Py_Dealloc
+     1.79%  python3-dbg  python3.10d       [.] binary_iop1
+     1.52%  python3-dbg  python3.10d       [.] PyNumber_Multiply
+     0.69%  python3-dbg  python3.10d       [.] PyTuple_GetItem
+     0.55%  python3-dbg  python3.10d       [.] PyNumber_Add
+     0.55%  python3-dbg  python3.10d       [.] PyNumber_InPlaceAdd
+     0.55%  python3-dbg  python3.10d       [.] _PyObject_Malloc
+     0.55%  python3-dbg  python3.10d       [.] lookdict_unicode_nodummy
+     0.41%  python3-dbg  python3.10d       [.] PyNumber_Power
+     0.41%  python3-dbg  python3.10d       [.] binary_iop
+     0.41%  python3-dbg  python3.10d       [.] binary_op
+     0.41%  python3-dbg  python3.10d       [.] ternary_op
+     0.28%  python3-dbg  libc.so.6         [.] __memmove_avx_unaligned_erms
+     0.28%  python3-dbg  libc.so.6         [.] __memset_avx2_unaligned_erms
+     0.28%  python3-dbg  libm.so.6         [.] pow@@GLIBC_2.29
+     0.28%  python3-dbg  python3.10d       [.] PyNumber_InPlaceSubtract
+     0.28%  python3-dbg  python3.10d       [.] PyThread_tss_get
+     0.28%  python3-dbg  python3.10d       [.] _PyMem_DebugCheckAddress
+     0.28%  python3-dbg  python3.10d       [.] _PyMem_DebugMalloc
+     0.28%  python3-dbg  python3.10d       [.] _PyMem_DebugRawFree
+     0.28%  python3-dbg  python3.10d       [.] _PyUnicode_CheckConsistency
+     0.28%  python3-dbg  python3.10d       [.] frame_dealloc.lto_priv.0
+     0.28%  python3-dbg  python3.10d       [.] validate_list
+     0.14%  python3-dbg  libc.so.6         [.] __strncpy_avx2
+     0.14%  python3-dbg  python3.10d       [.] PyBytes_FromStringAndSize
+     0.14%  python3-dbg  python3.10d       [.] PyNumber_Subtract
+     0.14%  python3-dbg  python3.10d       [.] PyObject_CallFunctionObjArgs
+     0.14%  python3-dbg  python3.10d       [.] PyThread_acquire_lock_timed
+     0.14%  python3-dbg  python3.10d       [.] PyTuple_Pack
+     0.14%  python3-dbg  python3.10d       [.] PyUnicode_InternInPlace
+     0.14%  python3-dbg  python3.10d       [.] PyUnicode_New
+     0.14%  python3-dbg  python3.10d       [.] _PyBytes_FromSize.lto_priv.0
+     0.14%  python3-dbg  python3.10d       [.] _PyEval_Vector
+     0.14%  python3-dbg  python3.10d       [.] _PyLong_New
+     0.14%  python3-dbg  python3.10d       [.] _PyObject_IsFreed
+     0.14%  python3-dbg  python3.10d       [.] _PyPegen_is_memoized
+     0.14%  python3-dbg  python3.10d       [.] _PyUnicode_FromId
+     0.14%  python3-dbg  python3.10d       [.] _copy_characters
+     0.14%  python3-dbg  python3.10d       [.] arena_map_get
+     0.14%  python3-dbg  python3.10d       [.] assemble_emit
+     0.14%  python3-dbg  python3.10d       [.] dict_dealloc.lto_priv.0
+     0.14%  python3-dbg  python3.10d       [.] find_name_in_mro.lto_priv.0
+     0.14%  python3-dbg  python3.10d       [.] get_coding_spec
+     0.14%  python3-dbg  python3.10d       [.] inherit_patma_flags
+     0.14%  python3-dbg  python3.10d       [.] insertdict
+     0.14%  python3-dbg  python3.10d       [.] list_extend.lto_priv.0
+     0.14%  python3-dbg  python3.10d       [.] lookdict_unicode
+     0.14%  python3-dbg  python3.10d       [.] move_unreachable
+     0.14%  python3-dbg  python3.10d       [.] rangeiter_next.lto_priv.0
+     0.14%  python3-dbg  python3.10d       [.] read_size_t
+     0.14%  python3-dbg  python3.10d       [.] set_next
+     0.14%  python3-dbg  python3.10d       [.] tok_get
+     0.14%  python3-dbg  python3.10d       [.] tupletraverse.lto_priv.0
+     0.14%  python3-dbg  python3.10d       [.] unicode_eq
+     0.14%  python3-dbg  python3.10d       [.] visit_decref
+     0.14%  python3-dbg  python3.10d       [.] 0x0000000000022c40
+     0.14%  python3-dbg  [unknown]         [k] 0xffffffffa9edd710
+     0.14%  python3-dbg  [unknown]         [k] 0xffffffffa9ee157c
+     0.14%  python3-dbg  [unknown]         [k] 0xffffffffaa186f27
+     0.14%  python3-dbg  [unknown]         [k] 0xffffffffaa1876b0
+     0.14%  python3-dbg  [unknown]         [k] 0xffffffffaa600be0
+     0.14%  python3-dbg  [unknown]         [k] 0xffffffffaa600fb2
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#

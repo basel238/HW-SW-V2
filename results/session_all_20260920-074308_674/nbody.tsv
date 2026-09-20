@@ -1,0 +1,5 @@
+benchmark	nbody
+loops	16
+baseline	/root/HW-SW-V2/results/nbody_baseline_20260920-080806_16940
+optimized	/root/HW-SW-V2/results/nbody_optimized_20260920-081744_16940
+comparison	/root/HW-SW-V2/results/session_all_20260920-074308_674/comparison_nbody

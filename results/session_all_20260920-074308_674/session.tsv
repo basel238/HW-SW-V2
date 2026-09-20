@@ -1,0 +1,5 @@
+nbody_kernel	flat_pow
+raytrace_kernel	full
+git_metadata	0
+raytrace	completed
+nbody	completed

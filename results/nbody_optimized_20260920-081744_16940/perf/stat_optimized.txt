@@ -1,0 +1,26 @@
+# started on Sun Sep 20 08:18:33 2026
+
+
+ Performance counter stats for 'taskset -c 0 python3 /root/HW-SW-V2/variants/bm_nbody_upstream_opt.py --mode raw --loops 16 --kernel flat_pow --no-gc' (5 runs):
+
+           2387.49 msec task-clock                #    0.992 CPUs utilized            ( +-  0.32% )
+              2358      page-faults               #  982.096 /sec                     ( +-  0.05% )
+              2358      minor-faults              #  982.096 /sec                     ( +-  0.05% )
+                 0      major-faults              #    0.000 /sec                   
+                39      context-switches          #   16.243 /sec                     ( +-  9.95% )
+                 0      cpu-migrations            #    0.000 /sec                   
+        5567576848      cycles                    #    2.319 GHz                      ( +-  0.38% )  (49.81%)
+       17618370380      instructions              #    3.15  insn per cycle           ( +-  0.04% )  (59.85%)
+        2008000142      branches                  #  836.323 M/sec                    ( +-  0.07% )  (59.82%)
+           9356999      branch-misses             #    0.47% of all branches          ( +-  6.64% )  (59.82%)
+           2986309      cache-references          #    1.244 M/sec                    ( +-  4.96% )  (59.94%)
+             56903      cache-misses              #    1.898 % of all cache refs      ( +-  6.14% )  (60.10%)
+        5627555954      L1-dcache-loads           #    2.344 G/sec                    ( +-  0.02% )  (40.18%)
+           3735019      L1-dcache-load-misses     #    0.07% of all L1-dcache accesses  ( +-  4.37% )  (40.18%)
+   <not supported>      LLC-loads                                                   
+   <not supported>      LLC-load-misses                                             
+        2788968626      dTLB-loads                #    1.162 G/sec                    ( +-  0.25% )  (40.06%)
+             79126      dTLB-load-misses          #    0.00% of all dTLB cache accesses  ( +- 14.12% )  (39.90%)
+
+           2.40772 +- 0.00740 seconds time elapsed  ( +-  0.31% )
+

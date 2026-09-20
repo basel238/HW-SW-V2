@@ -1,0 +1,5 @@
+benchmark	raytrace
+loops	4
+baseline	/root/HW-SW-V2/results/raytrace_baseline_20260920-074314_1800
+optimized	/root/HW-SW-V2/results/raytrace_optimized_20260920-075734_1800
+comparison	/root/HW-SW-V2/results/session_all_20260920-074308_674/comparison_raytrace

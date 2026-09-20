@@ -1,0 +1,17 @@
+hardware_pmu	available	task-clock,page-faults,minor-faults,major-faults,context-switches,cpu-migrations,cycles,instructions,branches,branch-misses,cache-references,cache-misses,L1-dcache-loads,L1-dcache-load-misses,LLC-loads,LLC-load-misses,dTLB-loads,dTLB-load-misses
+verify	passed	loops=16
+clean_timing	requested	
+perf_stat	requested	
+perf_record	requested	
+cache_profile	requested	
+cprofile	requested	
+pyspy	disabled	
+pyperformance	requested	
+clean_timing	completed	reps=11 loops=16
+sampling_workload	configured	loops=5 interpreter=python3-dbg
+perf_record	completed	samples=725 loops=5 interpreter=python3-dbg
+flamegraph	completed	
+sampling_workload	configured	loops=5 interpreter=python3-dbg
+cprofile	completed	loops=1
+pyperformance	not_applicable	optimized wrapper is outside upstream harness
+workflow	completed	review unavailable phases separately

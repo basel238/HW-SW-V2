@@ -1,0 +1,110 @@
+===============================================================
+ PERF STAT COMPARISON — raytrace
+===============================================================
+
+Counters come from perf stat COUNTING mode (~1% overhead), so the
+ratios below are valid even though absolute wall time in profiled
+phases is inflated.
+
+CRITICAL — PER-WORK NORMALIZATION:
+  Each variant is calibrated INDEPENDENTLY, so the two runs may execute
+  different amounts of work per process. Raw counter totals are
+  therefore NOT comparable, for exactly the same reason raw total_sec
+  is not. Every derived figure below is divided by the loop count.
+    baseline  loops = 4
+    optimized loops = 4
+
+--------------------------------------------------------------
+ baseline  (RAW totals as perf reported them — not comparable)
+--------------------------------------------------------------
+# started on Sun Sep 20 07:43:52 2026
+ Performance counter stats for 'taskset -c 0 python3 /root/HW-SW-V2/bench/bm_raytrace_upstream.py --mode raw --loops 4 --no-gc' (5 runs):
+           3267.46 msec task-clock                #    0.995 CPUs utilized            ( +-  0.29% )
+              1940      page-faults               #  592.166 /sec                     ( +-  0.06% )
+              1940      minor-faults              #  592.166 /sec                     ( +-  0.06% )
+                 0      major-faults              #    0.000 /sec                   
+                31      context-switches          #    9.462 /sec                     ( +- 19.58% )
+                 0      cpu-migrations            #    0.000 /sec                   
+        7600305887      cycles                    #    2.320 GHz                      ( +-  0.34% )  (49.84%)
+       20202515964      instructions              #    2.65  insn per cycle           ( +-  0.25% )  (59.87%)
+        2600737454      branches                  #  793.849 M/sec                    ( +-  0.29% )  (59.88%)
+           9561964      branch-misses             #    0.37% of all branches          ( +-  1.99% )  (59.89%)
+           8150077      cache-references          #    2.488 M/sec                    ( +-  3.94% )  (59.99%)
+             45521      cache-misses              #    0.519 % of all cache refs      ( +- 34.30% )  (60.11%)
+        6558291435      L1-dcache-loads           #    2.002 G/sec                    ( +-  0.12% )  (40.12%)
+         194539794      L1-dcache-load-misses     #    2.96% of all L1-dcache accesses  ( +-  1.86% )  (40.11%)
+        3240733713      dTLB-loads                #  989.201 M/sec                    ( +-  0.25% )  (40.01%)
+            295896      dTLB-load-misses          #    0.01% of all dTLB cache accesses  ( +- 16.92% )  (39.89%)
+           3.28296 +- 0.00810 seconds time elapsed  ( +-  0.25% )
+
+--------------------------------------------------------------
+ optimized  (RAW totals as perf reported them — not comparable)
+--------------------------------------------------------------
+# started on Sun Sep 20 07:58:32 2026
+ Performance counter stats for 'taskset -c 0 python3 /root/HW-SW-V2/variants/bm_raytrace_upstream_opt.py --mode raw --loops 4 --kernel full --no-gc' (5 runs):
+           1901.39 msec task-clock                #    0.993 CPUs utilized            ( +-  0.19% )
+              2203      page-faults               #    1.153 K/sec                    ( +-  0.04% )
+              2203      minor-faults              #    1.153 K/sec                    ( +-  0.04% )
+                 0      major-faults              #    0.000 /sec                   
+                25      context-switches          #   13.084 /sec                     ( +-  2.71% )
+                 0      cpu-migrations            #    0.000 /sec                   
+        4418435979      cycles                    #    2.313 GHz                      ( +-  0.22% )  (49.55%)
+       11373664013      instructions              #    2.56  insn per cycle           ( +-  0.05% )  (59.64%)
+        1475014501      branches                  #  771.991 M/sec                    ( +-  0.17% )  (59.81%)
+           7264509      branch-misses             #    0.50% of all branches          ( +-  2.64% )  (60.02%)
+           7915901      cache-references          #    4.143 M/sec                    ( +-  7.69% )  (60.23%)
+             91325      cache-misses              #    0.945 % of all cache refs      ( +- 10.60% )  (60.45%)
+        3661136700      L1-dcache-loads           #    1.916 G/sec                    ( +-  0.11% )  (40.19%)
+         110979376      L1-dcache-load-misses     #    3.02% of all L1-dcache accesses  ( +-  0.34% )  (39.98%)
+        1821578099      dTLB-loads                #  953.375 M/sec                    ( +-  0.21% )  (39.77%)
+            266138      dTLB-load-misses          #    0.01% of all dTLB cache accesses  ( +- 16.10% )  (39.55%)
+           1.91482 +- 0.00337 seconds time elapsed  ( +-  0.18% )
+
+--------------------------------------------------------------
+ PER-WORK counters and derived ratios
+--------------------------------------------------------------
+  event                        base/unit        opt/unit     change  conf
+  ----------------------------------------------------------------------
+  instructions             5,050,628,991   2,843,416,003    -43.70%   59.6%  <- LOW
+  cycles                   1,900,076,472   1,104,608,995    -41.87%   49.5%  <- LOW
+  branches                   650,184,364     368,753,625    -43.28%   59.8%  <- LOW
+  branch misses                2,390,491       1,816,127    -24.03%   59.9%  <- LOW
+  cache refs                   2,037,519       1,978,975     -2.87%   60.0%  <- LOW
+  cache misses                    11,380          22,831   +100.62%   60.1%  <- LOW
+  L1-d loads               1,639,572,859     915,284,175    -44.18%   40.1%  <- LOW
+  L1-d misses                 48,634,948      27,744,844    -42.95%   40.0%  <- VERY LOW
+  dTLB loads                 810,183,428     455,394,525    -43.79%   39.8%  <- VERY LOW
+  dTLB misses                     73,974          66,534    -10.06%   39.5%  <- VERY LOW
+  page faults                        485             551    +13.56%  100.0%
+  ctx switches                         8               6    -19.35%  100.0%
+
+  IPC baseline   = 2.6581
+  IPC optimized  = 2.5741
+
+  Interpretation:
+    instructions/unit down  -> work was REMOVED
+    instructions/unit flat but IPC up -> STALLS were removed
+  These are different claims and the counters distinguish them.
+
+  MISS-RATE CAVEAT (course Tutorial 2): a miss PERCENTAGE can rise while
+  misses PER UNIT OF WORK fall, because the denominator shrank. Always
+  quote the per-unit absolute counts above, not just the percentage.
+
+  WARNING: these events ran for <40% of the measurement period and
+  are statistical estimates, not exact counts. Do not build a precise
+  causal argument on them:
+    - L1-dcache-load-misses
+    - dTLB-loads
+    - dTLB-load-misses
+
+--------------------------------------------------------------
+ topdown breakdown (validity-checked)
+--------------------------------------------------------------
+ baseline: REJECTED — contains negative percentages, so the counters
+   are internally inconsistent (a share cannot be negative).
+   Do NOT assign a bottleneck interpretation to this output.
+     -61.7%
+ optimized: REJECTED — contains negative percentages, so the counters
+   are internally inconsistent (a share cannot be negative).
+   Do NOT assign a bottleneck interpretation to this output.
+     -59.2%

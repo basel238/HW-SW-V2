@@ -1,0 +1,9 @@
+reference (upstream advance), iterations=20000 loops=16
+  energy = -0.1690801979358367
+  grouped   energy bit-identical=True | all 30 state components bit-identical=True
+  flat_pow  energy bit-identical=True | all 30 state components bit-identical=True
+  flat_sqrt energy rel_diff=2.364e-14 | state max_abs=2.522e-10 norm_rel=1.004e-11 OK
+  sqrt      energy rel_diff=2.364e-14 | state max_abs=2.522e-10 norm_rel=1.004e-11 OK
+  hoist     energy rel_diff=0.000e+00 | state max_abs=0.000e+00 norm_rel=0.000e+00 OK
+  full      energy rel_diff=2.364e-14 | state max_abs=2.522e-10 norm_rel=1.004e-11 OK
+verify: OK  grouped/flat_pow are bit-identical; other kernels agree within 1e-9 relative energy / norm-relative state

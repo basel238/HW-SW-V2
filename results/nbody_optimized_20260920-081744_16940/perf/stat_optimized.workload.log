@@ -1,0 +1,35 @@
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.336772 s  146.048 ms/loop
+energy=-0.1690801979358367
+step_rate=136.94 ksteps/s
+RESULT total_sec=2.336772 loops=16 ms_per_loop=146.0483 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.337704 s  146.106 ms/loop
+energy=-0.1690801979358367
+step_rate=136.89 ksteps/s
+RESULT total_sec=2.337704 loops=16 ms_per_loop=146.1065 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.369495 s  148.093 ms/loop
+energy=-0.1690801979358367
+step_rate=135.05 ksteps/s
+RESULT total_sec=2.369495 loops=16 ms_per_loop=148.0934 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.333984 s  145.874 ms/loop
+energy=-0.1690801979358367
+step_rate=137.10 ksteps/s
+RESULT total_sec=2.333984 loops=16 ms_per_loop=145.8740 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow
+OPTIMIZED upstream nbody — kernel=flat_pow
+variant_sha256=5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=2.325863 s  145.366 ms/loop
+energy=-0.1690801979358367
+step_rate=137.58 ksteps/s
+RESULT total_sec=2.325863 loops=16 ms_per_loop=145.3664 energy=-0.1690801979358367 iterations=20000 kernel=flat_pow

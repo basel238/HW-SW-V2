@@ -1,0 +1,35 @@
+  24x24   kernel=upstream   sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=guards     sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=shadow_ray sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=combined   sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=sphere_scalar sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=camera     sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=nearest_hit sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=checkerboard sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=full       sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=slots      sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  24x24   kernel=full_slots sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored
+  100x100  kernel=upstream   sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=guards     sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=shadow_ray sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=combined   sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=sphere_scalar sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=camera     sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=nearest_hit sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=checkerboard sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=full       sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=slots      sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  100x100  kernel=full_slots sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored
+  37x23   kernel=upstream   sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=guards     sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=shadow_ray sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=combined   sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=sphere_scalar sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=camera     sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=nearest_hit sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=checkerboard sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=full       sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=slots      sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+  37x23   kernel=full_slots sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored
+batch verify: 4 frames at 100x100, kernel=full, all BIT-IDENTICAL
+verify: OK  all kernels; baseline before and after each candidate

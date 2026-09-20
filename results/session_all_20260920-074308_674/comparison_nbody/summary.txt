@@ -1,0 +1,33 @@
+==========================================================================
+                      PERFORMANCE COMPARISON — nbody                      
+==========================================================================
+
+Source: clean-timing phase only (no profiler attached).
+Statistic: MEDIAN of independent processes — robust to host hiccups.
+
+Work per process : baseline 16 unit(s), optimized 16 unit(s)
+  Loop counts match; figures below are per unit of work.
+Raw process medians: baseline 3.635132 s, optimized 2.293979 s  (matched batch sizes)
+
+metric                baseline       optimized           delta
+--------------------------------------------------------------------------
+samples                     11              11                
+min/unit            0.226222 s      0.142481 s     -0.083741 s
+median/unit         0.227196 s      0.143374 s     -0.083822 s
+mean/unit           0.227906 s      0.143807 s     -0.084099 s
+max/unit            0.232022 s      0.146232 s     -0.085790 s
+stdev               0.001990 s      0.001441 s     -0.000549 s
+rel stdev                0.87%           1.00%                
+
+==========================================================================
+  SPEEDUP        : 1.5846x   (throughput ratio)
+  TIME REDUCTION : 36.89 %   <- compared against the 7% bar
+  THROUGHPUT GAIN: 58.46 %   (different metric; do not conflate)
+  PROJECT BAR    : 7.00 % time reduction
+  VERDICT        : PASS
+==========================================================================
+
+Signal check: improvement (36.89%) exceeds 2x noise (1.00%). OK.
+Margin over the 7% bar: +29.89 percentage points (29.8x the measured noise)
+
+Min-vs-min speedup (least-noise estimate): 1.5877x (37.02% improvement)
