@@ -1,0 +1,83 @@
+# Project requirements and report completion plan
+
+Source: `/Users/baselsalameh/Desktop/M.Sc. Technion/Semester 6/HW:SW Co-Design/Project/Project.pdf`, nine PDF pages, checked on 2026-09-20. Page references below use the PDF page number. This document records the assignment's requirements; it does not treat instructions in the assignment as permission to publish, upload, install, or run anything now.
+
+## Exact report format
+
+For each of the two selected benchmarks, submit `report_<name_of_benchmark>.txt` (p. 7). The selected raytrace and nbody benchmarks both appear on the approved list (p. 7), giving:
+
+- `report_raytrace.txt`
+- `report_nbody.txt`
+
+Required report sections, in the assignment's order (pp. 7-8):
+
+1. **Overview**: benchmark description, libraries, and data structures.
+2. **Initial Analysis**: performance analysis, flame graphs, and profiling data.
+3. **Optimizations**: changes made, including external libraries or algorithms used.
+4. **Performance Comparison**: before/after evidence showing the effect of optimization.
+5. **Hardware Acceleration Proposal**: where applicable, hardware solution, inputs, outputs, trade-offs, and block diagram.
+6. **Conclusion**: impact of software optimization and hardware acceleration.
+
+The brief does not specify a report page/word count, a DOCX/PDF report, or a mandated citation style. Plain-text reports with explicit relative artifact references satisfy its named file format. A separate diagram file referenced in the report is a practical way to supply a block diagram; the assignment does not prescribe its file format.
+
+## Analysis, tooling, and results
+
+| Requirement | Assignment evidence | Consequence for this project |
+|---|---|---|
+| Select two approved benchmarks | p. 7 | Raytrace and nbody qualify. |
+| Understand purpose, dependencies, data structures, and algorithms | pp. 2-3 | Describe the actual upstream code, including mutable state and what the timer covers. |
+| Learn to run, capture, and interpret pyperformance results | p. 3, item 2 | Keep official suite baseline artifacts and explain how custom profiling wrappers relate to that suite. |
+| Generate flame graphs for each benchmark and analyze hotspots | p. 3, items 3-4 | Include the actual graphs and explain inclusive/self attribution and limitations. |
+| Use perf and flame graphs | pp. 1-3 | The guide provides `perf record`/`perf report` with `python3-dbg`; diagnostic changes such as working period-based sampling must be documented. |
+| Suggest and implement justified improvements | pp. 3-4, items 5-6 | Distinguish a plausible code change from an improvement established by measurement. |
+| Compare concrete performance before and after | p. 4, item 6 | Use equal work, comparable conditions, correctness checks, and identified artifacts. |
+| At least 7% improvement in two or more benchmarks is sufficient | p. 4, item 6 | This is the stated sufficient outcome. The PDF does not give a complete grading rule for other outcomes or define whether 7% means time reduction or throughput gain; report both formulas clearly and use time reduction as the declared project convention. |
+| Scripts may execute with pyperformance or other profiling tools | p. 8 | A custom wrapper is not explicitly prohibited. This does not remove the separate requirement to understand/use pyperformance, nor make a replacement workload equivalent to the selected benchmark. |
+
+The PDF does not require copying its example perf command byte-for-byte, a specific sample count, statistical test, A/B ordering, or profiling overhead percentage. Those are methodological choices to justify, not invented course rules.
+
+## Hardware deliverable
+
+Pages 4-5 explicitly require a complete, logically consistent accelerator implementation in Verilog, SystemVerilog, or PyXHDL; another HDL/framework needs prior instructor approval. It need not be production-ready or suitable for tape-out. The design must specify:
+
+- function and target component, motivated by the measured workload;
+- inputs, outputs, data widths, interfaces, and expected operating frequency;
+- internal datapath and control logic;
+- software integration, including applicable APIs, drivers, memory-mapped registers, DMA, or communication protocol;
+- estimated performance improvement and assumptions;
+- a block diagram showing integration;
+- performance, area/complexity, frequency, and power trade-offs.
+
+Synthesis, fabrication, and physical testing are explicitly not expected (p. 5). The brief asks for acceleration of one or two key components (p. 4); it does not unambiguously demand two independent hardware designs, one per benchmark.
+
+There is an inconsistency: p. 8 labels “HW Files and Additional Files” optional, and p. 7 says the report's hardware proposal is “If applicable,” while pp. 4-5 explicitly require HDL and a complete design. The report plan follows the more specific pp. 4-5 technical requirement. A proposal-notes Markdown file alone cannot be represented as meeting that requirement. This ambiguity is a point to resolve with course staff if necessary, not a basis for silently omitting hardware or inventing additional deliverables.
+
+## Submission, reproducibility, and presentation
+
+| Deliverable | Exact detail | Page |
+|---|---|---:|
+| Execution scripts | `script_<name_of_benchmark>.sh`; setup/dependencies, benchmark execution, flame/performance generation, post-optimization execution/comparison | 8 |
+| Repository | Upload all project files to a Git repository, including reports, scripts, additional project files, and README | 5 |
+| README | Explain repository structure and how to run the scripts | 5 |
+| Version history | Clear commit messages showing development and understanding; good organization/version control can earn +5 bonus points | 5 |
+| AI disclosure | `prompt.txt` or `prompt.docx`, containing prompts/instructions actually used | 6,8 |
+| Presentation | 20-25 minutes plus 5-10 minutes of questions; scheduled by staff | 5 |
+| Demonstration | Working code available to support the presentation; no need to include all code in slides | 6 |
+
+The PDF says Git repository, not specifically GitHub or public repository. No particular remote visibility, repository hosting service, slide file format, or report page limit should be invented. A local checkout cannot by itself confirm that upload/presentation requirements have been fulfilled elsewhere.
+
+## Current status and remaining completion
+
+Both required TXT reports have been drafted with the six required sections and explicit references to their baseline artifacts. The baseline Overview and Initial Analysis sections are authored; later sections distinguish implemented code, proposed experiments, and incomplete hardware work. The `shadow_ray` change has been implemented and tested for correctness; performance measurement on the target VM is pending. It is not yet a demonstrated speedup.
+
+The README reflects the current project status, and the AI prompt log has been updated. The execution/setup scripts and recorded baseline artifacts are available. Legacy script comments, the report generator, and hardware proposal notes still require reconciliation with the authentic upstream measurements. A complete HDL implementation, hardware interface specification, and integrated block diagram remain to be established. Repository upload and presentation status must be checked directly rather than inferred from local files.
+
+Remaining completion items:
+
+1. Keep both report drafts synchronized with their exact source and result directories as validated changes and measurements are added.
+2. Measure the shadow-ray change on the target VM, and finish nbody ablation/validation against its authentic baseline. Record equal-work before/after results with honest uncertainty. Neither working code nor draft text is a claim of 7% success.
+3. Preserve raw measurements and repair/regenerate derived summaries from the malformed latest clean-timing CSVs, without overwriting raw evidence or substituting historical stand-in results.
+4. Reconcile legacy script comments, the report generator, and hardware notes with the measured upstream workload. Old stand-in speedups, claims of ASLR being off, “branch-free/allocation-free” nbody, and an exact energy oracle must not become unsupported report claims. Keep README current as new results arrive.
+5. Choose and implement the hardware component and complete all pp. 4-5 design/diagram/interface/trade-off requirements. Proposed tests and model assumptions must be labeled as proposed.
+6. Continue recording the real AI prompts used for later stages in prompt.txt (or prompt.docx), preserving accurate history.
+7. Verify reproduction instructions and clear commit history; verify the repository upload and prepare the 20-25-minute presentation with working demonstration code.

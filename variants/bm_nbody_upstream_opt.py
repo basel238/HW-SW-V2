@@ -1,76 +1,59 @@
 #!/usr/bin/env python3
 """
-variants/bm_nbody_upstream_opt.py — OPTIMIZED, ported onto the REAL upstream
-pyperformance nbody kernel.
+Isolated optimization candidates for the authentic pyperformance nbody kernel.
+The reference in upstream/ is unchanged. The shared wrapper calls upstream's
+own timed benchmark and substitutes only advance(), bound to that run's state.
 
-HONEST STARTING POINT
----------------------
-An external review predicted that most of the gain measured against my custom
-baseline would evaporate here, and reading the upstream source confirms the
-mechanism. Upstream's inner loop already destructures coordinates in the `for`
-target:
+DEFAULT: GROUPED LOCAL STATE
+---------------------------
+Upstream already unpacks position coordinates into locals for each pair. The
+new `grouped` candidate goes further: it retains the first body's position and
+velocity components across consecutive pairs with that identical first body.
+Second-body velocity updates remain immediate; the first body's velocity is
+written back after its group. Positions move only after every pair is handled.
 
-    for (([x1, y1, z1], v1, m1), ([x2, y2, z2], v2, m2)) in pairs:
+Pair order, each floating-point expression, the power operation, and the order
+of increments to every velocity component are preserved. Groups contain body
+references, are never sorted, and are built once per advance() call INSIDE the
+upstream timer. State is reloaded at the start of each group and timestep.
+As in upstream's five-body workload, bodies have distinct mutable position and
+velocity lists and no pair contains the same body twice. This is a workload
+optimization, not a generic API for aliased bodies or side-effecting containers.
 
-so the coordinates are ALREADY locals and the masses are ALREADY bound from the
-pair tuple. My custom baseline had added `bodies[i]` / `p1[0]` subscripting that
-upstream never had, which means optimization [O2] (flatten + hoist subscripts)
-was largely removing work I had introduced myself.
+For ten pairs arranged as four first-body groups, pair processing reduces each
+of position-component reads, velocity-component reads, and velocity-component
+writes from 60 to 42 per timestep. That removes 54 component accesses per step
+(1,080,000 at 20,000 steps), counting reads performed by unpacking. These are
+source-level access counts, not machine instructions or a speedup prediction.
+Float arithmetic and result allocation remain; extra grouping/loop overhead
+also remains. Target-VM performance must be measured before claiming a gain.
 
-WHAT IS GENUINELY LEFT TO OPTIMIZE
-----------------------------------
-[U1] `** (-1.5)` -> `1.0 / (d2 * sqrt(d2))`
-     Upstream computes `mag = dt * ((dx*dx + dy*dy + dz*dz) ** (-1.5))`.
-     The `**` operator on a float with a non-integral exponent calls CPython's
-     float_pow, which calls libm pow(): a generic polynomial/exponential
-     evaluation (tens of cycles). sqrt() compiles to a single hardware
-     instruction (SQRTSD). Mathematically identical for d2 > 0, which always
-     holds here because two bodies never coincide.
+SEPARATE CANDIDATES
+------------------
+    upstream   original upstream advance(), unmodified control
+    grouped    consecutive-pair reuse, original power arithmetic (default)
+    sqrt       existing inverse-power rewrite with locally bound sqrt
+    hoist      existing per-pair velocity loads/stores; no cross-pair reuse
+    full       existing sqrt + per-pair hoist combination
+The legacy candidates are retained independently; `grouped` does not enable
+sqrt or combine with `full`.
 
-[U2] Bind `sqrt` into the function's fast locals via a default argument.
-     A bare `sqrt(...)` resolved from module scope is LOAD_GLOBAL (a dict
-     lookup, with a builtins fallback on miss). A default argument lives in the
-     frame's fast-locals array, so the same call becomes LOAD_FAST.
-
-[U3] Hoist the velocity lists' element access.
-     Upstream does `v1[0] -= dx*b2m` etc. -- six subscript load/store pairs per
-     pair. Reading the three components into locals, updating them, and writing
-     back replaces the in-place subscript arithmetic. This is NOT obviously a
-     win (the store count is unchanged), so it is included as a separately
-     measurable ablation rather than assumed to help.
-
-NOT APPLIED, AND WHY
---------------------
-  * Flattening to parallel scalar lists: upstream's layout is already
-    destructured at the loop head; rewriting it would change the data structure
-    the assignment asks us to analyse, for no measured benefit.
-  * numpy: 5 bodies / 10 pairs. Per-call overhead (~1 us) exceeds the whole
-    inner loop. Only a batched rewrite could win, which is a different program.
-  * Barnes-Hut: an approximation; would invalidate the energy oracle. n=5.
-  * threading: the GIL serialises pure-Python float arithmetic.
-
-CORRECTNESS CONTRACT
---------------------
-[U1] changes the rounding of ONE operation, so results are not required to be
-bit-identical. The gate therefore checks:
-  * relative energy agreement with upstream to < 1e-9, and
-  * full state (all positions and velocities) agreement to < 1e-9 relative.
-Both are verified at the MEASURED iteration count (20000), not a reduced one.
-
-ABLATION SUPPORT
-----------------
---kernel selects which variant is timed, so each edit can be attributed:
-    upstream   upstream advance(), unmodified          (control)
-    sqrt       [U1] + [U2] only
-    hoist      [U3] only
-    full       [U1] + [U2] + [U3]
+CORRECTNESS
+-----------
+Verify mode checks all candidates at the requested iterations AND loops
+(default one loop). Grouped must have finite, bit-identical energy and all 30
+position/velocity components. Legacy candidates retain their previous 1e-9
+relative-energy and norm-relative-state tolerance, because sqrt changes
+rounding. The state tolerance is max absolute error divided by the maximum
+absolute reference component; it is not a per-component relative bound.
 """
 
 import argparse
 import gc
 import os
 import sys
-from math import sqrt
+from math import isfinite, sqrt
+import struct
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "bench"))
@@ -93,7 +76,7 @@ def advance_sqrt(dt, n, bodies=None, pairs=None, _sqrt=sqrt):
             dy = y1 - y2
             dz = z1 - z2
             d2 = dx * dx + dy * dy + dz * dz
-            # [U1] d2 ** -1.5  ==  1 / (d2 * sqrt(d2)), via hardware SQRTSD
+            # [U1] Same real-number identity for d2 > 0; rounding may differ.
             mag = dt / (d2 * _sqrt(d2))
             b1m = m1 * mag
             b2m = m2 * mag
@@ -165,8 +148,52 @@ def advance_full(dt, n, bodies=None, pairs=None, _sqrt=sqrt):
             r[2] += dt * vz
 
 
+# Group only consecutive first-body references; preserve the original order.
+def _group_consecutive_pairs(pairs):
+    groups = []
+    for first, second in pairs:
+        if groups and first is groups[-1][0]:
+            groups[-1][1].append(second)
+        else:
+            groups.append((first, [second]))
+    return groups
+
+
+def advance_grouped(dt, n, bodies=None, pairs=None):
+    """Reuse local state while retaining upstream's exact pow arithmetic."""
+    if bodies is None or pairs is None:
+        raise ValueError("pass the upstream module's bodies and pairs")
+    groups = _group_consecutive_pairs(pairs)
+    for _ in range(n):
+        for (([x1, y1, z1], v1, m1), others) in groups:
+            vx1, vy1, vz1 = v1
+            for ([x2, y2, z2], v2, m2) in others:
+                dx = x1 - x2
+                dy = y1 - y2
+                dz = z1 - z2
+                mag = dt * ((dx * dx + dy * dy + dz * dz) ** (-1.5))
+                b1m = m1 * mag
+                b2m = m2 * mag
+                # Same arithmetic and ordering as upstream's v1[0:3] updates.
+                vx1 -= dx * b2m
+                vy1 -= dy * b2m
+                vz1 -= dz * b2m
+                # Second-body stores remain immediate and in original order.
+                v2[0] += dx * b1m
+                v2[1] += dy * b1m
+                v2[2] += dz * b1m
+            v1[0] = vx1
+            v1[1] = vy1
+            v1[2] = vz1
+        for (r, [vx, vy, vz], m) in bodies:
+            r[0] += dt * vx
+            r[1] += dt * vy
+            r[2] += dt * vz
+
+
 KERNELS = {
     "upstream": None,               # None => use upstream's own advance()
+    "grouped":  advance_grouped,
     "sqrt":     advance_sqrt,
     "hoist":    advance_hoist,
     "full":     advance_full,
@@ -195,17 +222,69 @@ def calibrate(iterations, kernel):
         loops *= 2
 
 
+def _checked_snapshot(up, energy, name):
+    state = base.snapshot(up)
+    if len(state) != 30:
+        raise AssertionError(f"{name}: expected 30 state components, got {len(state)}")
+    if not isfinite(energy) or not all(isfinite(value) for value in state):
+        raise AssertionError(f"{name}: non-finite energy or state")
+    return state
+
+
+def _float_bits(values):
+    return struct.pack(f"!{len(values)}d", *values)
+
+
+def verify(loops, iterations):
+    """Check the actual accumulated batch; explicit failures survive python -O."""
+    _, e_ref, up_ref = _run(loops, iterations, None)
+    s_ref = _checked_snapshot(up_ref, e_ref, "upstream")
+    print(f"reference (upstream advance), iterations={iterations} loops={loops}")
+    print(f"  energy = {e_ref!r}")
+
+    failures = []
+    for name, fn in KERNELS.items():
+        if fn is None:
+            continue
+        _, energy, up = _run(loops, iterations, fn)
+        state = _checked_snapshot(up, energy, name)
+        if name == "grouped":
+            ok_energy = _float_bits([energy]) == _float_bits([e_ref])
+            ok_state = _float_bits(state) == _float_bits(s_ref)
+            ok = ok_energy and ok_state
+            print(f"  {name:<9} energy bit-identical={ok_energy} "
+                  f"| all 30 state components bit-identical={ok_state}")
+        else:
+            rel_energy = abs(energy - e_ref) / max(abs(e_ref), 1e-300)
+            max_abs = max(abs(x - y) for x, y in zip(state, s_ref))
+            denom = max(max(abs(x) for x in s_ref), 1e-300)
+            norm_rel = max_abs / denom
+            ok = rel_energy < 1e-9 and norm_rel < 1e-9
+            print(f"  {name:<9} energy rel_diff={rel_energy:.3e} "
+                  f"| state max_abs={max_abs:.3e} norm_rel={norm_rel:.3e} "
+                  f"{'OK' if ok else 'FAIL'}")
+        if not ok:
+            failures.append(name)
+    if failures:
+        raise AssertionError("verification failed for: " + ", ".join(failures))
+    print("verify: OK  grouped is bit-identical; legacy kernels agree "
+          "within 1e-9 relative energy / norm-relative state")
+
+
 def main():
     p = argparse.ArgumentParser(
         description="OPTIMIZED upstream pyperformance nbody")
     p.add_argument("--mode", choices=("raw", "calibrate", "verify", "ablate"),
-                   default="raw")
-    p.add_argument("--loops", type=int, default=0)
+                   default="raw", help="verify checks all kernels, including the selected kernel")
+    p.add_argument("--loops", type=int, default=0,
+                   help="0 => auto-calibrate for timing; 1 loop for verification")
     p.add_argument("--iterations", type=int, default=0,
                    help="0 => upstream default (20000)")
-    p.add_argument("--kernel", choices=tuple(KERNELS), default="full")
+    p.add_argument("--kernel", choices=tuple(KERNELS), default="grouped")
     p.add_argument("--no-gc", action="store_true")
     a = p.parse_args()
+    if a.no_gc:
+        gc.disable()
 
     probe = base.load_upstream()
     iters = a.iterations or probe.DEFAULT_ITERATIONS
@@ -215,33 +294,7 @@ def main():
         print(calibrate(iters, kernel)); return 0
 
     if a.mode == "verify":
-        # Cross-check EVERY kernel against upstream at the MEASURED size.
-        _, e_ref, up_ref = _run(1, iters, None)
-        s_ref = base.snapshot(up_ref)
-        print(f"reference (upstream advance), iterations={iters}")
-        print(f"  energy = {e_ref!r}")
-
-        all_ok = True
-        for name, fn in KERNELS.items():
-            if fn is None:
-                continue
-            _, e, up = _run(1, iters, fn)
-            s = base.snapshot(up)
-            rel_e = abs(e - e_ref) / abs(e_ref)
-            max_abs = max(abs(x - y) for x, y in zip(s, s_ref))
-            denom = max(max(abs(x) for x in s_ref), 1e-300)
-            max_rel = max_abs / denom
-            # [U1] reassociates one operation, so exact equality is not
-            # required; 1e-9 relative is far tighter than any physical effect.
-            ok_e = rel_e < 1e-9
-            ok_s = max_rel < 1e-9
-            all_ok = all_ok and ok_e and ok_s
-            print(f"  {name:<9} energy rel_diff={rel_e:.3e} "
-                  f"{'OK' if ok_e else 'FAIL'}"
-                  f" | state max_abs={max_abs:.3e} rel={max_rel:.3e} "
-                  f"{'OK' if ok_s else 'FAIL'}")
-        assert all_ok, "a kernel diverged from upstream beyond tolerance"
-        print("verify: OK  all kernels agree with upstream within 1e-9 relative")
+        verify(a.loops or 1, iters)
         return 0
 
     if a.mode == "ablate":
@@ -269,8 +322,6 @@ def main():
         return 0
 
     loops = a.loops or calibrate(iters, kernel)
-    if a.no_gc:
-        gc.disable()
 
     elapsed, energy, up = _run(loops, iters, kernel)
     total_steps = loops * iters

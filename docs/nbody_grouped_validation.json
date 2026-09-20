@@ -1,0 +1,93 @@
+{
+  "scope": "Local correctness and logical access counts only; no target-VM speedup measured.",
+  "python": "3.14.6",
+  "host": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "kernel": "grouped",
+  "arithmetic": "Original inverse-power expression and pair order",
+  "setup_boundary": "Grouping is built once per advance call inside upstream's timer.",
+  "checks": [
+    {
+      "loops": 1,
+      "iterations_per_loop": 1,
+      "state_components": 30,
+      "state_bit_identical": true,
+      "energy_bit_identical": true,
+      "state_sha256": "7dbfb2148f5ac88dddb08b876a5f9b94ee21e20e1ab64544afb917c02cb6225d"
+    },
+    {
+      "loops": 1,
+      "iterations_per_loop": 10,
+      "state_components": 30,
+      "state_bit_identical": true,
+      "energy_bit_identical": true,
+      "state_sha256": "ab2289ad7b634beea8a099d48076b077ea5110bb97361623415265573a059799"
+    },
+    {
+      "loops": 1,
+      "iterations_per_loop": 20000,
+      "state_components": 30,
+      "state_bit_identical": true,
+      "energy_bit_identical": true,
+      "state_sha256": "eb3ce3f3322145d7aba8f77c46095c745f5cf4539f609881ed34a3bf7d7d24e6"
+    },
+    {
+      "loops": 4,
+      "iterations_per_loop": 20000,
+      "state_components": 30,
+      "state_bit_identical": true,
+      "energy_bit_identical": true,
+      "state_sha256": "b530b4d92556df295bba7dda351f20a2195abba51d73e0edf33912d3858916c1"
+    },
+    {
+      "loops": 16,
+      "iterations_per_loop": 20000,
+      "state_components": 30,
+      "state_bit_identical": true,
+      "energy_bit_identical": true,
+      "state_sha256": "3e4d7bcbcf03a52278e5de075a4f2631046d6588415f448770a9498d85afa0f6"
+    }
+  ],
+  "component_counts_per_step_including_position_update": {
+    "upstream": {
+      "position_reads": 75,
+      "velocity_reads": 75,
+      "position_writes": 15,
+      "velocity_writes": 60,
+      "total_reads": 150,
+      "total_writes": 75
+    },
+    "grouped": {
+      "position_reads": 57,
+      "velocity_reads": 57,
+      "position_writes": 15,
+      "velocity_writes": 42,
+      "total_reads": 114,
+      "total_writes": 57
+    }
+  },
+  "count_method": "Instrumented list subclasses count indexed and unpacked component reads/writes. Timing is not collected for these instrumented states.",
+  "reads_removed_per_20000_steps": 720000,
+  "writes_removed_per_20000_steps": 360000,
+  "source_sha256": {
+    "variants/bm_nbody_upstream_opt.py": "43f7d54c80cba39ae7c12c33ddc0f7a16bedfeeeac605de29714aeae6b576a50",
+    "upstream/bm_nbody_upstream.py": "d1385e816d7cfea361b7915e2cf70138cd6b84f40df8bd5152638851f7bcac2b",
+    "bench/bm_nbody_upstream.py": "1cf9b11c0ec65015d07bd46dfee167af7e809fc632b251b0ab3c7efecf47b13d"
+  },
+  "regression_tests": {
+    "command": "python3 -B -m unittest discover -s tests -v",
+    "passed": 24,
+    "nbody_tests": 13,
+    "raytrace_tests": 11,
+    "python_optimized_mode_failure_check": true
+  },
+  "cli_verify": {
+    "command": "python3 -B variants/bm_nbody_upstream_opt.py --mode verify --loops 16 --iterations 20000 --no-gc",
+    "all_kernels_passed": true,
+    "grouped_energy_bit_identical": true,
+    "grouped_all_30_state_components_bit_identical": true,
+    "legacy_tolerance": {
+      "relative_energy": 1e-09,
+      "norm_relative_state": 1e-09
+    }
+  }
+}

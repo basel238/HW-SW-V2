@@ -1,295 +1,236 @@
-# HW/SW Co-design Project — Benchmark Optimization, Analysis & Hardware Acceleration
+# HW/SW Co-design: upstream nbody and raytrace
 
-Course: **00460882 — HW/SW Co-design** (Technion)
-Benchmarks analyzed: **`raytrace`** and **`nbody`** (from the approved `pyperformance` list)
+Course **00460882**, Technion. This repository profiles two approved
+`pyperformance` workloads, tests software changes, and keeps the evidence for
+their analysis and a subsequent hardware proposal.
 
-A reproducible, VM-ready pipeline that profiles two `pyperformance` benchmarks with
-`perf`, generates flame graphs, applies software optimizations, and proves the
-improvement with statistically defensible before/after measurements.
+## Current status — 20 September 2026
 
----
+The current reference workloads are the files under `upstream/`, invoked through
+`bench/bm_*_upstream.py`. The independently written `bench/bm_nbody.py` and
+`bench/bm_raytrace.py` are older stand-ins. Their historical speedups do not
+establish improvement over the required upstream benchmarks.
 
-## Measured results
+The latest baseline analysis uses these two result sets only:
 
-All figures below come from **one identified result set**: the runs under
-`results/` on the target VM (Ubuntu 22.04 guest, KVM, Xeon E5-2630 v3, 1 vCPU,
-CPython 3.10.12). Numbers from any other machine or session are not mixed in.
+| Benchmark | Selected baseline | Median clean time | Process observations |
+|---|---|---:|---:|
+| nbody, 20,000 steps | `nbody_baseline_20260919-222849` | 227.247625 ms/unit | 11 × 16 units |
+| raytrace, 100×100 | `raytrace_baseline_20260919-220048` | 792.16625 ms/frame | 11 × 4 frames |
 
-### Custom harness (`bench/` vs `variants/`)
+Both were recorded on the Ubuntu 22.04 KVM guest with CPython 3.10.12. The old
+CSV fields contain trailing text and their summaries report no samples. The
+reports recover every observation from valid raw `RESULT` records; they do not
+discard failed parses selectively. Current parser repairs do not change those
+historical artifacts.
 
-| Benchmark | Work/unit base → opt | Speedup | **Time reduction** | Bar | Noise |
-|---|---|---|---|---|---|
-| `raytrace` | 257.92 → 96.40 ms/frame | 2.6756× | **62.62 %** | ≥7 % ✅ | 0.47 % |
-| `nbody` | 261.87 → 241.13 ms/sim | 1.0860× | **7.92 %** | ≥7 % ⚠️ | 0.19 % |
+The upstream raytrace variant now defaults to **`shadow_ray`**, which reuses one
+shadow ray per visibility query. `guards` selects R1 alone, `combined` enables
+R1 plus shadow-ray reuse, and `upstream` is the control. The combined kernel
+inherits R1's exact-class restrictions and shadow reuse's read-only-ray contract.
+Local verification of the original three kernels passes at five resolutions. The
+new kernel removes 72,172 duplicate Ray constructions/normalizations and 144,344
+Vector constructions per 100×100 frame. These are work reductions, not measured
+VM speedups. A matching target-VM optimized result is still needed.
 
-**Time reduction** is the metric compared against the 7 % bar. Throughput gain
-is a different number (raytrace: +167.56 %) and the two must not be conflated.
+The upstream nbody variant now defaults to **`grouped`**. It keeps the first
+body's position and velocity in local variables across consecutive pair
+interactions, then writes its velocity once per group. Pair order, arithmetic
+order, the original power expression, and the final position-update phase are
+preserved. The upstream reference and baseline wrapper are unchanged.
+`upstream`, `sqrt`, `hoist`, and `full` remain separate selectable experiments.
+There is no combined `grouped_sqrt` kernel in this change.
 
-Counters, normalized per unit of work:
+All 28 regression tests pass (13 nbody, 12 raytrace, and 3 shell-pipeline checks).
+Local checks match all 30 state
+components and energy bit-for-bit, including the 16 × 20,000-step batch.
 
-| | raytrace | nbody |
-|---|---|---|
-| instructions/unit | −59.50 % | −2.51 % |
-| cycles/unit | −61.93 % | −7.39 % |
-| IPC | 2.80 → 2.97 | 3.06 → 3.22 |
+For 20,000 steps, grouping removes 720,000 reads and 360,000 writes of numeric
+list components, including unpacking in the source-level counts. This is not a
+count of machine instructions or a predicted runtime percentage. The new
+target-VM comparison is pending; neither source-level work reductions nor local
+correctness checks establish the course's sufficient 7% improvement outcome.
 
-raytrace removed a large amount of executed work. nbody removed few
-instructions but more cycles, implying a cheaper mix of operations.
+- [Raytrace report](report_raytrace.txt): baseline evidence, implemented change,
+  validation, performance experiment, and hardware status.
+- [Nbody report](report_nbody.txt): actual algorithm, baseline evidence, grouped
+  implementation, correctness contract, and remaining measurements.
+- [Raytrace experiment instructions](docs/SHADOW_RAY_EXPERIMENT.md): explicit kernels,
+  correctness checks, profile interpretation, and VM measurement protocol.
+- [Nbody experiment instructions](docs/NBODY_GROUPED_EXPERIMENT.md): state reuse,
+  source-level access counts, correctness checks, and VM measurement protocol.
+- [Project requirements](docs/PROJECT_REQUIREMENTS.md): PDF page references and
+  remaining deliverables, including a complete hardware design.
+- [Raytrace validation evidence](docs/shadow_ray_validation.json): operation counts
+  and pixel hashes; not a target-VM timing record.
+- [Nbody validation evidence](docs/nbody_grouped_validation.json): exact-state
+  checks and access counts; not a target-VM timing record.
 
-⚠️ **nbody's margin is thin** — 0.92 percentage points over the bar. It needs a
-second measurement session before being relied upon.
-
-### Upstream pyperformance kernels (`upstream/` + `bench/bm_*_upstream.py`)
-
-`bench/bm_*.py` are **independently written stand-ins**, not the upstream
-benchmarks. Porting the optimizations onto the real kernels changes the result
-substantially. Measured ablation on the genuine upstream nbody kernel:
-
-| kernel | speedup | time reduction |
-|---|---|---|
-| upstream (control) | 1.0000× | 0.00 % |
-| `sqrt` — pow→sqrt only | 1.0360× | **3.47 %** |
-| `hoist` — subscript hoisting only | 0.9886× | **−1.15 %** (slower) |
-| `full` | 1.0247× | 2.47 % |
-
-**Upstream nbody gets ~3.5 %, below the 7 % bar.** Upstream already
-destructures coordinates at the loop head, so the flatten/hoist optimization was
-largely removing work the *custom baseline itself introduced*. raytrace has not
-yet been ported; upstream raytrace carries more overhead than the stand-in
-(`isPoint()`/`mustBeVector()` type checks per operation, a fresh list per ray),
-so its gain is expected to survive — but that is **unverified**.
-
-### Correctness
-
-- `raytrace` — rendered image **bit-identical** to baseline (SHA-256) at 32×32,
-  **100×100 (the measured size)** and 37×23, plus five geometric edge-case rays
-  agreeing on hit/miss and on bit-exact `t`
-- `nbody` — full state (30 values) agrees to `2.4e-13` relative, energy to
-  `9.5e-15`, total momentum conserved to `2.1e-15`, at the **measured 20 000
-  steps**
-
-## Quick start (fresh Ubuntu 22.04 / jammy VM)
+## Quick start on the Ubuntu VM
 
 ```bash
-# 1. dependencies: perf, python3-dbg, toolchain
 sudo ./setup/01_install_deps.sh
-
-# 2. Brendan Gregg's FlameGraph toolkit
 ./setup/02_get_flamegraph.sh
-
-# 3. kernel knobs for usable measurements (perf permissions, ASLR, governor)
 sudo ./setup/03_tune_vm.sh
-
-# 4. venv with pyperformance + pyperf   (NOT as root)
 ./setup/04_make_venv.sh
-
-# 5. preflight — tells you exactly what is missing and what will be skipped
 ./tools/doctor.sh
-
-# 6. run everything
-./run_all.sh
 ```
 
-Faster paths while iterating:
+The upstream files are already present. The pipeline checks their provenance;
+`setup/05_get_upstream.sh` is the acquisition helper if they are missing. Inspect
+the actual manifest to confirm which VM tuning settings took effect.
+
+Verify and run the new nbody experiment:
 
 ```bash
-./run_all.sh --quick        # ~3 min smoke test of the whole pipeline
-./run_all.sh --time-only    # just the speedup numbers, zero instrumentation
-./script_raytrace.sh --help # per-benchmark options
+python3 -B -m unittest discover -s tests -v
+python3 -B variants/bm_nbody_upstream_opt.py --mode verify --loops 16 --iterations 20000
+USE_UPSTREAM=1 ./script_nbody.sh --variant both --loops 16
 ```
 
----
+The optimized arm selects `grouped` by default. Verification compares all 30
+position/velocity components and energy at the requested batch size, with exact
+comparison for `grouped` and the existing tolerance contracts for candidates
+that change floating-point evaluation. `--no-gc` is applied before calibration
+and exploratory ablation as well as raw timing. The explicit 16-loop verification
+passes all kernels; the pipeline verification phase itself still defaults to
+one loop, so retain that explicit command before the timing run.
 
-## Why the results are trustworthy: phase separation
+The pipeline command provides an initial sequential before/after collection.
+Use the balanced separate-process protocol in the experiment guide for a final
+performance claim. To select the nbody kernel directly:
 
-Profilers perturb what they measure. `perf record` with DWARF unwinding adds
-roughly 10–30 % wall time; `cProfile` adds 2–5×. **No number this repo quotes is
-ever taken from an instrumented run.** Each phase runs in its own fresh process:
-
-| Phase | What runs | Overhead | What it is used for |
-|-------|-----------|----------|---------------------|
-| 1 | `--mode verify` | none | correctness gate — **hard fail** |
-| 2 | release Python, **no profiler** | **none** | ← **the only quotable timing** |
-| 3 | `perf stat` (counting mode) | ~1 % | IPC, cache misses, branch misses |
-| 4 | `perf record` (sampling, `python3-dbg`) | high | flame graphs — **timing discarded** |
-| 5 | `cProfile` (tracing) | 2–5× | exact call counts only |
-| 6 | `pyperformance` | own harness | citable mean ± stdev |
-
-Phases 4–5 write their wall time to a file literally named
-`*_DO_NOT_QUOTE_timing.txt` so it cannot be mistaken for a result.
-
-Additional noise controls: single-CPU pinning (`taskset`), fixed
-`PYTHONHASHSEED`, cyclic GC disabled inside the timed region, ASLR off,
-`performance` governor where the platform exposes it. The headline statistic is
-the **median of N independent processes**, and `compare.sh` refuses to endorse a
-result whose improvement is smaller than 2× the measured noise.
-
----
-
-## Repository layout
-
-```
-├── script_raytrace.sh        ← required deliverable (stage 2 of the brief)
-├── script_nbody.sh           ← required deliverable
-├── run_all.sh                   one command for everything
-├── report_raytrace.txt       ← required deliverable (generated, then you finish it)
-├── report_nbody.txt          ← required deliverable
-├── prompt.txt                ← required deliverable (AI prompts used)
-│
-├── config/bench.env             every tunable knob, with rationale
-├── lib/
-│   ├── common.sh                measurement engine (perf wrappers, flame graphs)
-│   └── pipeline.sh              the generic 6-phase pipeline + shared CLI
-│
-├── bench/                       BASELINE workloads
-│   ├── bm_raytrace.py
-│   └── bm_nbody.py
-├── variants/                    OPTIMIZED workloads
-│   ├── bm_raytrace_opt.py
-│   └── bm_nbody_opt.py
-│
-├── setup/                       01 deps · 02 flamegraph · 03 vm tuning · 04 venv
-├── tools/
-│   ├── doctor.sh                preflight: hard vs soft failures
-│   ├── compare.sh               before/after + differential flame graph
-│   └── gen_report.sh            assembles report_<bench>.txt from real data
-├── docs/
-│   ├── VM_SETUP.md              QEMU recipe (incl. PMU passthrough)
-│   ├── PERF_GUIDE.md            how to read the output; troubleshooting
-│   └── HW_PROPOSAL_NOTES.md     measured data for the stage-7 hardware design
-└── results/                     all generated artifacts (timestamped)
+```bash
+python3 -B variants/bm_nbody_upstream_opt.py --kernel upstream --mode raw --loops 16 --iterations 20000 --no-gc
+python3 -B variants/bm_nbody_upstream_opt.py --kernel grouped --mode raw --loops 16 --iterations 20000 --no-gc
 ```
 
----
+Verify and run the new raytrace experiment:
 
-## Where each deliverable comes from
+```bash
+python3 -B -m unittest discover -s tests -v
+python3 -B variants/bm_raytrace_upstream_opt.py --mode verify
+USE_UPSTREAM=1 ./script_raytrace.sh --variant both --loops 4
+```
 
-The brief asks for five things. Here is the mapping:
+The optimized arm selects `shadow_ray` by default. Choose a different kernel
+for the full shell pipeline with `--kernel`:
 
-| Brief requirement | This repo |
+```bash
+# Baseline versus R1 alone
+USE_UPSTREAM=1 ./script_raytrace.sh --variant both --loops 4 --kernel guards
+
+# Baseline versus R1 plus shadow-ray reuse
+USE_UPSTREAM=1 ./script_raytrace.sh --variant both --loops 4 --kernel combined
+
+# Baseline versus shadow-ray reuse alone (also the default)
+USE_UPSTREAM=1 ./script_raytrace.sh --variant both --loops 4 --kernel shadow_ray
+```
+
+The baseline always uses the unmodified upstream wrapper. `--kernel` selects
+only the optimized arm and is forwarded to verification, calibration, clean
+timing, and all workload profiling phases. The workload path and kernel arguments
+are recorded in each run's `manifest.txt`. The installed `pyperformance` phase
+remains a separate baseline measurement. Add `--time-only` to any command above
+to skip profiling. This option is specific to upstream raytrace.
+
+To run just the Python workload directly:
+
+```bash
+python3 variants/bm_raytrace_upstream_opt.py --kernel upstream --mode raw --loops 4 --no-gc
+python3 variants/bm_raytrace_upstream_opt.py --kernel shadow_ray --mode raw --loops 4 --no-gc
+python3 variants/bm_raytrace_upstream_opt.py --kernel guards --mode raw --loops 4 --no-gc
+python3 variants/bm_raytrace_upstream_opt.py --kernel combined --mode raw --loops 4 --no-gc
+```
+
+`guards` is R1 only; `combined` applies both R1 and shadow-ray reuse. These
+commands run the Python workload directly. `--variant both` in the shell
+pipeline means baseline plus the selected optimized variant, not both
+optimizations.
+Run `--mode verify` first: it checks all four raytrace kernels and restoration
+of the baseline after each. The combined kernel remains a fixed-scene experiment;
+it does not preserve arbitrary subclass/custom-guard behavior or support
+intersection methods that mutate the shared ray. Its speedup needs measurement.
+
+Use `--mode ablate` for a quick in-process exploratory comparison. Final claims
+need interleaved separate-process runs with identical work and complete paired
+observations, as described in the experiment instructions. The existing
+`tools/ab_timing.sh` needs its failed-arm handling and confidence-interval
+analysis checked before its PASS verdict is used as evidence.
+
+Other entry points:
+
+```bash
+./script_nbody.sh --help
+./script_raytrace.sh --help
+./run_all.sh --quick
+./run_all.sh --time-only
+```
+
+`USE_UPSTREAM=1` is the default. Setting it to zero deliberately selects the
+older stand-ins and changes what is being measured.
+
+## What each measurement establishes
+
+| Phase | Purpose | Interpretation |
+|---|---|---|
+| Verification | Reference state/pixel comparison | Check correctness before timing |
+| Clean release-Python timing | Unprofiled runtime | Before/after performance evidence |
+| Release `perf stat` | Counts of instructions, cycles and supported events | Explain changes in executed work; inspect multiplexing |
+| `perf record` with `python3-dbg` | Native sampled stacks and flame graphs | Locate interpreter mechanisms; percentages are not release-time fractions |
+| `cProfile` | Python functions and call counts | Test specific work-reduction predictions; timing is instrumented |
+| `pyperformance` | Installed suite's baseline harness | Independent baseline check; does not evaluate the custom optimized variant |
+
+This is an upstream workload in a profiling wrapper, plus a separate official
+suite baseline run. The wrapper itself is not an official pyperformance suite
+result. That distinction identifies the harness and measurement conditions;
+it does not invalidate an equal-work wrapper comparison.
+
+Keep speedup (`baseline / optimized`) separate from time reduction
+(`100 * (1 - optimized / baseline)`). This project declares time reduction as
+its convention for the 7% target. The old comparison script's noise heuristic
+is not a confidence interval.
+
+In the selected baseline manifests, affinity is guest CPU 0, hash seed is zero,
+and cyclic GC is disabled. ASLR is **enabled**, and a CPU governor is unavailable.
+Native profiles contain usable stacks but do not supply precise release-time
+Amdahl bounds. Several PMU events are multiplexed; LLC events are unsupported
+and negative top-down percentages make that decomposition invalid. Read the
+reports before interpreting those fields as bottleneck evidence.
+
+## Repository map and deliverables
+
+| Path | Purpose |
 |---|---|
-| `report_<bench>.txt` | `tools/gen_report.sh` fills sections 1–4 from real data; sections 5–6 are marked `[TODO]` for you |
-| `script_<bench>.sh` | `script_raytrace.sh`, `script_nbody.sh` |
-| Flame graphs | `results/*/flame/*.svg` — plus icicle, Python-only, py-spy, and a **differential** graph |
-| ≥ 7 % improvement on ≥ 2 benchmarks | 62.62 % and 7.92 % against the custom harness, both verified correct. **On the real upstream nbody kernel only ~3.5 %** — see the upstream table above. |
-| AI prompts | `prompt.txt` |
-| Hardware proposal | `docs/HW_PROPOSAL_NOTES.md` gives the measured motivation; the design is yours |
+| `upstream/` | Unmodified reference benchmark sources and provenance |
+| `bench/bm_*_upstream.py` | Raw timing, calibration and correctness wrappers |
+| `variants/bm_*_upstream_opt.py` | Independently selectable software experiments |
+| `tests/test_raytrace_shadow.py` | Shadow-ray correctness and baseline-isolation checks |
+| `tests/test_raytrace_pipeline.py` | Shell kernel selection and forwarding through timing/profiling phases |
+| `tests/test_nbody_grouped.py` | Grouping, state binding, and numerical verification |
+| `script_nbody.sh`, `script_raytrace.sh` | Required per-benchmark execution scripts |
+| `lib/`, `config/`, `setup/` | Measurement phases, settings, dependencies and VM setup |
+| `results/` | Timestamped logs, raw timings, profiles, graphs and manifests |
+| `report_nbody.txt`, `report_raytrace.txt` | Required six-section reports; comparison/hardware work remains open |
+| `docs/PROJECT_REQUIREMENTS.md` | Assignment mapping and completion plan |
+| `docs/SHADOW_RAY_EXPERIMENT.md` | New optimization rationale and measurement instructions |
+| `docs/NBODY_GROUPED_EXPERIMENT.md` | Nbody grouping rationale, correctness contract, and measurement instructions |
+| `prompt.txt` | AI usage history, including this implementation/report stage |
 
-`gen_report.sh` deliberately **does not fabricate analysis prose.** It fills in
-everything mechanically derivable and flags the rest. A report you can defend in
-the presentation beats one that reads well and collapses under questioning.
+For each selected result directory, begin with `manifest.txt`,
+`timing/clean_baseline.txt`, `raw/cprofile_baseline.txt`,
+`perf/report_baseline_self.txt`, `perf/stat_baseline.txt`, and
+`flame/baseline.svg`. Exact evidence paths appear in the reports.
 
----
+The authored reports take precedence over legacy template prose.
+`tools/gen_report.sh` still contains stand-in descriptions; its existing guard
+redirects output to `.generated.txt` when an authored report has no unfinished
+template markers. Review any generated document before using it. Older script
+comments and `docs/HW_PROPOSAL_NOTES.md` also need reconciliation before final
+submission; they are not proof of the current upstream behavior or a completed
+hardware design.
 
-## Output of a run
-
-```
-results/<bench>_<variant>_<timestamp>/
-├── manifest.txt                  full environment capture (CPU, kernel knobs, versions)
-├── timing/
-│   ├── clean_<variant>.csv           per-rep raw timings
-│   └── clean_<variant>_summary.txt  ← median/stdev/noise warning  ★ QUOTE THIS
-├── perf/
-│   ├── stat_<variant>.txt            counters (IPC, cache, branches)
-│   ├── report_<variant>.txt          `perf report --stdio` (the brief's command)
-│   ├── report_<variant>_self.txt     flat profile — hottest single functions
-│   ├── report_<variant>_callers.txt  inverted call graph
-│   ├── report_<variant>_dso.txt      time split by shared object
-│   └── report_<variant>_symbols.csv  machine-readable, for diffing
-├── flame/
-│   ├── <variant>.svg                 CPU flame graph
-│   ├── <variant>_icicle.svg          top-down (shows recursion depth)
-│   ├── <variant>_python.svg          Python frames only
-│   └── <variant>_top30_stacks.txt    quotable text form
-└── raw/
-    ├── cprofile_<variant>.txt        exact call counts
-    └── pyperf_<variant>_stats.txt    pyperformance mean ± stdev
-```
-
-And from `tools/compare.sh`:
-
-```
-results/comparison_<bench>_<timestamp>/
-├── summary.txt          speedup, improvement %, noise check, PASS/FAIL
-├── counters.txt         side-by-side perf stat + derived IPC
-├── symbols_delta.txt    which functions got cheaper or vanished entirely
-└── diff_flame.svg       differential flame graph (red = worse, blue = better)
-```
-
----
-
-## The optimizations
-
-Full rationale lives in each variant's module docstring, with every change tied
-to the profile observation that motivated it.
-
-**`raytrace` (62.62 %)** — the dominant win is deleting the `Vector` class. Each
-`a + b` cost a method dispatch, a Python frame, a heap allocation for the result,
-and later refcount/GC work. Carrying `x, y, z` as scalar locals removes all of
-it. Also: scene flattened to tuples, intersection inlined, `sqrt` bound to a
-local, quadratic solve strength-reduced to the half-`b` form.
-
-**`nbody` (7.92 % on the custom baseline, ~3.5 % on real upstream)** — replaced `d2 ** -1.5` (a `libm pow()` call) with
-`1/(d2*sqrt(d2))` (hardware `SQRTSD`); flattened body state into parallel scalar
-lists to turn `BINARY_SUBSCR` into `LOAD_FAST`; hoisted loop-invariant masses
-into the precomputed pair list.
-
-### A finding worth presenting
-
-The `raytrace` correctness gate **caught a real bug**. Replacing three divisions
-with one reciprocal-multiply is ~1 ULP off — normally invisible. But this
-renderer contains *discontinuities* (shadow hit/miss tests), and at one pixel on
-a shadow boundary that 1 ULP flipped the occlusion test, changing the pixel by
-**118/255**. Exact division is now the default; `FAST_FP=1` opts back in and
-fails the gate on demand:
-
-```bash
-FAST_FP=1 python3 variants/bm_raytrace_opt.py --mode verify   # fails, by design
-```
-
-**Lesson:** "safe" floating-point strength reduction is only safe in
-*branch-free* numeric code. Any optimization upstream of a comparison can change
-control flow. This is why the gate compares checksums against the baseline
-instead of trusting that the output "looks fine".
-
-### Rejected optimizations (and why)
-
-- **numpy** — both benchmarks work on 3-element vectors, where numpy's
-  per-call overhead (~1 µs) is expected to exceed the cost of 3 float ops.
-  **No benchmark for this is retained in the repository**, so this is stated
-  as reasoning, not as a measurement. A batched rewrite (all rays/bodies at
-  once) is a genuinely different and potentially winning design.
-- **threading** — the GIL serializes pure-Python float arithmetic.
-- **Barnes-Hut for nbody** — reduces O(n²) to O(n log n) but is an
-  *approximation*, so it would invalidate the energy oracle. With n=5 it is also
-  slower.
-
----
-
-## If you have no hardware PMU
-
-A QEMU guest started without PMU passthrough exposes **no** hardware counters.
-Flame graphs still work (perf falls back to the `cpu-clock` software event), but
-`cycles`, IPC and cache statistics will be missing. The pipeline detects this and
-degrades gracefully rather than failing.
-
-To get real counters, start the VM with KVM and the host CPU model:
-
-```bash
-qemu-system-x86_64 -enable-kvm -cpu host -smp 4 -m 4G ...
-```
-
-See `docs/VM_SETUP.md` for the full recipe.
-
----
-
-## Reproducing a single number
-
-```bash
-# fastest defensible speedup measurement, no profilers involved
-./script_nbody.sh --time-only
-cat results/latest_comparison_nbody/summary.txt
-```
-
-Every run records its git commit, full environment, and the exact event set used,
-so any figure in a report can be traced back to the run that produced it.
+Remaining project work includes target-VM comparisons, subsequent justified
+optimizations, the specified hardware design/interface/diagram/trade-offs, and
+the presentation. The TXT reports explicitly distinguish evidence already
+collected from proposed work.

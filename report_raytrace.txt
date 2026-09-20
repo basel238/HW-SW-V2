@@ -1,0 +1,380 @@
+RAYTRACE: BASELINE ANALYSIS AND SHADOW-RAY REUSE
+HW/SW Co-design, course 00460882
+Prepared: 2026-09-20
+
+Status: baseline analysis and locally validated software change. The target-VM
+baseline is measured; local correctness tests and call-count checks pass for
+shadow_ray. Its target-VM performance result and the complete hardware-design
+deliverables are not yet available. No optimized speedup or hardware
+performance is asserted in this report.
+
+1. OVERVIEW
+===========
+
+The workload is pyperformance's raytrace benchmark, invoked through
+bench/bm_raytrace_upstream.py. The wrapper loads
+upstream/bm_raytrace_upstream.py and calls its bench_raytrace function. The
+upstream file defines both the renderer and the measured scene; the wrapper
+does not substitute a different scene.
+
+The default frame is 100 by 100 pixels. The scene contains seven spheres, one
+checkerboard halfspace, and two point lights. The camera looks from (0, 1.8, 10)
+toward (0, 3, 0). Per-pixel rays find the nearest accepted intersection, evaluate
+ambient and Lambertian lighting, test visibility of each light, and trace
+specular reflections. The recursion limit permits the primary ray and up to
+three reflected bounces. Scene and canvas construction occur inside upstream's
+timed loop and remain part of the workload.
+
+Vector and Point are separate Python classes with x/y/z attributes and methods
+for arithmetic and type-dependent behavior. A Ray owns its origin and a
+normalized direction. Scene.objects is a list of geometry/surface pairs;
+Scene.lightPoints is a list of Points. Surfaces hold material coefficients and
+colors. Canvas stores RGB bytes in a flat array.array('B'). The seven spheres
+plus halfspace are tested in their original order; each nonterminal ray builds
+an intersection list before selecting its closest accepted hit.
+
+The rendering kernel uses Python's math and array modules and pyperf's timing
+interface. The wrapper can provide time.perf_counter through a minimal pyperf
+loader stub. Its argparse, importlib, gc, hashlib, and tempfile use supports
+execution and verification. Image writing and checksumming are outside the
+quoted timing region. No NumPy, numerical C extension, or parallel renderer is
+used. Consequently, a mathematical vector operation also entails Python
+dispatch, attribute access, temporary objects, and reference management.
+
+The benchmark is useful for this project because it exposes the difference
+between useful geometric computation and the software work used to express
+that computation. Its output also provides a strong, concrete correctness
+check: compare all rendered pixel bytes against the unchanged reference.
+
+2. INITIAL ANALYSIS
+===================
+
+2.1 Evidence and environment
+
+This analysis uses only the latest selected raytrace baseline:
+  results/raytrace_baseline_20260919-220048/
+
+The manifest records commit aa22972 with zero dirty files, Ubuntu 22.04.5,
+Linux 5.15.0-1106-kvm, a one-vCPU KVM guest presenting an Intel Xeon E5-2630 v3,
+Python 3.10.12, and perf 5.15.209. Timing and counting use python3; native
+sampling uses python3-dbg. Runs are pinned to guest CPU 0, PYTHONHASHSEED is 0,
+and cyclic GC is disabled. Pinning a guest CPU does not eliminate host-side
+scheduling effects. ASLR was enabled (kernel.randomize_va_space=2); the guest
+does not expose a CPU-frequency governor in the manifest.
+
+The recorded upstream SHA-256 is:
+  88ef4d9060d8e8f6ce40f376477aaf89cc808fa44813225a3071a05a1467f017
+The saved provenance block still labels the installed-package comparison
+UNVERIFIED. The hash identifies the measured source; it is not, by itself,
+proof that the package-authenticity check was completed for this run.
+
+2.2 Correctness and clean timing
+
+The baseline verification log reports deterministic pixel buffers at 24x24,
+100x100, and 37x23. The 100x100 buffer contains 30,000 bytes and has SHA-256
+prefix 11f2c36b02044f11. Optimized verification must compare against this
+unchanged reference, not against a reference with the same patch still active.
+
+There are 11 independent clean process observations, each rendering four
+100x100 frames. These processes have no profiler attached. The stored CSV
+contains values such as "3.168665 loops", so float conversion rejected its
+rows and the saved summary says "no samples collected". The raw text contains
+all valid RESULT records. The following statistics were recovered from those
+records and normalized by the recorded four frames per process:
+
+  Observations                       11
+  Frames per observation              4
+  Median time per frame       792.16625 ms
+  Mean time per frame         790.44191 ms
+  Standard deviation            5.34274 ms
+  Relative standard deviation   0.67592 %
+  Minimum / maximum           782.15125 / 798.39225 ms
+
+The current numeric-extraction repair prevents the trailing "loops" field;
+it does not retroactively repair these stored CSV and summary files. Future
+reports should retain both raw records and a validated numeric table.
+
+A separate baseline pyperformance run contains 60 values, with median 800 ms
+and mean 799 +/- 5 ms. It corroborates the approximate 0.8-second frame cost
+under another harness. It is not an optimized performance comparison.
+
+2.3 Python-level work
+
+The baseline cProfile pass renders one frame and also profiles CLI startup.
+It records 3,092,298 total calls, including Python functions and C/builtin
+calls. Dividing by 10,000 pixels gives about 309 total profiled calls per
+primary pixel; that is an activity count, not a fixed cost per call.
+
+  Operation                                  Calls in the baseline pass
+  Vector.dot                                                 509,873
+  Vector.mustBeVector                                        520,543
+  Vector construction                                        452,955
+  Point subtraction                                          277,865
+  Point.isPoint                                              277,865
+  Vector.isPoint                                              20,000
+  Sphere.intersectionTime                                    179,457
+  Ray construction                                            98,172
+  Vector.normalized / magnitude                      109,887 each
+  Scene._lightIsVisible                                       10,666
+  Scene.rayColour                                             15,333
+  Intersection-list construction                              15,265
+  Canvas.plot                                                 10,000
+
+The largest instrumented self-time entries are Vector.dot, Point subtraction,
+sphere intersection, Vector construction, visibility testing, and scaling.
+cProfile records approximately 1.941 seconds for the whole pass; its times
+are perturbed by instrumentation and must not replace clean timing or become
+fractions in a release-runtime speedup model. In particular, dividing the
+instruction count by the number of calls does not measure a fixed per-call
+overhead. A trivial guard and an entire rendering function have very different
+costs. A share of calls is not a share of instructions or elapsed time.
+
+The strongest specific redundancy is inside Scene._lightIsVisible. It is
+called 10,666 times, but its object loop constructs Ray(p, l-p) 82,838 times.
+The light point and surface point do not change during that loop. Every
+reconstruction repeats the same subtraction, magnitude, square root, scaling,
+and object creation. One shadow ray per visibility test would remove 72,172
+duplicate normalizations without approximating the mathematics.
+
+Sphere.intersectionTime is another candidate: its 179,457 invocations create
+179,457 temporary difference vectors and make 358,914 dot calls. This suggests
+testing identical scalar arithmetic with fewer intermediate objects after the
+shadow-ray experiment. Camera x/y components are also recomputed across rows
+and columns, although their potential work reduction is smaller.
+
+2.4 Native sampling and hardware counters
+
+The native profile contains 1,065 cycles samples, using a fixed period of
+5,000,000 events and DWARF unwinding with an 8,192-byte stack capture. The
+report lists zero lost samples. The debug Python executable accounts for
+97.93% of DSO self samples. _PyEval_EvalFrameDefault alone accounts for 26.38%
+of self samples; other hot symbols include function calls, frame allocation
+and deallocation, type/attribute lookup, and float/object handling.
+
+This is useful evidence about Python execution overhead, but python3-dbg is
+not the release interpreter used for clean timing. Debug checks and allocation
+behavior can change attribution. Native symbol names also do not partition
+the machine into "real arithmetic" and "overhead" with measured precision.
+
+In the flame graph, box width represents inclusive cycle-sample weight for
+that stack prefix: it includes descendants. Parent and child widths therefore
+overlap and must not be added as separate costs. The self-symbol report instead
+attributes samples to the currently executing native instruction. Stack depth
+shows nesting, not cost; a tall narrow stack is not expensive merely because
+it is tall. The horizontal axis orders stacks, not elapsed execution time.
+
+The separate release perf-stat pass averages five four-frame processes:
+
+  Instructions per process             20,239,482,204
+  Cycles per process                     7,639,538,127
+  Reported IPC                                      2.62
+  Branch-miss fraction                              0.38%
+  L1 data loads                          6,571,320,334
+  L1 data-load misses                       188,429,969
+  L1 data-load miss fraction                        2.87%
+
+These counts include process startup. Dividing by four gives amortized
+per-frame counts, not isolated counts for one source function. Hardware
+events run for roughly 40-60% of the counting interval and are multiplexed
+estimates. Generic cache misses have 28.75% reported variation; LLC-load
+events are unsupported. The topdown result contains negative bad speculation
+(-61.2%) and is rejected as an invalid bottleneck decomposition. Neither
+the low-level counters nor a cache-miss count multiplied by assumed latency
+establish a measured DRAM stall fraction or a memory-bound classification.
+
+3. OPTIMIZATIONS
+================
+
+3.1 R2: reuse the shadow ray
+
+The shadow_ray kernel changes the placement of one computation: construct the
+shadow Ray once for a light/surface-point visibility test, then pass that same
+Ray to each geometry object's intersection test. The upstream Sphere and
+Halfspace intersection methods read the ray and do not mutate it. The scene,
+materials, lights, traversal order, camera, recursion, and arithmetic formulas
+remain those of upstream.
+
+The change preserves the original occlusion rule: return False for the first
+intersection with t not None and t > EPSILON. It does not add a distance-to-
+light cutoff, choose different roots, or change numerical tolerances. Empty
+object lists must still return True without constructing a Ray. Patch
+restoration must occur even if rendering raises, so subsequent reference
+renders use unmodified methods.
+
+This is exact repeated-work elimination, not reciprocal approximation or
+floating-point reassociation. A local one-frame 100x100 call-count check now
+confirms the predicted reduction:
+
+  Quantity                           Local upstream   Local shadow_ray
+  All Ray constructions                   98,172             26,000
+  Vector.normalized calls                109,887             37,715
+  Vector constructions                   452,943            308,599
+  Scene._lightIsVisible calls              10,666             10,666
+
+The decrease is exactly 72,172 Ray constructions/normalizations and 144,344
+Vector constructions; the number of visibility queries is unchanged. This
+local profile loads upstream before enabling cProfile. It therefore excludes
+the 12 Vector constructions during module initialization that are included
+in the VM's whole-CLI profile (452,955). The different absolute scopes agree
+on the reduction. These are measured work counts, not elapsed-time speedups.
+
+Local validation also passed 11 focused tests. They cover reuse of the same
+ray, object order and early exit, strict epsilon behavior, empty scenes,
+unchanged guard methods, patch restoration after success and exceptions,
+detection of leaked patches, the default kernel, and GC handling. All three
+kernels (upstream, guards, shadow_ray) render identical pixels at 24x24,
+37x23, 100x100, 101x97, and 128x128. Unpatched baseline renders after the
+candidate calls also match, checking that the reference was restored.
+The record in docs/shadow_ray_validation.json contains the call counts and
+the additional 101x97/128x128 checksums; tests/test_raytrace_shadow.py contains
+the focused tests. These local checks do not substitute for target-VM timing
+or prove equivalence for arbitrary extensions to the upstream classes.
+
+3.2 Separate the hypotheses
+
+The existing guards kernel is retained as an independently selectable R1
+experiment. It replaces method-dispatched type checks with exact-class tests
+without changing the arithmetic expressions. Exact-class tests narrow behavior
+for subclasses and change some error messages; this is a specialization of
+the fixed benchmark's types, not a claim of general API equivalence. The
+shadow_ray kernel is measured separately so its contribution is not confused
+with R1. A combined experiment, if added later, must have its own identifier.
+
+No constant "instructions saved per call", 25% speedup, or hardware benefit is
+inferred from the call-count budget. These claims require measurements.
+
+4. PERFORMANCE COMPARISON
+=========================
+
+The measured baseline is 792.16625 ms/frame (median of 11 observations of four
+frames). A matching target-VM timing/counter/profile set for shadow_ray has not
+yet been collected. Therefore the optimized time, speedup, and whether this
+benchmark meets the course's 7% improvement criterion remain unestablished.
+Local implementation checks or measurements on another computer must not be
+presented as results from this VM.
+
+The next experiment should retain a complete record of the exact kernel,
+source hashes, interpreter, dimensions, loop count, GC setting, affinity, and
+raw observations. Repeat the correctness checks on the target VM before its
+timing experiment. Then compare upstream and shadow_ray in interleaved
+separate processes with identical work,
+alternating or randomizing their order. Require both arms of every planned
+round to succeed; missing observations invalidate the experiment rather than
+silently dropping one arm. A confidence interval should respect those paired
+rounds. The existing A/B tool's failure handling and analysis must be validated
+before using its PASS label as evidence.
+
+Report time reduction as 100 * (1 - optimized_time / baseline_time) and speedup
+as baseline_time / optimized_time. Keep those different quantities separate.
+After clean timing, repeat cProfile to confirm the locally observed call-count
+reductions on the VM, and use a separate release counting run for instructions
+and cycles per frame. A drop in calls without a reliable drop in clean time
+would falsify the proposed performance benefit on that interpreter. Fresh
+native profiles should show where the remaining work moved; normalized sample
+shares alone do not prove absolute time savings.
+
+5. HARDWARE ACCELERATION PROPOSAL
+================================
+
+This software result does not yet justify a final accelerator or a numerical
+hardware speedup. The baseline performs many geometric operations, but the
+profiles also expose dispatch, temporary objects, and repeated normalization.
+A scalar arithmetic unit called through Python for every small vector could
+leave those costs intact and add conversion/communication overhead. The first
+step is to measure the residual workload after exact software simplification.
+
+A candidate for subsequent study is a batched ray/intersection or visibility
+datapath with typed floating-point buffers and a single host invocation for a
+batch. The host would marshal inputs, submit work, and consume results; the
+datapath would preserve the reference's operation ordering, root/epsilon
+decisions, and traversal/tie behavior. Batching offers a way to amortize an
+interface, but it requires an explicit software-integration design that
+preserves the benchmark's visible behavior. Fused operations or approximate
+reciprocal/square-root arithmetic cannot be assumed pixel-equivalent.
+
+For a serialized first-order model, use:
+  speedup = 1 / ((1 - f) + f / S_accelerated + T_interface / T_baseline)
+Here f must be an appropriate release-runtime fraction for the actual
+offloaded work after software changes. T_interface includes required data
+conversion, submission, transfer, and completion handling. Debug-interpreter
+sample shares and cProfile times do not supply f. No value is assigned to
+these unknowns without evidence.
+
+The hardware deliverable is not complete at this stage. The course requires
+full logically consistent Verilog/SystemVerilog/PyXHDL, explicit widths and
+interfaces, an assumed operating frequency, datapath and control, software
+integration, an architecture diagram, and performance/area/power trade-offs.
+Those artifacts and their assumptions must be supplied and checked together.
+The course does not require synthesis or a fabricated performance result; this
+report supplies neither in their place.
+
+6. CONCLUSION
+=============
+
+The baseline is approximately 0.792 seconds per 100x100 frame under the
+recorded VM conditions. Its recoverable raw timings and nonempty profiles
+provide a concrete basis for optimization despite the stored CSV formatting
+failure. Python-level counts identify a particularly clear redundancy:
+82,838 shadow Ray constructions for only 10,666 visibility tests.
+
+Reusing that invariant ray is a small, explainable change with precise
+correctness conditions. Local tests pass and measured call-count reductions
+match the prediction. Its target-VM performance benefit remains a measurement
+question. Completion of this benchmark's
+performance comparison requires new target-VM evidence; completion of the
+hardware section requires a real design and an explicit cost model. The
+current analysis avoids substituting call-count arithmetic or diagnostic
+profile percentages for either result.
+
+APPENDIX A: EVIDENCE
+====================
+
+The target-VM baseline evidence is under:
+  results/raytrace_baseline_20260919-220048/
+
+  manifest.txt                         host, tools, workload hash, settings
+  logs/verify.log                      baseline image verification
+  timing/loops.txt                     four frames per process
+  timing/clean_baseline.txt             eleven raw RESULT observations
+  timing/clean_baseline.csv             malformed historical numeric fields
+  timing/clean_baseline_summary.txt     historical "no samples collected"
+  raw/cprofile_baseline.txt             call counts and callee relationships
+  raw/cprofile_baseline.pstats          machine-readable profile
+  raw/cprofile_baseline_loops.txt       one frame in the profiling pass
+  perf/stat_baseline.txt                release counting pass
+  perf/stat_baseline.topdown.txt        rejected negative-percent result
+  perf/report_baseline_self.txt         native self-sample attribution
+  perf/report_baseline_dso.txt          shared-object attribution
+  logs/baseline_stats.txt               exact 1,065 sample count
+  flame/baseline.svg                    interactive baseline CPU flame graph
+  raw/pyperf_baseline_stats.txt         independent baseline harness summary
+
+Recovered four-frame clean totals, in seconds and original observation order:
+  3.168665, 3.193569, 3.128605, 3.164604, 3.189617, 3.171755,
+  3.169376, 3.145245, 3.144564, 3.133061, 3.170383
+
+Local software validation, separate from VM performance evidence:
+  docs/shadow_ray_validation.json       call counts and extra image checks
+  tests/test_raytrace_shadow.py         eleven focused correctness tests
+
+APPENDIX B: EXPLICIT KERNEL SELECTION
+====================================
+
+From the project root, one verification invocation checks every registered
+kernel against the unchanged reference and checks restoration afterwards:
+
+  python3 variants/bm_raytrace_upstream_opt.py --mode verify
+
+Run the focused correctness tests with:
+
+  python3 -m unittest discover -s tests -p 'test_raytrace_shadow.py'
+
+Examples of equal-work raw invocations (four 100x100 frames, cyclic GC off):
+
+  python3 variants/bm_raytrace_upstream_opt.py --kernel upstream --mode raw --loops 4 --width 100 --height 100 --no-gc
+  python3 variants/bm_raytrace_upstream_opt.py --kernel shadow_ray --mode raw --loops 4 --width 100 --height 100 --no-gc
+  python3 variants/bm_raytrace_upstream_opt.py --kernel guards --mode raw --loops 4 --width 100 --height 100 --no-gc
+
+These commands select the experiment. A single invocation is not a statistical
+comparison. Apply the recorded VM affinity/environment consistently, retain
+all observations, and use the paired measurement procedure in section 4.

@@ -278,7 +278,12 @@ run_clean_timing() {
     cat "$RUN_DIR/timing/.rep$i" >> "$out"
     # NOTE: a `grep ... | head -1` here SIGPIPEs grep -> 141 -> set -e abort.
     # Single-process awk reads the file directly and cannot short-circuit a pipe.
-    t="$(awk -F= '/total_sec=/{print $2; exit}' "$RUN_DIR/timing/.rep$i")"
+    # Must match the NUMBER only: the line is
+    #   RESULT total_sec=3.239182 loops=4 ms_per_frame=809.79
+    # so -F= would yield "3.239182 loops". Use match()/substr() instead.
+    t="$(awk 'match($0,/total_sec=[0-9.]+/){
+                print substr($0,RSTART+10,RLENGTH-10); exit }' \
+         "$RUN_DIR/timing/.rep$i")"
     [[ -n "$t" ]] && { echo "$i,$t" >> "$csv"; printf '  rep %d: %s s\n' "$i" "$t"; }
     rm -f "$RUN_DIR/timing/.rep$i"
   done
