@@ -1,0 +1,6 @@
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=1
+elapsed=0.291930 s  291.930 ms/loop
+energy=-0.16908926275527172
+step_rate=68.51 ksteps/s
+RESULT total_sec=0.291930 loops=1 ms_per_loop=291.9300 energy=-0.16908926275527172 iterations=20000 kernel=grouped

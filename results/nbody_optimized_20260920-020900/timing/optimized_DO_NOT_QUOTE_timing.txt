@@ -1,0 +1,2 @@
+elapsed=2.302419 s  460.484 ms/loop
+RESULT total_sec=2.302419 loops=5 ms_per_loop=460.4837 energy=-0.1690798593916718 iterations=20000 kernel=grouped

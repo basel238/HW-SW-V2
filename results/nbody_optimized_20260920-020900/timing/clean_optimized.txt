@@ -1,0 +1,66 @@
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.497447 s  218.590 ms/loop
+energy=-0.1690801979358367
+step_rate=91.50 ksteps/s
+RESULT total_sec=3.497447 loops=16 ms_per_loop=218.5905 energy=-0.1690801979358367 iterations=20000 kernel=grouped
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.519210 s  219.951 ms/loop
+energy=-0.1690801979358367
+step_rate=90.93 ksteps/s
+RESULT total_sec=3.519210 loops=16 ms_per_loop=219.9507 energy=-0.1690801979358367 iterations=20000 kernel=grouped
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.512737 s  219.546 ms/loop
+energy=-0.1690801979358367
+step_rate=91.10 ksteps/s
+RESULT total_sec=3.512737 loops=16 ms_per_loop=219.5461 energy=-0.1690801979358367 iterations=20000 kernel=grouped
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.486673 s  217.917 ms/loop
+energy=-0.1690801979358367
+step_rate=91.78 ksteps/s
+RESULT total_sec=3.486673 loops=16 ms_per_loop=217.9170 energy=-0.1690801979358367 iterations=20000 kernel=grouped
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.568077 s  223.005 ms/loop
+energy=-0.1690801979358367
+step_rate=89.68 ksteps/s
+RESULT total_sec=3.568077 loops=16 ms_per_loop=223.0048 energy=-0.1690801979358367 iterations=20000 kernel=grouped
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.562773 s  222.673 ms/loop
+energy=-0.1690801979358367
+step_rate=89.82 ksteps/s
+RESULT total_sec=3.562773 loops=16 ms_per_loop=222.6733 energy=-0.1690801979358367 iterations=20000 kernel=grouped
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.480674 s  217.542 ms/loop
+energy=-0.1690801979358367
+step_rate=91.94 ksteps/s
+RESULT total_sec=3.480674 loops=16 ms_per_loop=217.5421 energy=-0.1690801979358367 iterations=20000 kernel=grouped
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.519968 s  219.998 ms/loop
+energy=-0.1690801979358367
+step_rate=90.91 ksteps/s
+RESULT total_sec=3.519968 loops=16 ms_per_loop=219.9980 energy=-0.1690801979358367 iterations=20000 kernel=grouped
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.513416 s  219.588 ms/loop
+energy=-0.1690801979358367
+step_rate=91.08 ksteps/s
+RESULT total_sec=3.513416 loops=16 ms_per_loop=219.5885 energy=-0.1690801979358367 iterations=20000 kernel=grouped
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.493851 s  218.366 ms/loop
+energy=-0.1690801979358367
+step_rate=91.59 ksteps/s
+RESULT total_sec=3.493851 loops=16 ms_per_loop=218.3657 energy=-0.1690801979358367 iterations=20000 kernel=grouped
+OPTIMIZED upstream nbody — kernel=grouped
+bodies=5 pairs=10 iterations=20000 loops=16
+elapsed=3.536614 s  221.038 ms/loop
+energy=-0.1690801979358367
+step_rate=90.48 ksteps/s
+RESULT total_sec=3.536614 loops=16 ms_per_loop=221.0384 energy=-0.1690801979358367 iterations=20000 kernel=grouped

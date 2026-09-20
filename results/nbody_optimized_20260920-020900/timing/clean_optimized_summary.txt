@@ -1,0 +1,7 @@
+n        = 11
+min      = 3.480674 s
+median   = 3.513416 s   <-- headline
+mean     = 3.517404 s
+max      = 3.568077 s
+stdev    = 0.028791 s
+rel_sd   = 0.82 %

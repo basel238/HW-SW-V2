@@ -1,0 +1,15 @@
+Couldn't record kernel reference relocation symbol
+Symbol resolution may be skewed if relocation was used (e.g. kexec).
+Check /proc/kallsyms permission or run as root.
+perf_event__synthesize_bpf_events: failed to synthesize bpf images: No such file or directory
+Couldn't synthesize bpf events.
+UPSTREAM pyperformance nbody kernel (unmodified)
+  source: upstream/bm_nbody_upstream.py
+  sha256: d1385e816d7cfea361b7915e2cf70138
+bodies=5 pairs=10 iterations=20000 loops=5
+elapsed=2.384406 s  476.881 ms/loop
+energy=-0.1690798593916718
+step_rate=41.94 ksteps/s
+RESULT total_sec=2.384406 loops=5 ms_per_loop=476.8812 energy=-0.1690798593916718 iterations=20000
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.059 MB /root/HW-SW-V2/results/nbody_baseline_20260920-015849/perf/baseline_cachemiss.data (5 samples) ]

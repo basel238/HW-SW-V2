@@ -1,0 +1,20 @@
+# started on Sun Sep 20 02:09:59 2026
+
+3583.03,msec,task-clock,0.37%,3583026969,100.00,0.990,CPUs utilized
+1826,,page-faults,0.05%,3583026969,100.00,504.942,/sec
+1826,,minor-faults,0.05%,3583026969,100.00,504.942,/sec
+0,,major-faults,0.00%,3583026969,100.00,0.000,/sec
+41,,context-switches,3.83%,3583026969,100.00,11.338,/sec
+0,,cpu-migrations,0.00%,3583026969,100.00,0.000,/sec
+8360127322,,cycles,0.37%,1786264545,49.84,2.312,GHz
+25318587156,,instructions,0.02%,2146169462,59.88,3.00,insn per cycle
+2892327573,,branches,0.09%,2145171903,59.85,799.813,M/sec
+17188278,,branch-misses,2.01%,2149225228,59.97,0.60,of all branches
+1729929,,cache-references,5.83%,2153823915,60.09,478.376,K/sec
+2124,,cache-misses,178.83%,2157559702,60.20,0.106,of all cache refs
+8008958546,,L1-dcache-loads,0.04%,1438901152,40.15,2.215,G/sec
+4407191,,L1-dcache-load-misses,5.94%,1434847827,40.03,0.05,of all L1-dcache accesses
+<not supported>,,LLC-loads,0.00%,0,100.00,,
+<not supported>,,LLC-load-misses,0.00%,0,100.00,,
+3970891277,,dTLB-loads,0.11%,1430249140,39.91,1.098,G/sec
+146728,,dTLB-load-misses,120.49%,1426513353,39.80,0.00,of all dTLB cache accesses
