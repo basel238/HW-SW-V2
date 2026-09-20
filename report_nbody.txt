@@ -4,11 +4,11 @@ HW/SW Co-design | Evidence reviewed 20 September 2026
 1. OVERVIEW
 Nbody: retain state across all timesteps
 
-The newest full target-VM run confirms that flat_pow reduces median runtime by 37.53%, from 228.25 to 142.58 ms per 20,000-step unit. The earlier grouped change achieved only 3.40%. The larger improvement comes from eliminating repeated container traffic and short-loop machinery while preserving the force calculation and all timesteps.
+The newest complete session reproduces the exact flat_pow improvement: median runtime falls from 227.19575 to 143.3736875 ms per 20,000-step unit, a 36.89% reduction (1.5846x). The previous full run showed 37.53% with the same source. This is confirmation under another collection block, not a new nbody optimization; grouped remains the earlier 3.40% intermediate.
 
 Candidate / evidence | Median runtime reduction | Decision
 grouped, earlier Ubuntu pair | 3.40% | Useful intermediate; below 7%.
-flat_pow, latest full Ubuntu pair | 37.53% / 1.6009x | Exact default; above 7%.
+flat_pow, newest full Ubuntu pair | 36.89% / 1.5846x | Exact default; reproduced previous 37.53%.
 flat_sqrt, separate timing pair | 38.58% | Optional approximate experiment.
 New structural controls | Exact verification passed | Explain contributions; no extra speedup claimed.
 
@@ -20,7 +20,7 @@ Conceptually, for each pair delta = r1 - r2 and mag = dt * (delta dot delta) ** 
 
 The wrapper loads fresh upstream state for each independent measurement and calls upstream.bench_nbody. Momentum offset occurs before its internal timer. Each timed unit runs energy reporting, advance, then energy reporting. The optimized wrapper substitutes only advance; validation, loading and writeback in that function remain timed. Energy reporting and the upstream loop remain unchanged.
 
-Latest pair: results/nbody_baseline_20260920-031836 and results/nbody_optimized_20260920-032819. Comparison: results/comparison_nbody_20260920-033626. Kernel flat_pow is explicitly recorded; current variant SHA matches the run.
+Newest matched pair: results/nbody_baseline_20260920-080806_16940 and results/nbody_optimized_20260920-081744_16940. Comparison: results/session_all_20260920-074308_674/comparison_nbody. Kernel flat_pow and all captured source hashes match current files.
 
 2. INITIAL ANALYSIS
 Use independent instruments for different questions
@@ -43,7 +43,7 @@ Container overhead was real, but not the whole cost
 
 A flame graph is an aggregation of sampled call stacks, not a timeline. Width is inclusive sampled weight; height is stack depth, not elapsed time. Self weight counts only samples whose leaf is that symbol. Children weight includes descendants and overlaps other ancestors. The libc start routine can therefore have a huge inclusive share while doing little direct work. Aggregate a function across every folded stack: the top-30 listing is incomplete, and repeated appearances must not be mistaken for separate causes.
 
-In the newest baseline native profile, PyObject_GetItem and PyObject_SetItem subtrees cover 226 of 1,174 samples (19.25%). Evaluator self weight is 511 (43.53%). Float operators, binary dispatch, boxing and release are also prominent. These categories can overlap when inclusive; do not sum them into a partition of runtime.
+In the newest baseline native profile, PyObject_GetItem and PyObject_SetItem subtrees cover 206 of 1,175 samples (17.53%). Evaluator self weight is 526 (44.77%). Float operators, binary dispatch, boxing and release are also prominent. These categories overlap when inclusive; do not sum them into a partition of runtime.
 
 The source explains the stack evidence. Every pair unpacks positions and masses; each v[i] update reads and writes a list element through Python's generic numeric/container machinery. A cache hit still needs interpreter instructions, bounds/index handling, reference updates and dispatch. Keeping a float reference in a local avoids those container operations even when the entire physical working set fits in cache.
 
@@ -79,7 +79,7 @@ Correctness, alternatives and decisions
 
 Acceptance for grouped and flat_pow requires finite, bit-identical energy and all 30 state components, checked as binary floating-point values. Energy alone is insufficient: different trajectories can share a similar total energy. Tests cover zero steps, small trajectories, randomized valid states/masses, list identity, invalid layout rejection and full accumulated batches.
 
-The 16 x 20,000-step comparison returns energy -0.1690801979358367 and matches all state bits for grouped and flat_pow on the target VM. The newly supplied profiling directory saved an automatic one-unit verification; the separate user-provided 16-unit transcript supplies the longer check. Current scripts have been changed to verify the actual requested timing batch. All 63 integrated software tests pass locally; this is tested agreement, not a proof over every possible input.
+The saved optimized gate in this new session compares the complete reference and candidate 16 x 20,000-step batch: energy -0.1690801979358367 and every state bit match for grouped and flat_pow. Earlier full results saved only a one-unit automatic gate; the new artifact closes that batch-evidence gap. The standalone baseline verifier still checks one unit despite a loops=16 phase label; the independent reference run inside the optimized gate provides the full comparison. The existing integrated software suite passed 63 tests; no benchmark code changed in this review.
 
 Idea | Reason / evidence | Decision
 sqrt rewrite | At 16 units, relative energy error 2.364e-14; max state error 2.522e-10; normalized error 1.004e-11. | Retain as optional, reject as exact default.
@@ -94,52 +94,52 @@ The decision is to keep the measured exact flat_pow implementation and add diagn
 Contracts, commands and previous validation are retained in docs/NBODY_FLAT_EXPERIMENT.md, docs/NBODY_GROUPED_EXPERIMENT.md, docs/NBODY_CONTROL_EXPERIMENTS.md and tests/.
 
 4. PERFORMANCE COMPARISON
-The latest full run clears the runtime goal
+Newest full run confirms the previous improvement
 
-Figure: docs/reports/assets/nbody_latest_runtime.png
-Newest full run: 11 fresh processes per arm, 16 accumulated units per process. All samples retained. Separate collection blocks leave host drift as a limitation.
+Figure: docs/reports/assets/nbody_session_runtime.png
+Eleven fresh processes per arm; 16 accumulated units per process. Every observation retained; arms collected in separate blocks.
 
-Clean timing | Upstream | flat_pow
-Median / 20,000-step unit | 228.24925 ms | 142.578375 ms
-Mean +/- sample SD | 228.128 +/- 1.491 ms | 144.193 +/- 3.707 ms
-CV / range | 0.654%; 226.360-231.080 ms | 2.571%; 142.253-153.887 ms
-Median process batch | 3.651988 s | 2.281254 s
+Clean timing per unit | Upstream | Optimized
+Median | 227.195750 ms | 143.373688 ms
+Mean +/- sample SD | 227.906 +/- 1.990 ms | 143.807 +/- 1.441 ms
+CV | 0.873% | 1.002%
+Minimum - maximum | 226.222 - 232.022 ms | 142.481 - 146.232 ms
 
-The median reduction is 37.534% (1.6009x speedup), saving 85.67 ms per unit. A 7% reduction would require at most 212.27 ms. The actual result has substantial margin. Every optimized observation is faster than every baseline observation; dispersion is small relative to the effect. Sequential arm collection still prevents a claim that drift has been fully excluded.
+Median runtime reduction is 36.8942% (1.5846x), saving 83.8221 ms per unit. Even the slowest optimized observation beats the fastest baseline by 35.36%. This exceeds the 7% runtime criterion with wide margin; within-block dispersion is not a bound on systematic VM drift.
 
-The earlier grouped pair was 227.314 -> 219.589 ms (3.40%). A separate flat_pow timing-only pair gave 37.77%, consistent with this full workflow. The optional flat_sqrt pair gave 38.58%; its 140.702 ms median was only about 1.28% below the earlier flat_pow median, across separate blocks. That small incremental difference is not a controlled direct comparison and does not justify sacrificing bit identity.
+The preceding full run was 228.24925 -> 142.578375 ms (37.53%). Relative to that run, this baseline is 0.46% faster and flat_pow is 0.56% slower. The source is identical; the 0.64 percentage-point change is a repeat-measurement difference, not evidence of an added optimization or a code regression. Grouped remains 3.40%; the optional flat_sqrt result remains a separate approximate experiment.
 
-Official pyperformance 1.14.0 / pyperf 2.10.0 baseline: about 230 +/- 3 ms, consistent with the custom 228.25 ms baseline. There is no corresponding official optimized-suite run; do not relabel the custom result.
+Latest official pyperformance baseline: 60 values, median 228.636 ms, mean 229.411 +/- 3.439 ms. It corroborates workload scale; no optimized official-harness result exists.
 
 4. PERFORMANCE COMPARISON
-The new profiles isolate the removed work
+The removed work is reproduced in the new profiles
 
-Figure: docs/reports/assets/nbody_latest_native.png
-Equal native work: five units per arm, debug CPython, fixed 5-million-cycle sample period. Subscript and boxing/free rows are inclusive unions; evaluator and libm pow rows are self. Do not sum rows.
+Figure: docs/reports/assets/nbody_session_native.png
+Equal native work: five units per arm, debug CPython, fixed 5-million-cycle period. Item access and float lifetime rows are inclusive unions; evaluator and libm pow are self. Do not sum rows.
 
-Counter, per 20,000-step unit | Upstream | flat_pow | Change
-Instructions, TXT batch | 1.69191 billion | 1.10005 billion | -34.98%
-Cycles, TXT batch | 544.895 million | 347.711 million | -36.19%
-L1 data loads, TXT batch | 535.487 million | 351.029 million | -34.45%
-Independent CSV batch | Instructions -34.87% | Cycles -36.43% | Loads -34.58%
+Counter / unit (TXT) | Upstream | Optimized | Change
+Instructions | 1,691.786m | 1,101.148m | -34.91%
+Cycles | 549.829m | 347.974m | -36.71%
+L1 data loads | 535.846m | 351.722m | -34.36%
+Branches | 193.593m | 125.500m | -35.17%
 
-The largest direct signature is disappearance of generic state indexing: the GetItem/SetItem union falls 226 -> 2 samples, while evaluator self falls 511 -> 278. Total native samples fall 1,174 -> 726. This matches the source mechanism and the instruction/runtime reductions. It is stronger evidence for the optimization than the baseline profile alone.
+Generic item-access union falls 206 -> 2 samples and evaluator self falls 526 -> 285. Total samples fall 1,175 -> 725. The preceding run showed the same structural change (226 -> 2 item-access samples). Independent CSV counting corroborates instructions -34.82%, cycles -37.03% and L1 loads -34.50%.
 
-The new remaining cost is boxed arithmetic and interpreter execution, not repeated list updates. Float creation inclusive samples are 60 -> 57, float release 47 -> 52 and libm pow self 19 -> 20. Those small counts are noisy, but clearly do not show arithmetic disappearing. Their shares rise because other work was removed. A pow sample share is not a hard upper bound for a rewrite that also changes dispatch, boxing and dependencies.
+Float creation inclusive samples are 71 -> 73, release 41 -> 42, and libm pow self 20 -> 19. These noisy counts support arithmetic and boxed-value lifetime work remaining. Locals have not eliminated float-result objects or the power calculation. The gain comes mainly from reducing repeated state access, unpacking and interpreter traversal.
 
 4. PERFORMANCE COMPARISON
 Read the similar stacks without missing the change
 
-Figure: docs/reports/assets/nbody_latest_flame_compare.png
-Structural overview of the latest original SVGs. Each fills its own panel, hiding the difference in total sample count. Original SVGs alongside this PDF retain interactive zoom.
+Figure: docs/reports/assets/nbody_session_flame_compare.png
+Newest original native SVG overviews. Each fills its own panel despite 1,175 versus 725 total samples. Adjacent original SVGs allow zooming.
 
 Both runs still enter the same upstream timed loop, call advance and execute floating-point operations through CPython. Those common stack bases dominate the visual silhouette. The flat wrapper adds a different call path, so depth is not a direct work measure. Look for the missing subscription branches and compare equal-work leaf/subtree counts instead of only the outline.
 
-cProfile calls advance once per unit; nbody is not the raytrace story of millions of small Python method calls. Total process calls actually rise from 4,911 to 25,256, largely due to optimized-wrapper imports/startup and validation. The hot arithmetic remains inside one advance call. Native interpreter helpers are not separate Python source calls. Top-30 lists omit many stacks; full folded aggregation avoids mistaking partial listings for the whole profile.
+Each cProfile arm still calls the numerical advance function once per unit. Whole-process call counts include optimized-wrapper startup and validation; they do not count arithmetic bytecodes as Python calls. Most remaining work is within the long advance call. Folded aggregation of all stacks is more reliable than comparing two partial top-30 listings.
 
-Both independent counter batches support the major instruction, cycle and load reductions. L1 load misses increase 5.48% (TXT) and 9.26% (CSV): this is not a cache-miss improvement. TXT miss rate rises from 0.0504% to 0.0811% while loads fall 34.45%. IPC changes modestly, 3.105 to 3.164. Fewer executed instructions dominate. PMU coverage is roughly 40-60%; generic cache misses are noisy, LLC is unsupported, and negative top-down bad-speculation fractions invalidate that decomposition.
+TXT and CSV counter batches agree on major instruction, cycle and load reductions. L1 misses disagree in direction between batches; generic cache events are noisy. No cache-miss improvement is established. Negative top-down fractions invalidate that decomposition and unsupported LLC events remain unavailable. These limitations do not invalidate the independent clean runtime result.
 
-The logged variant hash matches the current flat_pow source. Both arms record upstream SHA d1385e816d7cfea361b7915e2cf70138cd6b84f40df8bd5152638851f7bcac2b. However, manifests record 13/14 dirty files, an UNVERIFIED provenance placeholder and no full authenticity-gate transcript. Hash identity establishes the local source, not independently its published origin. The separate official baseline supports workload scale; retain future package-hash comparisons and complete manifests for stronger provenance.
+Session manifests capture the actual variant, upstream, wrapper, common/pipeline and configuration hashes; all match current files. Git metadata is disabled rather than guessed. The full saved optimized correctness gate covers reference and candidate at 16 units. However, there is no persisted phase-0 package authenticity transcript, and the embedded UNVERIFIED placeholder remains. Some phase rows stay requested despite present completed artifacts; py-spy is explicitly disabled.
 
 The remaining bottleneck is a set of costs: arithmetic dispatch, boxed values, evaluator work and pow. An exact next software improvement must be tested against flat_pow. The new structural controls can distinguish locality from unrolling; the current aggregate speedup cannot uniquely allocate savings among them.
 
@@ -162,29 +162,36 @@ Each operation rounds separately to binary64, nearest-even, including gradual un
 
 HardFloat source and license: hardware/vendor/ provenance and license files. Primary specification: https://www.jhauser.us/arithmetic/HardFloat-1/doc/HardFloat-Verilog.html. Detailed ports, schedule and host format: docs/HARDWARE_DESIGN.md and hardware/.
 
+Design reassessment: sphere intersections remain frequent, but square root is reached only 6,934 times (3.864% of 179,457 queries). The current core is a single-query sequential function with no resident scene or internal batch controller. A batched geometric core or a small reusable FP64 command engine are alternatives, not implemented replacements. More general hardware is not automatically faster; operand residency and the software offload boundary need justification.
+
+Shared arithmetic reduces replication but constrains throughput; pipelining or multiple lanes costs area, registers and potential switching. No area/watt/achieved-clock numbers are claimed. Nbody offload still needs exact host-power semantics or an explicit different contract; this ray-sphere core does not accelerate nbody.
+
 5. HARDWARE ACCELERATION PROPOSAL
-Interfaces, software stack and honest estimates
+New workload evidence changes the estimate
 
-Item | Specification / status
-Request | 640 operand bits (10 FP64 values) plus 32-bit tag; ready/valid; one outstanding query.
-Response | 64-bit distance, tag, root/error status and 5 FP exception flags; stable under backpressure.
-Control | Reset discards in-flight work; explicit sequential FSM; completion returns to accepting state.
-Software | Host packing/reference helper exists. Batched renderer scheduling, driver and transport/DMA are proposed, not deployed.
-Frequency / schedule | 50 MHz target assumption; 20-cycle miss / 80-cycle root initiation budgets. Not synthesis or simulation results.
-Validation | Syntax/elaboration and host-format checks only. No HDL behavioral simulation, timing analysis or physical measurement.
+Interface / validation | Current specification
+Request / response | 640 operand bits + 32-bit tag; distance/status/flags response; one outstanding query; ready/valid and held response.
+Numerical contract | Separate FP64 rounding, ordered expressions, caller-normalized rays; finite supported domain with CPU fallback on error.
+Implementation boundary | Arithmetic/control RTL and host packing exist. Renderer batching, transport/DMA and driver remain proposed.
+Clock / schedule | 50 MHz target assumption; 20 cycles/miss, 80/root budget. No achieved timing or HDL simulation.
 
-Illustrative pessimistic case: 179,457 queries/frame, all taking a root; 50 MHz; 1 GB/s transport; batches of 1,024 with 10 us launch cost; 100 ns packing/query. The model gives 287.13 ms computation + 18.66 ms transfer + 1.76 ms launch + 17.95 ms packing = 325.50 ms offload cost. These are assumptions, not measured hardware performance.
+The full-profile math.sqrt caller map records 6,934 sphere calls; 37,715 other square roots belong to magnitude and one to import setup. Thus h = 6,934 / 179,457 = 0.0386388. Source control flow confirms that sphere calls sqrt only after a nonnegative discriminant. This measured workload mix replaces the earlier all-root assumption; it is not a measured hardware speed.
 
-Use T_new = T_software x (1 - f) + T_offload, where f is the release-time fraction actually removed by a real batch implementation. Starting from the measured 611.02 ms shadow-ray software, break-even needs f > 53.27%. With f = 50%, the estimate is 631.01 ms: 3.27% slower. With f = 70%, it is 508.81 ms: 16.73% lower time. Neither f is established by the debug profile, and the newer full software requires a new baseline.
+With the same assumed 50 MHz, 1 GB/s aggregate payload bandwidth, batch size 1,024, 10 us launch/batch and 100 ns native packing/query, modeled core time is 80.1036 ms. Transfer is 18.6635 ms, launch 1.7600 ms and packing 17.9457 ms: 118.4728 ms total offload cost. Against the new full software time of 452.69625 ms, break-even requires removing more than 26.17% of release runtime.
 
-A single shared datapath limits area and switching relative to many parallel lanes, but limits throughput; FP64 sqrt/rounding still costs substantial logic. Deeper pipelining or replication trades area, clocking and power for throughput. No LUT, gate, watt or achieved-clock numbers are claimed. The proposal needs batch amortization and must eventually be compared with an equivalent compiled CPU batch, since bypassing Python alone may explain most gains.
+Assumed removed fraction f | Estimated total time | Reduction vs full
+20% | 480.630 ms | -6.17% (slower)
+30% | 435.360 ms | 3.83%
+40% | 390.091 ms | 13.83%
 
-The assignment requires a complete logical HDL design and interface/architecture estimates (pp. 4-5), not physical implementation. Source completeness and syntax checks do not prove functional correctness. Hardware numerical/pixel acceptance and real transport integration remain future work.
+T_new = T_full x (1 - f) + T_offload. f remains unknown: cProfile sphere share cannot supply it. The modeled 7% runtime reduction would require f > 33.17%; this is a sensitivity point, not a separate mandated hardware target. Batching can change early-exit queries and h, so the original query mix must be rechecked after integration.
+
+The old all-root case against shadow-only software remains historical evidence, not the current default estimate. If applied to faster full software, that all-root stress case needs 71.90% removable time just to break even. No hardware improvement occurred between estimates; only software baseline and workload assumptions changed.
 
 6. CONCLUSION
 A successful exact optimization, with bounded claims
 
-The newest measured flat_pow result exceeds the declared 7% runtime goal by a wide margin while retaining the power expression and exact accumulated state. The grouped experiment was useful: it showed that reducing some list accesses was insufficient. Full-state locality and explicit pair/position updates remove substantially more repeated interpreter work, as the new native stacks and counters confirm.
+The new complete session confirms flat_pow at 36.89% lower runtime, following the previous 37.53% result with identical source. It retains the power expression and exact accumulated state. Grouped showed that some local reuse was insufficient; full-state locality and explicit pair/position updates remove much more repeated work, reproduced in both native profiles and independent counter batches.
 
 A five-body hardware engine could hold state locally and execute complete advance batches, amortizing transfer across 20,000 steps. It is not the implemented accelerator: exact agreement with the host nonintegral pow routine, dependencies between velocity updates and full trajectory validation make it a different, larger design. A MAC/rsqrt replacement would change rounding and is unsuitable for the strict final contract without further proof and testing.
 
@@ -201,9 +208,9 @@ Required deliverable | Location / evidence
 Six-section TXT report | report_nbody.txt; this PDF is supplemental and uses the same source.
 Execution scripts / README | script_nbody.sh, run_all.sh, tools/, README.md.
 Variants and exact checks | variants/bm_nbody_upstream_opt.py; tests/; docs/evidence/.
-Latest full evidence | results/031836 baseline, 032819 optimized, 033626 comparison; full names on page 1.
+Latest full evidence | Session074308_674: baseline080806_16940, optimized081744_16940; full directory names on page 1.
 Analysis / hardware / AI disclosure | docs/reports/, hardware/, docs/HARDWARE_DESIGN.md, prompt.txt.
-Remaining submission actions | Repository upload, 20-25-minute presentation and working demo; new full raytrace VM measurement.
+Remaining submission actions | Presentation and working demo; author-controlled repository upload; optional VM raytrace ablations and refined hardware integration.
 
 Project.pdf pp. 3-5 and 7-8 drive these sections; docs/PROJECT_REQUIREMENTS.md maps each requirement. No Git operations were performed. New measurements require deliberate source/report updates; the pipeline will not overwrite authored interpretation.
 

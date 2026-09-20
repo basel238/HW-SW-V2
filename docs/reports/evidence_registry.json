@@ -3108,5 +3108,18 @@
       "Manifest upstream provenance text remains UNVERIFIED; official pyperformance metadata and source hashes are separate evidence, not a saved authenticity gate transcript."
     ]
   },
-  "nbody_latest_file_hashes": "evidence/nbody_latest_source_hashes.json"
+  "nbody_latest_file_hashes": "evidence/nbody_latest_source_hashes.json",
+  "latest_session": {
+    "session": "results/session_all_20260920-074308_674",
+    "raytrace": "evidence/session_074308_raytrace_analysis.json",
+    "raytrace_profile": "evidence/session_074308_raytrace_profile_analysis.json",
+    "nbody": "evidence/session_074308_nbody_analysis.json",
+    "source_hashes": "evidence/session_074308_source_hashes.json",
+    "decisions": {
+      "raytrace": "Keep exact full bundle; individual VM contributions unmeasured.",
+      "nbody": "Retain exact flat_pow; same source, repeated result.",
+      "hardware": "Use measured sphere root fraction and latest full runtime; no new RTL or measured hardware speed."
+    }
+  },
+  "_selection_note": "latest_session is the current report source. All other top-level run records, including the legacy nbody_latest_full key, are preserved historical evidence."
 }

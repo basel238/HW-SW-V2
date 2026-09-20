@@ -8,21 +8,25 @@ ray-sphere accelerator design with explicitly analytical estimates.
 
 | Target-VM experiment | Baseline median | Optimized median | Runtime reduction |
 |---|---:|---:|---:|
-| Raytrace shadow-ray reuse, 100 x 100 | 789.756 ms/frame | 611.023 ms/frame | 22.63% |
+| Raytrace full, newest matched session | 791.215 ms/frame | 452.696 ms/frame | **42.78%** |
+| Raytrace shadow-ray reuse, historical | 789.756 ms/frame | 611.023 ms/frame | 22.63% |
 | Nbody grouped, 20,000 steps | 227.314 ms/unit | 219.589 ms/unit | 3.40% |
-| Nbody flat_pow, newest full run | 228.249 ms/unit | 142.578 ms/unit | 37.53% |
+| Nbody flat_pow, previous full run | 228.249 ms/unit | 142.578 ms/unit | 37.53% |
+| Nbody flat_pow, newest matched session | 227.196 ms/unit | 143.374 ms/unit | **36.89%** |
 
 Both selected exact improvements exceed the declared 7% runtime target on the
 Ubuntu CPython 3.10.12 VM. Clean timing, not profiler elapsed time or cycle counts,
 is the criterion. Eleven independent processes per arm were collected in separate
-blocks; host drift remains a limitation. The latest full nbody result is
-`nbody_baseline_20260920-031836` against `nbody_optimized_20260920-032819`.
-The raytrace result is `raytrace_baseline_20260920-012836` against
-`raytrace_optimized_20260920-014248`.
+blocks; host drift remains a limitation. The newest pairs are selected by
+`results/session_all_20260920-074308_674/`: raytrace 074314_1800 / 075734_1800,
+and nbody 080806_16940 / 081744_16940. Captured source hashes match current files.
+Both optimized verification logs cover the actual batch (4 frames / 16 units).
 
-**Current defaults:** nbody `flat_pow`, raytrace `full`. The newer full raytrace
-kernel passes exact checks and has an exploratory Mac result, but has not yet
-been measured on the target VM. Do not label the older shadow-only result as full.
+**Current defaults:** nbody `flat_pow`, raytrace `full`. Keep the exact full
+raytrace bundle: its new VM result supports the combined changes. Individual
+VM contributions are not isolated; diagnostic kernels and optional slots remain.
+Nbody uses the same source as the preceding full run; this is confirmation.
+Canonical reports are the filenames below, without a copied " 2" suffix.
 
 - [Raytrace PDF](docs/reports/report_raytrace.pdf) and [required TXT](report_raytrace.txt)
 - [Nbody PDF](docs/reports/report_nbody.pdf) and [required TXT](report_nbody.txt)

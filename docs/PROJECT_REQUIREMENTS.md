@@ -73,10 +73,11 @@ sections and one shared reviewed content source. They describe exact algorithms,
 measurement definitions, tools, selected artifacts, optimization decisions,
 correctness contracts, results, hardware architecture and limitations.
 
-Measured target-VM runtime reductions are 22.63% for raytrace shadow reuse and
-37.53% for nbody flat_pow; grouped remains an intermediate 3.40% result. The new
-full raytrace kernel has local exact tests and exploratory Mac timing, but needs
-its own Ubuntu comparison. The newest nbody full profiles are incorporated.
+Newest target-VM runtime reductions are 42.78% for raytrace full and 36.89%
+for nbody flat_pow, in session_all_20260920-074308_674. Saved optimized gates
+cover the full requested batches. Historical raytrace shadow reuse (22.63%),
+nbody grouped (3.40%) and prior flat_pow (37.53%) remain explicit history.
+The new nbody source is unchanged; the latest measurement confirms its result.
 
 The full workflow defaults to baseline plus full exact candidates, verifies the
 actual batch and records explicit session paths/hashes. All 63 integrated tests
@@ -93,8 +94,8 @@ claims. Simulation is not expressly required by the assignment.
 
 Remaining actions:
 
-1. Measure the full raytrace kernel on the target VM; retain exact session paths
-   and source hashes and revise its report deliberately.
+1. Optional: run isolated or leave-one-out raytrace ablations before ranking
+   individual components. The full target-VM bundle is already measured.
 2. Preserve raw results and capture authenticity output when running; historical
    dirty manifests and an UNVERIFIED provenance placeholder are documented.
 3. If pursuing hardware performance beyond the course design, verify RTL behavior,

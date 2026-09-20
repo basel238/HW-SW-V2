@@ -1,25 +1,99 @@
 {
-  "status": "hypothetical sensitivity; not measured hardware performance",
+  "status": "analytical sensitivity, not measured or simulated hardware",
+  "observed_inputs": {
+    "source_session": "results/session_all_20260920-074308_674",
+    "sphere_queries": 179457,
+    "sphere_sqrt_calls": 6934,
+    "software_full_s_per_frame": 0.45269625
+  },
   "assumptions": {
     "tests": 179457,
-    "root_fraction": 1.0,
+    "root_fraction": 0.03863878254958012,
     "mhz": 50.0,
     "bandwidth_gbs": 1.0,
     "batch": 1024,
     "launch_us": 10.0,
     "pack_ns": 100.0,
-    "software_s": 0.61102275,
+    "software_s": 0.45269625,
     "offloaded_fraction": 0.5
   },
   "result": {
-    "compute_s": 0.2871312,
+    "compute_s": 0.0801036,
     "transfer_s": 0.018663528,
     "launch_s": 0.0017599999999999998,
     "pack_s": 0.017945700000000002,
-    "offload_s": 0.32550042799999995,
-    "estimated_total_s": 0.6310118029999999,
-    "speedup": 0.9683222201154295,
-    "time_reduction_percent": -3.271408961450284,
-    "break_even_offloaded_fraction": 0.5327140896145028
-  }
+    "offload_s": 0.118472828,
+    "estimated_total_s": 0.34482095300000004,
+    "speedup": 1.3128443792683329,
+    "time_reduction_percent": 23.829509743012,
+    "break_even_offloaded_fraction": 0.2617049025698799
+  },
+  "scenarios": [
+    {
+      "removed_fraction": 0.2,
+      "compute_s": 0.0801036,
+      "transfer_s": 0.018663528,
+      "launch_s": 0.0017599999999999998,
+      "pack_s": 0.017945700000000002,
+      "offload_s": 0.118472828,
+      "estimated_total_s": 0.4806298280000001,
+      "speedup": 0.9418813057936136,
+      "time_reduction_percent": -6.170490256988015,
+      "break_even_offloaded_fraction": 0.2617049025698799
+    },
+    {
+      "removed_fraction": 0.25,
+      "compute_s": 0.0801036,
+      "transfer_s": 0.018663528,
+      "launch_s": 0.0017599999999999998,
+      "pack_s": 0.017945700000000002,
+      "offload_s": 0.118472828,
+      "estimated_total_s": 0.4579950155,
+      "speedup": 0.9884305171002457,
+      "time_reduction_percent": -1.1704902569879883,
+      "break_even_offloaded_fraction": 0.2617049025698799
+    },
+    {
+      "removed_fraction": 0.3,
+      "compute_s": 0.0801036,
+      "transfer_s": 0.018663528,
+      "launch_s": 0.0017599999999999998,
+      "pack_s": 0.017945700000000002,
+      "offload_s": 0.118472828,
+      "estimated_total_s": 0.435360203,
+      "speedup": 1.0398200085367013,
+      "time_reduction_percent": 3.829509743012016,
+      "break_even_offloaded_fraction": 0.2617049025698799
+    },
+    {
+      "removed_fraction": 0.4,
+      "compute_s": 0.0801036,
+      "transfer_s": 0.018663528,
+      "launch_s": 0.0017599999999999998,
+      "pack_s": 0.017945700000000002,
+      "offload_s": 0.118472828,
+      "estimated_total_s": 0.390090578,
+      "speedup": 1.160490090073388,
+      "time_reduction_percent": 13.829509743012004,
+      "break_even_offloaded_fraction": 0.2617049025698799
+    },
+    {
+      "removed_fraction": 0.5,
+      "compute_s": 0.0801036,
+      "transfer_s": 0.018663528,
+      "launch_s": 0.0017599999999999998,
+      "pack_s": 0.017945700000000002,
+      "offload_s": 0.118472828,
+      "estimated_total_s": 0.34482095300000004,
+      "speedup": 1.3128443792683329,
+      "time_reduction_percent": 23.829509743012,
+      "break_even_offloaded_fraction": 0.2617049025698799
+    }
+  ],
+  "limitations": [
+    "Removed release-runtime fraction is unmeasured; 0.5 is illustrative, not a prediction.",
+    "50 MHz, 1 GB/s, 1024 queries/batch, 10 us launch and 100 ns native packing are assumptions.",
+    "Batching may change query count and root fraction by changing early-exit work.",
+    "No transport/driver, behavioral HDL simulation, synthesis or achieved timing."
+  ]
 }

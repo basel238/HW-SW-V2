@@ -17,14 +17,15 @@ its arithmetic. Offloading only a multiply or square root per Python call would
 keep most of that work and add transport overhead. A batch interface would need
 to remove the complete intersection operation from the Python inner loop.
 
-The current software comparison reports 789.7555 ms/frame upstream versus
-611.02275 ms/frame for shadow-ray reuse (22.63% lower time; source:
-`results/comparison_raytrace_20260920-015451/summary.txt`). Hardware estimates
-below use the **optimized** 611.02275 ms as their starting point. The older
-sphere-call count is a planning input; new optimized profiles and a real batch
-implementation are needed to establish the actual offloaded time and query
-count. Native samples collected using `python3-dbg` do not supply a release-time
-Amdahl fraction or a fixed instruction cost per Python call.
+The newest full software comparison is 791.2145 ms/frame upstream versus
+452.69625 ms/frame for full (42.78% lower runtime). It is selected by
+`results/session_all_20260920-074308_674/comparison_raytrace/summary.txt`.
+Hardware comparisons now start from **full**, not historical shadow-only
+software (611.02275 ms/frame). The optimized one-frame cProfile records
+179,457 sphere queries and 6,934 sphere square roots, a measured root-bearing
+fraction of 3.8639%. Query count and mix must be remeasured if batching changes
+early exits. Debug native samples and traced function shares cannot supply the
+removed release-time fraction or a fixed instruction cost per Python call.
 
 The design is deliberately sequential: one shared add/subtract unit, one shared
 multiplier and one iterative square-root unit make the operation/control
@@ -183,7 +184,7 @@ word bit numbering in RTL.
 | 12–15 | 4 | bit 0 `has_root`, bit 1 `error`, bits 6–2 exception flags; remaining bits zero |
 
 Simply replacing each Python `intersectionTime` call with a device submission
-would introduce 179,457 small transfers in the old profile. A credible
+would introduce 179,457 small transfers in the current full profile. A credible
 integration instead accumulates currently ready rays in a tile/frontier and
 processes their sphere queries through one native batch call. Plane tests,
 nearest-hit selection, shading, recursion limits and epsilon rules remain
@@ -193,7 +194,7 @@ and visibility decisions preserve semantics.
 Primary rays can be batched easily; reflection and shadow rays become available
 only after earlier work. Batching all sphere queries can also evaluate pairs
 that upstream's early-exit visibility loop would have skipped. Therefore the
-future batch count and query count cannot be assumed equal to the old profile.
+future batch count and query count cannot be assumed equal to the current unbatched profile.
 The analytical model exposes both assumptions. Packing must happen in a native
 loop for the assumed per-record cost to be credible; constructing each packed
 record in Python would need a new measured cost. Hardware and compiled CPU
@@ -229,29 +230,64 @@ Toffload = Tcore + Ttransfer + Tlaunch + Tpack
 Tnew = Tsoftware*(1-f) + Toffload            f = removed release-runtime fraction
 ```
 
-This conservative sum assumes no overlap between transfer and computation;
-a transport that overlaps them needs a revised, justified model. The example
-uses N=179,457, 50 MHz, 1 GB/s aggregate payload bandwidth, batches of 1,024,
-10 microseconds of launch cost per batch, and 100 ns native packing cost per
-query. These are assumptions, not platform specifications. Baseline for the
-comparison is the measured shadow-ray software time, 611.02275 ms/frame.
+This sum assumes no overlap between transfer and computation. N=179,457,
+h=6,934/179,457, and Tsoftware=452.69625 ms/frame are measured inputs from the
+new full run. The 50 MHz clock, 1 GB/s aggregate payload bandwidth, batches of
+1,024, 10 microseconds launch/batch and 100 ns native packing/query are
+assumptions, not platform specifications. The removed release-runtime fraction
+f remains unknown. The tool's default f=0.5 is illustrative, not a prediction.
 
-| Assumed root fraction h | Assumed removed fraction f | Estimated new time | Time reduction vs optimized software |
-|---:|---:|---:|---:|
-| 0.5 | 0.3 | 645.542 ms | -5.65% (slower) |
-| 0.5 | 0.5 | 523.338 ms | 14.35% |
-| 0.5 | 0.7 | 401.133 ms | 34.35% |
-| 1.0 | 0.3 | 753.216 ms | -23.27% (slower) |
-| 1.0 | 0.5 | 631.012 ms | -3.27% (slower) |
-| 1.0 | 0.7 | 508.807 ms | 16.73% |
+| Modeled component | Time per frame |
+|---|---:|
+| Core: average 22.3183 cycles/query | 80.103600 ms |
+| Transfer: 88-byte request + 16-byte response | 18.663528 ms |
+| Launch: 176 batches | 1.760000 ms |
+| Native packing | 17.945700 ms |
+| **Total offload** | **118.472828 ms** |
 
-With every query root-bearing, modeled offload costs 325.500 ms and must remove
-more than 53.27% of optimized software time just to break even. We do not know
-that fraction yet. The model therefore demonstrates both a possible useful
-region and a plausible losing region; it does not establish an expected
-measured gain. Increasing actual query count, reducing batch size, slower
-packing, a slower clock or a faster compiled CPU comparator can eliminate the
-advantage. Reporting only arithmetic latency would hide these costs.
+| Assumed removed release fraction f | Estimated new total | Reduction vs full |
+|---:|---:|---:|
+| 20% | 480.630 ms | -6.17% (slower) |
+| 25% | 457.995 ms | -1.17% (slower) |
+| 30% | 435.360 ms | 3.83% |
+| 40% | 390.091 ms | 13.83% |
+| 50% | 344.821 ms | 23.83% |
+
+Break-even requires **f > 26.17%**. A modeled additional 7% runtime reduction
+would require f > 33.17%; that is a sensitivity point, not another hardware
+course requirement. The sphere's approximately 32.5% traced cumulative share
+is not a release f: cProfile perturbs calls, and a batch boundary changes what
+work is removed. Measure an equivalent native CPU batch before assigning f.
+
+The historical all-root stress case costs 325.500428 ms: it required 53.27%
+removable time against shadow-only software, or 71.90% against today's full.
+The revised model is less pessimistic because the root mix is now measured;
+no hardware became faster. Conversely, faster software leaves less time for
+offload overhead. The extra 60-cycle root-path budget contributes 8.3208 ms;
+this includes the whole extra controller/root path, not a pure sqrt latency.
+
+## Architecture decision after the full run
+
+Retain the sequential exact sphere core as an inspectable candidate, not as a
+proven best accelerator. Most queries exit before sqrt. Priorities therefore
+shift toward the pre-discriminant datapath, resident scene/ray operands and
+batch dispatch rather than a sqrt-only engine. The present core resends ten
+FP64 operands per query and supports one outstanding transaction; resident
+scene storage and a batch scheduler are not implemented.
+
+Two alternatives merit discussion: a batched geometric engine with resident
+operands, or a small reusable FP64 command engine that executes ordered
+operations. Neither was required to be as specific as this sphere controller,
+and neither is automatically better. Generality adds instruction/control cost;
+resident data can reduce transport, while parallel arithmetic can change the
+rounding contract if reassociated. Compare the same numerical operation and
+native CPU boundary before choosing a redesign. This review updates estimates
+and evidence only; the RTL, interface and architecture diagram are unchanged.
+
+Increasing query count, smaller batches, slower packing/clock or a faster CPU
+comparator can eliminate the modeled advantage. A new batching implementation
+must preserve primitive ordering, shadow early exits and exact output, and
+remeasure its own count and root fraction.
 
 ## Area, power, and alternatives
 

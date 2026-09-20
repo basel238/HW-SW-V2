@@ -1,0 +1,19 @@
+{
+  "raytrace": {
+    "pages": 12,
+    "required_sections_present": true,
+    "canonical_output_matches_repo": true,
+    "rendered_pages_visually_reviewed": 12,
+    "pdf_sha256": "d88489536401aa148bc125258de4f7d0076ad36a9a6cfbf9a0f9724baecfd047"
+  },
+  "nbody": {
+    "pages": 11,
+    "required_sections_present": true,
+    "canonical_output_matches_repo": true,
+    "rendered_pages_visually_reviewed": 11,
+    "pdf_sha256": "a3c71b838424c588cc6a6efb21a081ef45a963cfc48e711aecd0d0e65db188ca"
+  },
+  "protected_files_unchanged": 25,
+  "raw_artifact_hashes_unchanged": 168,
+  "scope": "Report/docs/evidence updates and analytical-model defaults only; no Git, benchmark kernel, upstream, raw result, latest-pointer or RTL changes."
+}

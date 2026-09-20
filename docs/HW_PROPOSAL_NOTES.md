@@ -1,55 +1,38 @@
-# Hardware proposal: evidence and decision
+# Hardware proposal: current evidence and decision
 
-The implemented proposal is a sequential FP64 ray–sphere accelerator. Read
+The candidate remains the sequential exact FP64 ray-sphere core. See
 [HARDWARE_DESIGN.md](HARDWARE_DESIGN.md) for the datapath, controller, ports,
-reset/backpressure contract, software interface, block diagram and analytical
-performance model. RTL and licensed floating-point primitives are in
-`hardware/`; syntax/elaboration passed, but hardware behavior and frequency
-have not been simulated or measured.
+block diagram, software stack, numerical contract, trade-offs and validation.
+No RTL, driver or transport was changed in this result review.
 
-## Evidence supporting the experiment
+## Updated evidence
 
-- The original 100×100 upstream raytrace profile contains 179,457 sphere
-  intersection calls. The operation has a defined FP64 input/output boundary.
-- The current clean software comparison reports 789.7555 ms/frame upstream and
-  611.02275 ms/frame for shadow-ray reuse, a 22.63% time reduction. This is a
-  **software measurement**, not hardware evidence. Source:
-  `results/comparison_raytrace_20260920-015451/summary.txt`.
-- Python calls, temporary objects, attribute lookup and arithmetic dispatch are
-  plausible costs removed by moving an entire batch to a native/hardware path.
-  Their removal must be measured in a defined integration, not inferred from
-  instructions divided by total calls.
-- A compiled CPU implementation of the same batch operation is an essential
-  future comparator. Otherwise a hardware comparison against Python could
-  largely measure the benefit of leaving the interpreter.
+The newest full raytrace software run is 791.2145 -> 452.69625 ms/frame,
+42.78% lower runtime. The full profile still makes 179,457 sphere queries,
+but only 6,934 reach sqrt (3.8639%). This is measured software work, not
+hardware performance. The preceding shadow-only 22.63% result is historical.
 
-## Claims this proposal does not make
+At the existing assumed 50 MHz, 20 cycles/miss, 80/root, 1 GB/s transfer,
+1,024-query batches, 10 us launch/batch and 100 ns native packing/query,
+modeled offload costs **118.472828 ms**. Break-even against full requires
+removing over **26.17%** of release runtime. The removed fraction is unknown;
+traced sphere time and debug sample shares cannot establish it. The model
+includes both winning and losing scenarios and does not claim achieved speed.
 
-Debug-build self samples are not release-runtime Amdahl fractions. A small
-native float-handler share does not prove a fixed hardware speedup ceiling,
-and a large interpreter share does not prove that a small FPU removes that
-share. Historical custom-kernel speedups are not current upstream results.
-There is no verified 1 GHz clock, one-query-per-cycle throughput, measured
-hardware speedup, area ratio between FP32 and FP64, or demonstrated equivalence
-of an approximate reciprocal-square-root datapath.
+## Reassessment
 
-The implemented core keeps upstream's exact operation tree with separate FP64
-rounding. Batched software/transport integration is specified but not
-implemented; per-intersection MMIO would keep Python dispatch and add overhead.
-Batching may also increase query count by evaluating work that the visibility
-loop would have skipped. Both effects belong in the performance estimate.
+A sqrt-only accelerator has a weak workload target: most queries exit before
+sqrt. The present complete sphere operation has a clearer boundary, but its
+single-query core repeatedly transfers operands. Resident scene/ray data,
+batching and the pre-discriminant path deserve priority. A reusable FP64
+command engine is an alternative to fixed geometric control; no redesign has
+been selected or implemented. A native CPU batch comparator is needed to
+separate escaping Python from the value of hardware.
 
-## Honest analytical result
-
-For an illustrative 50 MHz clock, all-root 80-cycle budget, 1 GB/s transfer,
-1,024-query batches, 10 microseconds launch overhead and 100 ns native packing
-per query, the old 179,457-call workload costs about 325.500 ms to offload.
-Against 611.02275 ms optimized software, it must remove more than 53.27% of
-runtime merely to break even. That removed fraction has not been established.
-The sensitivity table in the design document includes faster and slower cases;
-these are assumptions and calculations, not achieved performance.
-
-Nbody hardware is deferred because exact upstream nonintegral `pow` semantics
-and sequential velocity dependencies require a different, more involved
-contract. The current nbody software optimizations remain independent of this
-raytrace hardware proposal.
+The code-derived clock/cycle budgets, transport and native packing assumptions
+remain unvalidated. Batched early-exit behavior may change query counts/mix.
+Syntax/elaboration and host reference checks are recorded; behavioral HDL
+simulation, achieved timing, deployed transport and pixel equivalence through
+hardware remain unverified. The exact operation tree has no FMA, reassociation
+or approximation. Nbody hardware remains deferred because matching host
+nonintegral pow and ordered dependent state updates needs a distinct contract.

@@ -4,12 +4,49 @@
 
 The optimized wrapper now defaults to **`full`**, combining the compatible pure-Python changes described below. The upstream file and baseline wrapper remain unchanged. Historical kernels remain available for reproducing earlier experiments and separating causes.
 
-There are two distinct evidence sets:
+The newest target-VM session, `session_all_20260920-074308_674`, now measures
+**full**: 791.2145 -> 452.69625 ms/frame, **42.7846% lower runtime** (1.7478x).
+The pair is `raytrace_baseline_20260920-074314_1800` /
+`raytrace_optimized_20260920-075734_1800`. Eleven processes per arm run four
+frames each. All 22 raw timing values match their CSV entries; saved full-batch
+verification is bit-identical, and captured source hashes match this code.
+Keep full as a bundle. A new VM ablation is still needed to rank its components.
+
+The earlier evidence sets remain useful history:
 
 - **Target Ubuntu VM, shadow-only:** the recorded baseline and optimized runs reduced median runtime from 789.7555 to 611.02275 ms/frame: **22.6314% less runtime**, with bit-identical images. Those runs were `raytrace_baseline_20260920-012836` and `raytrace_optimized_20260920-014248`; the comparison is `comparison_raytrace_20260920-015451`. This result establishes the benefit of shadow-ray reuse, not the new `full` kernel.
 - **Local Mac, new candidates:** the exploratory ablation below supports further testing. It is not a VM measurement, does not update the target result, and cannot substitute for the target's clean timing or native profiles.
 
-The repository's [local ablation samples](evidence/raytrace_full_local_ablation.json) and [correctness evidence](evidence/raytrace_full_correctness.json) preserve the source hashes, test commands, results and assumptions. New `full`/`full_slots` target results were not available when this guide was written.
+The repository's [local ablation samples](evidence/raytrace_full_local_ablation.json) and [correctness evidence](evidence/raytrace_full_correctness.json) preserve the source hashes, test commands, results and assumptions. New `full` target evidence is recorded in `docs/reports/evidence/session_074308_raytrace_analysis.json`. `full_slots` has no new target runtime result.
+
+## What the latest profiles establish
+
+The geometry workload is preserved: sphere tests 179,457; plane tests 25,501;
+visibility queries 10,666; ray-colour calls 15,333; and 10,000 output pixels.
+Vector constructions fall from 452,955 to 105,497. The 347,458 removed objects
+are exactly accounted for by shadow reuse (144,344), scalar sphere calculations
+(179,457), camera reuse (19,800), and the discarded checkerboard result (3,857).
+Dot calls fall 509,873 -> 78,787; total traced calls fall 3,092,309 -> 881,684.
+These are exact work counts, not isolated timing contributions.
+
+Release perf counting corroborates less executed work: instructions -43.70%,
+cycles -41.87%, L1 data loads -44.18% in the TXT batch; the independent CSV
+batch agrees in direction and scale. Native debug samples fall 1,061 -> 552
+for one frame. Evaluator self samples fall 263 -> 174 while its share rises
+24.79% -> 31.52%. The same interpreter frames remain in normalized-width flame
+graphs, explaining similar shapes despite less work. Debug percentages are not
+release-runtime Amdahl fractions; cProfile self time moves into inlined sphere
+code while its cumulative time decreases.
+
+The current full median is 25.91% below the historical shadow-only median.
+That is a cross-session comparison, not an isolated same-session ablation.
+Guards and checkerboard had small negative isolated local results; this new
+bundle result does not overturn those observations or prove all components win.
+Optional slots remains outside the default contract.
+
+Only 6,934 sphere calls reach sqrt: 3.8639% of all sphere tests. This now informs
+the hardware estimate. It does not imply that a sqrt-only accelerator would
+remove the remaining interpreter work. See HARDWARE_DESIGN.md.
 
 ## What each kernel changes
 
@@ -112,7 +149,7 @@ Positive reduction means faster; a negative value means slower. Reductions are `
 
 The small isolated changes are comparable to measurement variability: sample coefficients of variation are roughly 1.6–2.1% for most candidates and 5.5% for checkerboard. Thus the small regressions/gains do not establish a universal ranking. Safe guard fallback checks themselves cost work, explaining why removing method calls need not improve every interpreter/workload. The full-versus-full_slots difference also deserves a target comparison before deciding to accept the storage contract change.
 
-The combined result supports the hypothesis that vector temporaries, repeated camera work, calls and container traversal are worthwhile targets. It does not establish the remaining VM hardware bottleneck, the contribution of each component within `full`, or an accelerator's achievable speedup. Those require new optimized profiles and an explicit transfer/latency model.
+The combined result supports the hypothesis that vector temporaries, repeated camera work, calls and container traversal are worthwhile targets. It does not establish the remaining VM hardware bottleneck, the contribution of each component within `full`, or an accelerator's achievable speedup. The new optimized profiles and revised transfer/latency model narrow those questions; a measured release offload boundary and isolated VM ablations remain necessary.
 
 ## Reproduction on Ubuntu
 

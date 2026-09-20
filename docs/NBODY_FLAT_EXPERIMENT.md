@@ -218,3 +218,17 @@ The pipeline now verifies the actual requested batch and run_all.sh selects
 flat_pow for nbody and full for raytrace. Separate structural controls are
 available in experiments/nbody_controls.py. See the current reports for the
 complete decision history and evidence.
+
+## Newest full-session confirmation
+
+Session `session_all_20260920-074308_674` selects baseline
+`nbody_baseline_20260920-080806_16940` and exact `flat_pow`
+`nbody_optimized_20260920-081744_16940`. Median runtime is
+227.19575 -> 143.3736875 ms per 20,000 steps: **36.8942% lower time**.
+The kernel hash is identical to the preceding 37.53% run; this is confirmation,
+not another code improvement. Eleven processes per arm run 16 units each.
+The saved optimized gate now checks all 16 units against upstream, including
+all 30 state bits and final energy. Item-access union samples fall 206 -> 2;
+instructions fall about 35%. Arithmetic boxing and pow remain. The updated
+reports retain both full sessions without treating their small difference as
+an optimization or regression.

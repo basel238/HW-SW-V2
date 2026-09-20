@@ -311,3 +311,18 @@ shadow-only VM result is 22.63%; new full-kernel Mac timings are not VM claims.
 Final reports correct earlier unsupported claims about fixed call cost, debug
 Amdahl ceilings, disappearing float allocations and static bytecode percentages.
 The student must understand and defend these choices, limitations and evidence.
+
+
+2026-09-20 - Newest complete session review
+Actual user request:
+inspect the results of the newest run, they landed under same directory
+lets infer everything we need from it and understand if further improvements occurred, which improvements to keep
+update the reports if we decide on keeping the additional improvements for raytrace
+and think if this changes anything about the suggested hardware optimization
+
+Resulting decisions: retain exact raytrace full bundle (42.78% target runtime
+reduction), retain unchanged nbody flat_pow (36.89% repeat), preserve historical
+and optional candidates without invented individual VM speedups. Update PDF/TXT
+reports and hardware analytical inputs using measured 6,934/179,457 root mix.
+Hardware remains a candidate with unmeasured release removal/transport costs.
+No Git operations, source-kernel edits, RTL changes or raw-result changes.

@@ -25,14 +25,16 @@ def estimate(*, tests, root_fraction, mhz, bandwidth_gbs, batch, launch_us,
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
+    # N, root fraction and software time are observed in session_074308.
+    # Clock, transport, packing and removed fraction remain assumptions.
     p.add_argument('--tests', type=int, default=179457)
-    p.add_argument('--root-fraction', type=float, default=1.)
+    p.add_argument('--root-fraction', type=float, default=6934 / 179457)
     p.add_argument('--mhz', type=float, default=50.)
     p.add_argument('--bandwidth-gbs', type=float, default=1.)
     p.add_argument('--batch', type=int, default=1024)
     p.add_argument('--launch-us', type=float, default=10.)
     p.add_argument('--pack-ns', type=float, default=100.)
-    p.add_argument('--software-s', type=float, default=2.444091 / 4)
+    p.add_argument('--software-s', type=float, default=1.810785 / 4)
     p.add_argument('--offloaded-fraction', type=float, default=.5)
     a = p.parse_args()
     if not (0 <= a.root_fraction <= 1 and 0 <= a.offloaded_fraction <= 1):

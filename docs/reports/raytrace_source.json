@@ -7,7 +7,7 @@
       "blocks": [
         {
           "type": "p",
-          "text": "The verified shadow-ray change lowers target-VM median runtime by 22.63%, from 789.76 to 611.02 ms per 100 x 100 frame. The new full exact kernel adds scalar sphere intersections, camera reuse, direct nearest-hit selection and other object/call reductions. Its local Mac experiment is promising, but a full-kernel Ubuntu result is still required."
+          "text": "The newest complete Ubuntu session confirms full as the exact optimized default: median runtime falls from 791.2145 to 452.69625 ms per 100 x 100 frame, a 42.78% reduction (1.7478x). The earlier shadow-only change achieved 22.63%. Relative to its historical 611.02 ms optimized median, full is about 25.91% faster; that comparison is across separate sessions, not a direct randomized ablation."
         },
         {
           "type": "table",
@@ -18,30 +18,30 @@
               "Decision"
             ],
             [
-              "Ubuntu shadow_ray",
-              "22.63% lower runtime; pixel identity",
-              "Measured improvement above 7%."
+              "Ubuntu full, newest session",
+              "42.78% lower runtime; exact four-frame gate",
+              "Keep the full bundle as default."
             ],
             [
-              "Local Mac full",
-              "38.55% lower median, exploratory",
-              "New exact default; VM measurement pending."
+              "Ubuntu shadow_ray, earlier pair",
+              "22.63% lower runtime",
+              "Keep as the measured intermediate."
             ],
             [
-              "Local Mac full_slots",
-              "39.81% lower median, exploratory",
-              "Optional: broader object-model restrictions."
+              "Mac individual / slots experiments",
+              "Exploratory; not current VM ablations",
+              "Retain optional kernels; no isolated VM ranking."
             ],
             [
-              "FP64 accelerator",
-              "Complete RTL; syntax/elaboration checked",
-              "Analytical proposal; no achieved speedup."
+              "FP64 hardware proposal",
+              "Root fraction now measured: 3.864%",
+              "Update model; no achieved acceleration."
             ]
           ],
           "widths": [
-            0.29,
+            0.3,
             0.36,
-            0.35
+            0.34
           ]
         },
         {
@@ -58,7 +58,7 @@
         },
         {
           "type": "small",
-          "text": "Measured pair: raytrace_baseline_20260920-012836 and raytrace_optimized_20260920-014248. Comparison: comparison_raytrace_20260920-015451. All are under results/."
+          "text": "Newest matched pair: results/raytrace_baseline_20260920-074314_1800 and results/raytrace_optimized_20260920-075734_1800. Comparison: results/session_all_20260920-074308_674/comparison_raytrace. Session explicitly selects full; all captured source hashes match the reviewed files."
         }
       ]
     },
@@ -117,12 +117,16 @@
         {
           "type": "small",
           "text": "Runtime reduction = 100 x (1 - optimized median / baseline median). Speedup = baseline median / optimized median. We use runtime reduction for the declared 7% target. CV = sample standard deviation / mean. Samples from separate TXT and CSV perf invocations are not pooled."
+        },
+        {
+          "type": "small",
+          "text": "Latest session saves a four-frame exact optimized gate covering both reference and candidate. Standalone baseline verification is smaller despite its phase label; the saved optimized gate provides the actual batch comparison. Some perf phases remain labelled requested although their artifacts exist. py-spy is explicitly disabled; official pyperformance applies only to the baseline."
         }
       ]
     },
     {
       "section": "2. Initial Analysis",
-      "title": "From stacks to a testable hypothesis",
+      "title": "Initial hypothesis and historical shadow evidence",
       "blocks": [
         {
           "type": "p",
@@ -294,12 +298,16 @@
         {
           "type": "p",
           "text": "Rejected or deferred: unconditional guard deletion breaks polymorphism; exact-class rejection without fallback narrows behavior; fixing upstream shadow/checkerboard semantics changes the task. Lower precision, approximate roots, a new integrator or answer caching violate the exact reference contract. Compiled native backends remain a possible separate experiment, outside the agreed pure-Python implementation."
+        },
+        {
+          "type": "p",
+          "text": "Retention decision after the new Ubuntu run: keep full as a tested bundle. The additional work reductions occur in the predicted functions and the whole bundle is much faster. No new VM isolated or leave-one-out ablation was collected, so this does not prove every component contributes positive runtime savings. In particular, guards and checkerboard were slightly slower alone in the old Mac experiment. Keep those controls and optional slots available; do not claim their individual VM gains."
         }
       ]
     },
     {
       "section": "4. Performance Comparison",
-      "title": "Runtime clears the target; counters explain why",
+      "title": "Historical shadow-only runtime comparison",
       "blocks": [
         {
           "type": "image",
@@ -366,65 +374,254 @@
     },
     {
       "section": "4. Performance Comparison",
-      "title": "Why the flame graphs still look similar",
+      "title": "Newest full run: a further substantial improvement",
       "blocks": [
         {
           "type": "image",
-          "path": "assets/raytrace_flame_compare.png",
-          "caption": "Structural overview of the original baseline and shadow-ray native flame graphs. Each panel is independently normalized. Use the adjacent original SVG files to zoom; the count table below is the quantitative comparison.",
-          "max_height": 190
-        },
-        {
-          "type": "p",
-          "text": "The same interpreter, render algorithm, recursion and geometry methods still run. Reusing shadow rays removes repeated executions; it does not remove the renderer from the call tree. Both SVGs fill the available width, so a faster run can have a similar outline. Debug wrapper ancestry can also deepen a stack independently of useful workload."
+          "path": "assets/raytrace_full_runtime.png",
+          "caption": "Eleven independent processes per arm, four frames per process; all observations retained. Dashed lines mark medians. Arms were collected in separate blocks.",
+          "max_height": 210
         },
         {
           "type": "table",
           "rows": [
             [
-              "Equal-work native sample observation",
-              "Before -> after",
-              "Meaning"
+              "Clean timing per unit",
+              "Upstream",
+              "Optimized"
             ],
             [
-              "All sampled stacks",
-              "1,073 -> 823",
-              "23.30% fewer samples at the same cycle period."
+              "Median",
+              "791.214500 ms",
+              "452.696250 ms"
+            ],
+            [
+              "Mean +/- sample SD",
+              "792.408 +/- 4.550 ms",
+              "453.830 +/- 4.022 ms"
+            ],
+            [
+              "CV",
+              "0.574%",
+              "0.886%"
+            ],
+            [
+              "Minimum - maximum",
+              "786.148 - 800.841 ms",
+              "449.354 - 462.805 ms"
+            ]
+          ],
+          "widths": [
+            0.35,
+            0.325,
+            0.325
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Median runtime reduction is 42.7846%, saving 338.51825 ms/frame. Even the slowest optimized process beats the fastest baseline by 41.13%. Dispersion is small relative to the effect, but sequential collection leaves slow VM drift unmeasured. The generated 2x-noise rule is a heuristic, not a significance test."
+        },
+        {
+          "type": "p",
+          "text": "The earlier shadow-only baseline was 789.7555 ms, only 0.185% below this baseline; its optimized median was 611.02275 ms. Full is 25.91% below that older optimized median. This is corroborating historical evidence, not an isolated estimate of the added components because the experiments were collected at different times."
+        },
+        {
+          "type": "small",
+          "text": "Official baseline cross-check: 20 value-producing workers, 60 values; median about 801 ms, mean 801 +/- 5 ms. It uses a different harness and does not supply an official optimized result. Full source SHA: 5badaf27f0f9519fd0d2779bd37c745feadcf76e31fbde833cd89dfbb5770d55."
+        }
+      ]
+    },
+    {
+      "section": "4. Performance Comparison",
+      "title": "What changed: fewer calls, objects and instructions",
+      "blocks": [
+        {
+          "type": "table",
+          "rows": [
+            [
+              "One-frame calls",
+              "Upstream",
+              "shadow_ray*",
+              "full"
+            ],
+            [
+              "Sphere intersections",
+              "179,457",
+              "179,457",
+              "179,457"
+            ],
+            [
+              "Ray construction",
+              "98,172",
+              "26,000",
+              "26,000"
+            ],
+            [
+              "Vector construction",
+              "452,955",
+              "308,611",
+              "105,497"
+            ],
+            [
+              "dot",
+              "509,873",
+              "437,701",
+              "78,787"
+            ],
+            [
+              "Point subtraction",
+              "277,865",
+              "205,693",
+              "26,236"
+            ],
+            [
+              "mustBeVector",
+              "520,543",
+              "448,371",
+              "4"
+            ],
+            [
+              "Nearest-hit helper",
+              "15,265",
+              "15,265",
+              "0"
+            ],
+            [
+              "Intersection list comprehension",
+              "15,265",
+              "15,265",
+              "0"
+            ],
+            [
+              "Normalization",
+              "109,887",
+              "37,715",
+              "37,715"
+            ]
+          ],
+          "widths": [
+            0.43,
+            0.19,
+            0.19,
+            0.19
+          ]
+        },
+        {
+          "type": "small",
+          "text": "* Shadow column is the historical shadow-only profile. The deterministic query counts match across scenes; this is a work comparison, not a same-session runtime ablation. New full total process calls: 3,092,309 -> 881,684 (-71.49%), including interpreter/library calls."
+        },
+        {
+          "type": "p",
+          "text": "All 179,457 sphere tests remain. Vector constructions fall by 347,458: shadow reuse removes 144,344; scalar spheres 179,457; camera reuse 19,800; checkerboard 3,857. These sum exactly to the observed delta. Scalar spheres also remove two dot helpers per test. Direct hit selection removes the intersection list/helper. Exact images and unchanged primitive, visibility and pixel counts support preserved work; these counts do not isolate each change's runtime contribution."
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "Counter / unit (TXT)",
+              "Upstream",
+              "Optimized",
+              "Change"
+            ],
+            [
+              "Instructions",
+              "5,050.629m",
+              "2,843.416m",
+              "-43.70%"
+            ],
+            [
+              "Cycles",
+              "1,900.076m",
+              "1,104.609m",
+              "-41.87%"
+            ],
+            [
+              "L1 data loads",
+              "1,639.573m",
+              "915.284m",
+              "-44.18%"
+            ],
+            [
+              "Branches",
+              "650.184m",
+              "368.754m",
+              "-43.28%"
+            ]
+          ],
+          "widths": [
+            0.35,
+            0.235,
+            0.235,
+            0.18
+          ]
+        },
+        {
+          "type": "p",
+          "text": "A separate five-run CSV counter batch corroborates the TXT result: instructions -43.87%, cycles -42.41%, L1 loads -43.75%. Both batches show about 43% fewer L1 load misses. IPC decreases modestly (TXT 2.658 -> 2.574); fewer instructions explain the speedup. These are separate counting experiments and include process startup outside the clean timer."
+        }
+      ]
+    },
+    {
+      "section": "4. Performance Comparison",
+      "title": "Similar stack shapes; markedly less sampled work",
+      "blocks": [
+        {
+          "type": "image",
+          "path": "assets/raytrace_full_flame_compare.png",
+          "caption": "Original native flame-graph overviews, each independently normalized. Original SVGs are retained for zooming. The one-frame profiles use debug CPython and a fixed 5-million-cycle period.",
+          "max_height": 170
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "Equal-work native observation",
+              "Before -> full",
+              "Interpretation"
+            ],
+            [
+              "All native samples",
+              "1,061 -> 552",
+              "47.97% fewer sampled cycles; not the clean runtime reduction."
             ],
             [
               "Evaluator self",
-              "320 -> 227",
-              "Less evaluator work in absolute samples."
+              "263 -> 174",
+              "Absolute decrease; share rises 24.79% -> 31.52%."
             ],
             [
               "call_function self",
-              "47 -> 22",
+              "45 -> 22",
               "Consistent with fewer Python calls."
             ],
             [
               "frame_dealloc self",
-              "33 -> 27",
-              "Absolute work falls; share rises 3.08% -> 3.28%."
+              "34 -> 14",
+              "Less frame-lifetime work."
             ],
             [
-              "Average stack depth",
-              "67.30 -> 69.25",
-              "Not evidence of more work or a regression."
+              "Attribute/dict self group",
+              "184 -> 87",
+              "Defined symbol group; not a complete disjoint partition."
             ]
           ],
           "widths": [
-            0.4,
-            0.21,
+            0.38,
+            0.23,
             0.39
           ]
         },
         {
           "type": "p",
-          "text": "The top-30 stacks cover only 297/1,073 and 244/823 samples; they cannot stand in for whole-profile categories. Unknown frames occur in roughly one-fifth of paths, and sparse symbol changes are uncertain. The normalized differential graph shows redistribution of share, not absolute saved time per frame. Filtering native stacks for Python symbols does not turn them into Python-level py-spy samples."
+          "text": "The interpreter and renderer remain on the stack, and both SVGs fill their canvas width. The remaining evaluator share can grow while its absolute samples fall. The normalized differential graph shows redistribution, not saved seconds; wrapper ancestry also changes. Unknown frames occur somewhere in 240 baseline and 88 optimized sample paths, so exact attribution remains incomplete."
         },
         {
           "type": "p",
-          "text": "Remaining work includes sphere/plane queries, recursive shading, attribute access and boxed arithmetic. The next full-kernel VM run must measure how much of these costs remains after scalarization. Do not apply an Amdahl bound derived from the old debug profile to the new release kernel."
+          "text": "The remaining largest traced Python function is scalar sphere: 0.29546 s self and 0.29646 s cumulative across 179,457 calls. Its self time increased after work was inlined, while inclusive sphere time fell from about 0.78140 s. That is attribution moving into the function, not a regression. ray_colour, visibility, shading and remaining vector helpers follow. Tracing times are not release fractions or hardware speedup ceilings."
+        },
+        {
+          "type": "small",
+          "text": "L1 miss rate rises slightly (2.966% -> 3.031%) despite fewer misses. Generic cache-miss counts disagree across TXT/CSV; cache-sampling runs have only 12 and 3 samples. Reject cache hotspot claims from them. Negative top-down fractions are invalid; LLC events are unsupported. Kernel/BPF warnings qualify symbol interpretation; reported lost samples are zero."
         }
       ]
     },
@@ -454,65 +651,95 @@
         {
           "type": "small",
           "text": "HardFloat source and license: hardware/vendor/ provenance and license files. Primary specification: https://www.jhauser.us/arithmetic/HardFloat-1/doc/HardFloat-Verilog.html. Detailed ports, schedule and host format: docs/HARDWARE_DESIGN.md and hardware/."
+        },
+        {
+          "type": "p",
+          "text": "Design reassessment: sphere intersections remain frequent, but square root is reached only 6,934 times (3.864% of 179,457 queries). The current core is a single-query sequential function with no resident scene or internal batch controller. A batched geometric core or a small reusable FP64 command engine are alternatives, not implemented replacements. More general hardware is not automatically faster; operand residency and the software offload boundary need justification."
+        },
+        {
+          "type": "small",
+          "text": "Resource sharing limits replication and potential switching but also throughput. FP64 rounding/sqrt remain substantial logic; no numerical area, power or achieved frequency is claimed. A pipelined or multi-lane version trades area/control/clocking for throughput. An equivalent native CPU batch is necessary to separate escaping Python from hardware value."
         }
       ]
     },
     {
       "section": "5. Hardware Acceleration Proposal",
-      "title": "Interfaces, software stack and honest estimates",
+      "title": "New workload evidence changes the estimate",
       "blocks": [
         {
           "type": "table",
           "rows": [
             [
-              "Item",
-              "Specification / status"
+              "Interface / validation",
+              "Current specification"
             ],
             [
-              "Request",
-              "640 operand bits (10 FP64 values) plus 32-bit tag; ready/valid; one outstanding query."
+              "Request / response",
+              "640 operand bits + 32-bit tag; distance/status/flags response; one outstanding query; ready/valid and held response."
             ],
             [
-              "Response",
-              "64-bit distance, tag, root/error status and 5 FP exception flags; stable under backpressure."
+              "Numerical contract",
+              "Separate FP64 rounding, ordered expressions, caller-normalized rays; finite supported domain with CPU fallback on error."
             ],
             [
-              "Control",
-              "Reset discards in-flight work; explicit sequential FSM; completion returns to accepting state."
+              "Implementation boundary",
+              "Arithmetic/control RTL and host packing exist. Renderer batching, transport/DMA and driver remain proposed."
             ],
             [
-              "Software",
-              "Host packing/reference helper exists. Batched renderer scheduling, driver and transport/DMA are proposed, not deployed."
-            ],
-            [
-              "Frequency / schedule",
-              "50 MHz target assumption; 20-cycle miss / 80-cycle root initiation budgets. Not synthesis or simulation results."
-            ],
-            [
-              "Validation",
-              "Syntax/elaboration and host-format checks only. No HDL behavioral simulation, timing analysis or physical measurement."
+              "Clock / schedule",
+              "50 MHz target assumption; 20 cycles/miss, 80/root budget. No achieved timing or HDL simulation."
             ]
           ],
           "widths": [
-            0.24,
-            0.76
+            0.28,
+            0.72
           ]
         },
         {
           "type": "p",
-          "text": "Illustrative pessimistic case: 179,457 queries/frame, all taking a root; 50 MHz; 1 GB/s transport; batches of 1,024 with 10 us launch cost; 100 ns packing/query. The model gives 287.13 ms computation + 18.66 ms transfer + 1.76 ms launch + 17.95 ms packing = 325.50 ms offload cost. These are assumptions, not measured hardware performance."
+          "text": "The full-profile math.sqrt caller map records 6,934 sphere calls; 37,715 other square roots belong to magnitude and one to import setup. Thus h = 6,934 / 179,457 = 0.0386388. Source control flow confirms that sphere calls sqrt only after a nonnegative discriminant. This measured workload mix replaces the earlier all-root assumption; it is not a measured hardware speed."
         },
         {
           "type": "p",
-          "text": "Use T_new = T_software x (1 - f) + T_offload, where f is the release-time fraction actually removed by a real batch implementation. Starting from the measured 611.02 ms shadow-ray software, break-even needs f > 53.27%. With f = 50%, the estimate is 631.01 ms: 3.27% slower. With f = 70%, it is 508.81 ms: 16.73% lower time. Neither f is established by the debug profile, and the newer full software requires a new baseline."
+          "text": "With the same assumed 50 MHz, 1 GB/s aggregate payload bandwidth, batch size 1,024, 10 us launch/batch and 100 ns native packing/query, modeled core time is 80.1036 ms. Transfer is 18.6635 ms, launch 1.7600 ms and packing 17.9457 ms: 118.4728 ms total offload cost. Against the new full software time of 452.69625 ms, break-even requires removing more than 26.17% of release runtime."
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "Assumed removed fraction f",
+              "Estimated total time",
+              "Reduction vs full"
+            ],
+            [
+              "20%",
+              "480.630 ms",
+              "-6.17% (slower)"
+            ],
+            [
+              "30%",
+              "435.360 ms",
+              "3.83%"
+            ],
+            [
+              "40%",
+              "390.091 ms",
+              "13.83%"
+            ]
+          ],
+          "widths": [
+            0.4,
+            0.3,
+            0.3
+          ]
         },
         {
           "type": "p",
-          "text": "A single shared datapath limits area and switching relative to many parallel lanes, but limits throughput; FP64 sqrt/rounding still costs substantial logic. Deeper pipelining or replication trades area, clocking and power for throughput. No LUT, gate, watt or achieved-clock numbers are claimed. The proposal needs batch amortization and must eventually be compared with an equivalent compiled CPU batch, since bypassing Python alone may explain most gains."
+          "text": "T_new = T_full x (1 - f) + T_offload. f remains unknown: cProfile sphere share cannot supply it. The modeled 7% runtime reduction would require f > 33.17%; this is a sensitivity point, not a separate mandated hardware target. Batching can change early-exit queries and h, so the original query mix must be rechecked after integration."
         },
         {
           "type": "small",
-          "text": "The assignment requires a complete logical HDL design and interface/architecture estimates (pp. 4-5), not physical implementation. Source completeness and syntax checks do not prove functional correctness. Hardware numerical/pixel acceptance and real transport integration remain future work."
+          "text": "The old all-root case against shadow-only software remains historical evidence, not the current default estimate. If applied to faster full software, that all-root stress case needs 71.90% removable time just to break even. No hardware improvement occurred between estimates; only software baseline and workload assumptions changed."
         }
       ]
     },
@@ -522,19 +749,19 @@
       "blocks": [
         {
           "type": "p",
-          "text": "Shadow-ray reuse is an exact, measured improvement over the upstream workload and exceeds the declared 7% runtime goal. Matching call-count reductions, approximately 23% fewer instructions and the 22.63% runtime reduction explain the gain more convincingly than a broad label such as interpreter-bound. Similar flame shapes are compatible with fewer executions of the same code."
+          "text": "Full is now the selected exact raytrace implementation, with a 42.78% target-VM runtime reduction and a saved four-frame correctness gate. The earlier 22.63% shadow result remains the first measured step. Additional scalarization, call removal and direct traversal visibly remove work; the aggregate result does not establish the isolated value of every component."
         },
         {
           "type": "p",
-          "text": "The full exact software now contains the remaining implemented candidates and passes the expanded correctness suite. Its Mac ablation is evidence for further testing, not a claim of target-VM improvement. Run the full workflow on Ubuntu and retain the selected session manifest before revising this report. Keep individual kernels available to identify components that regress there."
+          "text": "Keep all diagnostic kernels, including optional slots, for controlled comparisons. New individual VM ablations are needed before ranking or pruning small changes. Hardware remains a candidate: the measured low root fraction improves the analytical estimate, while faster software tightens the budget. The next hardware decision should compare a batched geometric core with a small reusable arithmetic engine and account for native CPU execution."
         },
         {
           "type": "code",
-          "text": "./run_all.sh\n# Defaults: nbody flat_pow; raytrace full; both baseline arms.\n./script_raytrace.sh --variant both --kernel full --loops 4\npython3 -B variants/bm_raytrace_upstream_opt.py \\\n  --mode verify --loops 4\npython3 -B -m unittest discover -s tests -v"
+          "text": "python3 -B variants/bm_raytrace_upstream_opt.py \\\n  --mode verify --loops 4\n# Exploratory within-process ablation; all kernels, rotating order:\npython3 -B variants/bm_raytrace_upstream_opt.py --mode ablate \\\n  --loops 4 --reps 22 --no-gc --json raytrace_ablation.json\n# Confirm a selected bundle with independent-process paired rounds:\nLOOPS=4 ./tools/ab_timing.sh raytrace 16 --kernel full"
         },
         {
           "type": "p",
-          "text": "The scripts verify the actual batch, preserve authored reports, record source hashes and list missing optional tools. Session manifests name the exact baseline, optimized and comparison directories; they do not silently pair arbitrary latest folders. The balanced A/B timing tool is available for confirmation when a result is close or ordering effects are suspected."
+          "text": "This session records exact baseline/optimized paths and source hashes without Git commands. The kernel, upstream, wrappers, common/pipeline and configuration hashes match current files. The old UNVERIFIED provenance text and absent authenticity transcript remain limitations: hashes identify the local source but do not alone certify package origin. Original results and latest-pointer links were not modified by this review."
         },
         {
           "type": "table",
@@ -565,7 +792,7 @@
             ],
             [
               "AI prompts / presentation",
-              "prompt.txt records actual prompts. Presentation (20-25 min plus questions), live demo and repository upload remain separate submission actions."
+              "prompt.txt records actual prompts. Presentation (20-25 min plus questions), live demo and repository upload remain separate actions."
             ]
           ],
           "widths": [
