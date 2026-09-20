@@ -228,3 +228,60 @@ New target-VM optimized performance, a completed hardware design, publication,
 and presentation are not claimed. The student must understand, review, and
 extend the drafts and append future prompts rather than treating AI-produced
 text as independent experimental evidence.
+
+
+===============================================================================
+ CODEX GROUPED NBODY IMPLEMENTATION — 2026-09-20
+===============================================================================
+
+Tool: OpenAI Codex. This appendix records the new nbody experiment and preserves
+prior AI history above. Earlier claims in that history are historical records,
+not a substitute for the evidence and qualifications in the current reports.
+
+Verbatim user prompts (line breaks/trailing whitespace normalized):
+
+"now lets move on to optimizing the nbody benchmark
+you said something about reusing state across consecutive pairs
+how should we be doing that"
+
+"also lets rethink what the bottlenecks are and how do we eliminate them by doing this"
+
+"did you implement this already? if not, lets implement"
+
+"this should be implemented in optimized, don't touch the upstream version. we want to optimize upstream"
+
+AI-produced work in this stage:
+* Add grouped to variants/bm_nbody_upstream_opt.py and make it the default.
+* Retain the first body's position/velocity locals across consecutive partners;
+  preserve pair order, arithmetic order, original power, and final position phase.
+* Build groups from current-state references once per advance inside the timer.
+* Preserve upstream sources and baseline wrapper; keep existing candidate kernels
+  separately selectable. No combined grouped_sqrt variant is introduced.
+* Verify all kernels at the explicitly requested loop and iteration counts;
+  require grouped to match finite energy and all 30 state components bit-for-bit.
+* Apply --no-gc before optimized calibration and ablation as well as raw timing.
+* Add focused regression checks, a local validation record, and an experiment
+  guide; update README and the six-section nbody analysis report.
+
+Evidence and limitations recorded in this stage:
+* The advance hotspot plus native list/float/interpreter work motivates the
+  experiment; debug flame widths do not establish a release-runtime ceiling.
+* Whole-step source-level numeric component reads fall from 150 to 114 and
+  writes from 75 to 57. At 20,000 steps this removes 720,000 reads and 360,000
+  writes. These counts include unpacking and are not machine-instruction counts.
+* A 24% reduction in those component accesses is not a 24% speedup prediction;
+  arithmetic/float-object work remains and group construction has a timed cost.
+* The implemented grouped kernel matched energy and all state-component bits
+  for (loops, steps-per-loop) = (1,1), (1,10), (1,20000), (4,20000), (16,20000)
+  in local checks recorded in docs/nbody_grouped_validation.json.
+* All 24 regression tests pass (13 nbody and 11 raytrace), and explicit 16-loop
+  CLI verification passes every kernel under its stated contract. These checks
+  are not VM timings.
+* The pipeline's default one-loop verification does not inherit --loops 16 from
+  timing; the guide explicitly requests a 16-loop verification first.
+* The latest baseline median remains 227.247625 ms per 20,000 steps. New VM
+  optimized timing, balanced uncertainty analysis, the 7% outcome, and a
+  completed hardware implementation are not claimed.
+
+The student remains responsible for understanding the transformation, reviewing
+its assumptions, running the target-VM comparison, and appending future prompts.

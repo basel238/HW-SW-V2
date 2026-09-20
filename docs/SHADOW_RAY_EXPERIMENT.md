@@ -15,8 +15,31 @@ The kernel is installed only around upstream's own benchmark function and restor
 | `upstream` | Unmodified reference |
 | `shadow_ray` | Shadow-ray reuse only; new default for the optimized pipeline |
 | `guards` | Existing exact-class guard specialization, retained as a separate experiment |
+| `combined` | R1 guard specialization plus shadow-ray reuse |
 
-The two optimizations are not combined. The guard experiment narrows general behavior for subclasses and custom predicates; fixed-scene pixel equality does not prove general API equivalence.
+The `combined` kernel explicitly enables both changes; `shadow_ray` remains the default. The guard experiment narrows general behavior for subclasses and custom predicates; fixed-scene pixel equality does not prove general API equivalence. The combined kernel inherits that restriction and the read-only-ray contract, and its speedup must be measured independently because the saved work can overlap.
+
+Run either choice directly from the repository root after verification:
+
+```bash
+python3 -B variants/bm_raytrace_upstream_opt.py --mode verify
+python3 -B variants/bm_raytrace_upstream_opt.py --kernel guards --mode raw --loops 4 --no-gc
+python3 -B variants/bm_raytrace_upstream_opt.py --kernel combined --mode raw --loops 4 --no-gc
+```
+
+These are direct workload runs. To collect the full shell profiling pipeline:
+
+```bash
+USE_UPSTREAM=1 ./script_raytrace.sh --variant both --loops 4 --kernel guards
+USE_UPSTREAM=1 ./script_raytrace.sh --variant both --loops 4 --kernel combined
+```
+
+The baseline remains unmodified. `--kernel` selects only the optimized arm,
+including calibration, clean timing, and all workload profiling passes. Its
+arguments are recorded in `manifest.txt`. Verification still checks every
+registered raytrace kernel; the installed-suite phase remains baseline-only.
+Omitting `--kernel` selects `shadow_ray`. Add `--time-only` for clean timing
+without profiling.
 
 ## How the evidence leads to this change
 
@@ -37,7 +60,7 @@ python3 -B -m unittest discover -s tests -v
 python3 -B variants/bm_raytrace_upstream_opt.py --mode verify
 ```
 
-`verify` checks all three kernels, regardless of `--kernel`, at 24×24, the configured size (default 100×100), and 37×23. It repeats candidates and checks a fresh baseline after each. The focused tests also cover empty scenes, EPSILON boundaries, traversal and early exit, dynamic globals, and patch restoration after exceptions.
+`verify` checks all four kernels, regardless of `--kernel`, at 24×24, the configured size (default 100×100), and 37×23. It repeats candidates and checks a fresh baseline after each. The focused tests also cover empty scenes, EPSILON boundaries, traversal and early exit, dynamic globals, both combined patches being active, and patch restoration after exceptions.
 
 The work-count prediction at 100×100 is:
 

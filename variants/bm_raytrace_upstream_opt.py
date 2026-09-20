@@ -21,6 +21,10 @@ prove equivalence for arbitrary objects. A whole-frame instruction count divided
 by a call count is not the marginal cost of a guard call, and the fraction of
 calls removed is not a measured speedup.
 
+``combined`` applies both shadow-ray reuse and the six guard specializations.
+It inherits both contracts above; it is an explicit experimental choice, while
+``shadow_ray`` remains the default. The gains can overlap and must be measured.
+
 Patches are installed only while calling upstream's own bench_raytrace function
 and restored even if it raises. Patch setup/restoration is outside upstream's
 internal timer; ray construction, rendering and scene construction remain inside
@@ -127,6 +131,8 @@ def _methods(up, kernel):
         return _shadow_methods(up)
     if kernel == "guards":
         return _r1_methods(up)
+    if kernel == "combined":
+        return _r1_methods(up) + _shadow_methods(up)
     if kernel == "upstream":
         return []
     raise ValueError(f"unknown kernel: {kernel}")
@@ -134,7 +140,7 @@ def _methods(up, kernel):
 
 @contextlib.contextmanager
 def _patched(up, kernel):
-    """Install one independent kernel and restore the cached upstream module."""
+    """Install the selected kernel and restore the cached upstream module."""
     missing = object()
     saved = []
     try:
@@ -168,11 +174,19 @@ def _bench_shadow_ray(loops, width, height, filename):
         return up.bench_raytrace(loops, width, height, filename)
 
 
+def _bench_combined(loops, width, height, filename):
+    """Call upstream's timed function with guards and shadow-ray reuse active."""
+    up = base.load_upstream()
+    with _patched(up, "combined"):
+        return up.bench_raytrace(loops, width, height, filename)
+
+
 # Kernel registry. None => upstream, unmodified.
 KERNELS = {
     "upstream": None,
     "guards":   _bench_guards,
     "shadow_ray": _bench_shadow_ray,
+    "combined": _bench_combined,
 }
 
 
@@ -274,7 +288,8 @@ def main():
 
     label = {"upstream": "unmodified reference",
              "guards": "exact-class guard specialization",
-             "shadow_ray": "one shadow ray per visibility query"}[a.kernel]
+             "shadow_ray": "one shadow ray per visibility query",
+             "combined": "guard specialization + shadow-ray reuse"}[a.kernel]
     print(f"UPSTREAM raytrace — kernel={a.kernel} ({label})")
     print(f"resolution={a.width}x{a.height} loops={loops}")
     print(f"elapsed={elapsed:.6f} s  {elapsed / loops * 1e3:.3f} ms/frame")

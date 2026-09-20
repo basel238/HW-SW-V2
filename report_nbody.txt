@@ -1,7 +1,7 @@
 NBODY - HW/SW CO-DESIGN PROJECT REPORT
 Draft date: 2026-09-20
-Status: Overview and Initial Analysis authored from the identified baseline.
-        Optimization validation, final comparison, and hardware design remain open.
+Status: Baseline analysis and grouped software experiment documented.
+        Target-VM optimized comparison and hardware design remain open.
 
 Evidence scope
 --------------
@@ -10,8 +10,10 @@ The baseline evidence in this report is exclusively:
 All result paths below are relative to that directory unless stated otherwise.
 This directory records commit aa22972, a clean working tree at collection, and
 the authentic upstream workload selected by USE_UPSTREAM=1. Current source was
-read to explain its structure. No new performance runs were made to write this
-draft, and no historical custom stand-in speedups are used.
+read to explain its structure. The grouped optimization is documented separately
+from the historical baseline. Local correctness evidence is recorded in
+docs/nbody_grouped_validation.json; it supplies no new target-VM performance
+result. No historical custom stand-in speedups are used.
 
 
 1. Overview
@@ -183,8 +185,8 @@ check also does not establish a long-term bound on drift.
 The 16-loop clean batch ends at energy -0.1690801979358367. Its difference from
 the one-loop verification energy is expected because the simulated state has
 advanced for 320,000 steps, not 20,000. Comparisons must use the same work and
-state/reset policy. Future optimized correctness gates should compare all 30
-state values and energy against upstream at the actual measured batch sizes.
+state/reset policy. The new grouped correctness gate described in Section 3
+compares all 30 state values and energy at the requested measured batch size.
 
 Python-level profile: where to investigate
 -----------------------------------------
@@ -314,12 +316,63 @@ stall breakdown on this virtualized PMU.
 3. Optimizations
 ================
 
-Current source state
---------------------
-variants/bm_nbody_upstream_opt.py already provides separately selectable
-upstream, sqrt, hoist, and full kernels. This draft records their mechanisms;
-it does not assert that any is an accepted performance improvement.
+Implemented grouped experiment
+------------------------------
+variants/bm_nbody_upstream_opt.py now selects grouped by default. The upstream
+source and bench/bm_nbody_upstream.py are unchanged. The existing upstream,
+sqrt, hoist, and full kernels remain independently selectable; grouped does
+not include the square-root transformation.
 
+The original ten pairs form four consecutive groups by first body:
+  Sun:      Jupiter, Saturn, Uranus, Neptune
+  Jupiter:  Saturn, Uranus, Neptune
+  Saturn:   Uranus, Neptune
+  Uranus:   Neptune
+
+Grouped retains the first body's position and velocity in local variables
+across its consecutive partners. It applies each velocity contribution in the
+original order, updates the second body's velocity immediately, and writes the
+first body's three velocity components once after its group. At the next group,
+its first body's velocity is reloaded, including contributions already received
+when it was a second body. Positions still change only after all pairs in the
+step. Displacements, mass products, and the original **(-1.5) power expression
+retain the upstream operation order. Contributions are not pre-summed.
+
+Groups reference the current run's bodies. Construction occurs once per advance
+invocation inside the upstream timer, before the timestep loop, rather than
+once per timestep or in an untimed global cache. Thus the measured 16-loop batch
+includes 16 constructions and continues the same state across its loops. The
+existing wrapper binds each replacement to its fresh module's SYSTEM/PAIRS,
+then invokes upstream's own bench_nbody. Setup, state identity, and arithmetic
+must all remain visible in a fair comparison.
+
+Mechanism and work reduction
+----------------------------
+The hypothesis is that removing repeated Python container operations reduces
+interpreter, subscription, assignment, and reference-handling work. This is
+consistent with the advance hotspot and native list-update paths; the evidence
+does not establish an isolated release-time fraction or guarantee a speedup.
+The low L1 miss rate does not make a cached Python list access free.
+
+Source-level numeric component accesses per timestep, including unpacking:
+                                upstream  grouped  removed
+  Pair position reads                 60       42       18
+  Pair velocity reads                 60       42       18
+  Pair velocity writes                60       42       18
+  Whole-step reads                   150      114       36
+  Whole-step writes                   75       57       18
+
+Ten second-body visits plus four first-body groups give (10+4)*3=42 accesses
+in each grouped pair-phase category. The unchanged position-update phase adds
+30 component reads and 15 writes. Across 20,000 steps, grouping removes 720,000
+reads and 360,000 writes. These are source-level component accesses, not machine
+instructions, cache misses, or eliminated float operations. The 24 percent
+reduction in the counted whole-step accesses is not a 24 percent runtime claim.
+Group construction and an additional loop have costs; arithmetic still uses
+Python float objects, numeric dispatch, and newly produced float results.
+
+Other selectable experiments
+---------------------------
 sqrt rewrites dt*d2**(-1.5) as dt/(d2*sqrt(d2)), with sqrt bound as a local
 default argument. For positive distance this is algebraically equivalent in
 real arithmetic, but floating-point rounding differs. It substitutes a square
@@ -328,33 +381,47 @@ math-library cost can be offset by added interpreter work. An exact hardware
 instruction sequence or fixed cycle saving is not established by these data.
 
 hoist explicitly loads the six velocity components into local variables before
-the six stores. It keeps the power expression. The six reads and six writes
-still occur, so its benefit is a hypothesis about bytecode/operation structure,
-not removal of all list traffic. The baseline already binds coordinates and
-masses locally; those are not new savings. full combines sqrt and hoist and
-is the current optimized default, which is not evidence that it is the best
-variant.
+the six stores. The six reads and six writes still occur for every pair, so it
+changes expression structure without the cross-pair access reduction of grouped.
+It keeps the power expression. full combines sqrt and hoist. None is silently
+combined with grouped, so the effect of retaining state can be isolated.
+The independently written bench/bm_nbody.py stand-in is not the baseline.
 
-The wrapper binds any replacement advance to the fresh module's SYSTEM/PAIRS,
-then calls upstream's bench_nbody. This retains the benchmark structure while
-making the selected kernel change auditable. No new optimization was applied
-for this report draft. The independently written bench/bm_nbody.py stand-in is
-not the baseline for these experiments.
+Correctness contract and validation
+----------------------------------
+Grouped must match upstream bit-for-bit for energy and all 30 position/velocity
+components, with finite outputs, at the requested loop and iteration counts.
+This is stronger than matching final energy alone. Exact comparison is justified
+because this transformation preserves each body's floating-point update order;
+it changes when ordinary list contents are loaded and stored, not the numeric
+expressions. It is a contract for the benchmark's distinct body records and
+ordinary containers, not arbitrary aliased or side-effecting replacement data.
 
-Next validation
----------------
-First compare each candidate with upstream at the same iteration and loop
-counts, using full position/velocity state, energy, momentum, and finite-value
-checks. Document absolute and relative tolerances and report worst errors.
-The existing optimized state metric divides the maximum absolute component
-error by the largest reference component; that is a global scale measure,
-not a separate relative-error bound on every near-zero component.
+The legacy sqrt, hoist, and full kernels retain their existing 1e-9 relative
+energy and state contracts. The state metric divides the maximum absolute
+component error by the largest reference component; it is not a separate
+relative-error bound for every near-zero component. Square-root variants may
+change rounding, so they do not inherit grouped's bit-exact claim.
 
-Then test baseline, sqrt, hoist, and full as separate ablations under the same
-release interpreter and reset policy. Preserve all measurements and eliminate
-variants whose apparent gain is not repeatable. Larger algorithm/layout changes
-should only follow a specific hypothesis and must preserve the benchmark's
-defined work or be explicitly presented as a changed workload.
+The explicit measured-batch verification command is:
+  python3 -B variants/bm_nbody_upstream_opt.py --mode verify --loops 16 --iterations 20000
+It checks all registered kernels at that batch size. The existing pipeline's
+verification phase defaults to one loop and does not forward its timing --loops
+argument, so this explicit command is needed before the 16-loop collection.
+
+Independent local checks of the implemented grouped kernel matched all 30 state
+components and energy bit-for-bit at (loops, steps-per-loop) = (1,1), (1,10),
+(1,20000), (4,20000), and (16,20000). Instrumented component-list checks confirmed
+the per-step access counts above. All 13 focused tests in
+tests/test_nbody_grouped.py pass. The full CLI verification at 16 x 20,000 steps
+also passes every kernel: grouped is bit-exact, hoist has zero measured error,
+and sqrt/full have relative energy error 7.535e-14 and norm-relative state error
+2.259e-11. Those legacy errors pass their 1e-9 contract; they are not bit-exact
+results. Saved local evidence is in docs/nbody_grouped_validation.json. These
+checks are separate from target-VM timing. The combined regression suite passes
+24 tests (13 nbody and 11 raytrace). The experiment guide documents the rationale,
+reference hash, source-level counts, and reproducible commands:
+  docs/NBODY_GROUPED_EXPERIMENT.md
 
 
 4. Performance Comparison
@@ -363,13 +430,22 @@ defined work or be explicitly presented as a changed workload.
 Current status
 --------------
 The baseline reference is 227.248 ms per unit from the recovered clean log.
-This baseline-focused draft has no accepted post-change comparison or verified
-7 percent improvement claim. The broken derived summaries must be repaired
-before a final automated comparison is cited. Existing variant code and an
+The new grouped implementation has no accepted target-VM post-change comparison
+or verified 7 percent improvement claim. The broken derived summaries must be
+repaired before a final automated comparison is cited. Existing variant code and an
 “optimized” filename are not substitutes for performance evidence.
 
 Planned comparison protocol
 ---------------------------
+After the explicit measured-batch verification above, collect the initial run:
+  USE_UPSTREAM=1 ./script_nbody.sh --variant both --loops 16
+The optimized arm selects grouped. This pipeline collects sequential baseline
+and candidate phases; it is an initial collection rather than the full balanced
+final experiment. --no-gc now applies before calibration/ablation as well as raw
+execution in the optimized CLI. The standalone tools/ab_timing.sh still needs
+its failed-arm handling and confidence-interval analysis checked before its
+PASS output is used as evidence.
+
 Use equal 16-loop batches of 20,000 steps, matching GC, hash seed, interpreter,
 CPU affinity, timer boundary, and module-reset policy. Interleave balanced
 baseline/candidate and candidate/baseline rounds, or randomize their order;
@@ -442,8 +518,11 @@ native sampling shows interpreter arithmetic, float-object handling, and list
 updates as concrete optimization targets. The profiles are useful but their
 debug build, sampling limits, and invalid topdown output restrict causal claims.
 
-The next milestone is a correctness-checked, repeatable comparison of separate
-software candidates. The report will then be updated with the selected change,
-its measured impact, and the completed hardware design and cost model. At this
-stage, neither the 7 percent sufficient performance target nor the hardware
+The implemented grouped candidate retains one body's state across consecutive
+pairs while preserving upstream's expressions and interaction order. Its exact
+state contract and source-level access reduction are auditable; whether that
+work reduction produces a useful target-VM speedup remains to be measured.
+The next milestone is a correctness-checked, balanced comparison with upstream,
+followed by a measured impact discussion and the completed hardware design and
+cost model. Neither the 7 percent sufficient performance target nor the hardware
 deliverable is declared complete.

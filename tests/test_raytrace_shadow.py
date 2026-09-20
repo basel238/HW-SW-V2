@@ -70,7 +70,7 @@ class RaytraceShadowTests(unittest.TestCase):
     def test_epsilon_is_strict_and_first_blocker_exits_early(self):
         distances = [None, -1, 0, self.up.EPSILON,
                      math.nextafter(self.up.EPSILON, math.inf), 1]
-        for kernel in ("upstream", "shadow_ray"):
+        for kernel in ("upstream", "shadow_ray", "combined"):
             with self.subTest(kernel=kernel):
                 visible, visited, _, constructed = self.query(distances, kernel)
                 self.assertFalse(visible)
@@ -80,7 +80,7 @@ class RaytraceShadowTests(unittest.TestCase):
     def test_empty_scene_does_not_construct_or_normalize_ray(self):
         up = self.up
         scene, point = up.Scene(), up.Point(1, 2, 3)
-        for kernel in ("upstream", "shadow_ray"):
+        for kernel in ("upstream", "shadow_ray", "combined"):
             with self.subTest(kernel=kernel), variant._patched(up, kernel):
                 with mock.patch.object(up, "Ray", side_effect=AssertionError("Ray called")):
                     self.assertTrue(scene._lightIsVisible(point, point))
@@ -104,18 +104,33 @@ class RaytraceShadowTests(unittest.TestCase):
             self.assertIsNot(up.Scene._lightIsVisible, self.state[-1][3])
             self.assertIs(variant.base.load_upstream(), up)
 
+    def test_combined_installs_both_changes_and_reuses_one_ray(self):
+        with variant._patched(self.up, "combined"):
+            for cls, name, _, original in self.state:
+                self.assertIsNot(getattr(cls, name), original)
+        baseline = self.query([None, -1, 0, self.up.EPSILON], "upstream")
+        candidate = self.query([None, -1, 0, self.up.EPSILON], "combined")
+        self.assertEqual(candidate[:2], baseline[:2])
+        self.assertEqual(len(candidate[3]), 1)
+        self.assertTrue(all(ray is candidate[3][0] for ray in candidate[2]))
+        for before, after in zip(baseline[2], candidate[2]):
+            self.assertEqual(vars(before.point), vars(after.point))
+            self.assertEqual(vars(before.vector), vars(after.vector))
+
     def test_wrappers_restore_after_success_and_exception(self):
         up = self.up
-        for kernel in ("guards", "shadow_ray"):
+        for kernel in ("guards", "shadow_ray", "combined"):
             for fail in (False, True):
                 with self.subTest(kernel=kernel, fail=fail):
                     def bench(loops, width, height, filename):
                         self.assertEqual((loops, width, height, filename), (1, 24, 24, None))
-                        target = up.Scene if kernel == "shadow_ray" else up.Vector
-                        name = "_lightIsVisible" if kernel == "shadow_ray" else "dot"
-                        original = next(fn for cls, n, _, fn in self.state
-                                        if cls is target and n == name)
-                        self.assertIsNot(getattr(target, name), original)
+                        for cls, name, _, original in self.state:
+                            changed = (kernel == "combined" or
+                                       (cls is up.Scene) == (kernel == "shadow_ray"))
+                            if changed:
+                                self.assertIsNot(getattr(cls, name), original)
+                            else:
+                                self.assertIs(getattr(cls, name), original)
                         if fail:
                             raise RuntimeError("intersection failed")
                         return 1.25
