@@ -162,3 +162,69 @@ understanding every part of what is in this repository, and the errors listed
 above are evidence that its output required independent checking rather than
 acceptance.
 ===============================================================================
+
+
+===============================================================================
+ CODEX REVIEW AND SHADOW-RAY IMPLEMENTATION — 2026-09-20
+===============================================================================
+
+Tool: OpenAI Codex. This appendix preserves the prior Claude history above.
+Scope: inspection of the latest upstream baseline evidence, one isolated
+raytrace change, correctness validation, and initial course report drafts.
+It is a record of the prompts available in this conversation, not a claim to
+be a complete export of every earlier AI interaction or private reasoning.
+
+Verbatim user prompts for the immediate implementation stage:
+
+"given these observations made by both you and the ther analysis
+what would you suggest we do next?
+Can you help me firts better undertsand from the results how do we conclude the bottlenecks you talked about?
+how did you infer these limits on the benchmarks from seeing this data and flamegraphs?"
+
+"lets start with that, apply the changes to the code under /Users/baselsalameh/Desktop/M.Sc. Technion/Semester 6/HW:SW Co-Design/HW-SW-V2 (under the variants / optimized )
+and in parallel, lets start preparing the documents for the analysis that is required by the project
+see project pdf attached"
+
+"this is the project pdf"
+Attachment: Project/Project.pdf in the parent course directory.
+
+Additional directly relevant user instructions from this conversation:
+
+"i don't care about optimized
+as you said, we still don't have optimized implementation
+lets see the normal runs and try to identify issues"
+
+"study the results
+take only the last results (last timestamp for each type, nbode/raytrace baseline/optimized)
+and lets go over the results and understand if they are matching to what we were expecting"
+
+The later baseline-only instruction governs the baseline analysis in the new
+reports. Subsequent authorization above adds the new software experiment.
+Line breaks/trailing whitespace were normalized in this record.
+
+AI-produced work in this stage:
+* Default shadow_ray kernel: reuse the ray in a light-visibility object loop.
+* Preserve the pre-existing guards experiment as a separate kernel.
+* Correctness tests, same-process reference isolation, and call-count evidence.
+* report_raytrace.txt and report_nbody.txt using the PDF's six-section format.
+* Updated README, assignment requirements map, and experiment instructions.
+
+Claims checked or corrected during this review:
+* Whole-program instructions / function calls is not per-call overhead.
+* Counts of Python/C calls do not directly measure fractions of runtime.
+* Native profiles use debug Python and cannot yield exact release-time limits.
+* The latest raytrace baseline has 1,065 samples, with 26.38% native self
+  samples in _PyEval_EvalFrameDefault; older aggregated percentages should
+  not replace the actual evidence.
+* Exact-class guards narrow subclass/custom-predicate semantics. A successful
+  fixed-scene image hash is not a proof of unrestricted API equivalence.
+* The measured upstream scene has seven spheres, a halfspace, and two lights.
+* Nbody uses a kick-drift update and precomputed body-reference pairs.
+* Saved clean-timing CSVs were malformed; all raw observations were recovered.
+* Negative PMU top-down percentages cannot justify a hardware bottleneck claim.
+
+Validation at this stage is local correctness and operation-count evidence.
+New target-VM optimized performance, a completed hardware design, publication,
+and presentation are not claimed. The student must understand, review, and
+extend the drafts and append future prompts rather than treating AI-produced
+text as independent experimental evidence.

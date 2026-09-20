@@ -1,0 +1,449 @@
+NBODY - HW/SW CO-DESIGN PROJECT REPORT
+Draft date: 2026-09-20
+Status: Overview and Initial Analysis authored from the identified baseline.
+        Optimization validation, final comparison, and hardware design remain open.
+
+Evidence scope
+--------------
+The baseline evidence in this report is exclusively:
+  results/nbody_baseline_20260919-222849/
+All result paths below are relative to that directory unless stated otherwise.
+This directory records commit aa22972, a clean working tree at collection, and
+the authentic upstream workload selected by USE_UPSTREAM=1. Current source was
+read to explain its structure. No new performance runs were made to write this
+draft, and no historical custom stand-in speedups are used.
+
+
+1. Overview
+===========
+
+Purpose and dependencies
+------------------------
+The nbody benchmark simulates the Sun and four giant planets: Jupiter, Saturn,
+Uranus, and Neptune. It repeatedly evaluates pairwise gravitational interactions,
+updates velocities and positions, and calculates system energy. The program
+is the Computer Language Benchmarks Game nbody implementation distributed with
+pyperformance. The file retains its original authorship and provenance header.
+
+The selected source is upstream/bm_nbody_upstream.py. Its SHA256 is:
+  d1385e816d7cfea361b7915e2cf70138cd6b84f40df8bd5152638851f7bcac2b
+This equals the source hash captured in the baseline manifest. The official
+baseline JSON identifies pyperformance 1.14.0 and pyperf 2.10.0. The manifest's
+additional extraction/version fields still say “not yet extracted” and
+“UNVERIFIED”; these stale fields are not an independent authenticity certificate
+and should be repaired in future collection metadata. Source identity and the
+identity of a particular measurement run are documented separately.
+
+The upstream module imports pyperf for timing and the benchmark runner. Its
+numerical kernel uses ordinary Python floating-point arithmetic and built-in
+lists/tuples/dictionaries, with no NumPy, native extension, or external physics
+library. CPython implements the float operations through its numeric protocol;
+the native profile includes float handling and libm power evaluation.
+
+The custom wrapper bench/bm_nbody_upstream.py loads a fresh copy of the upstream
+module and calls upstream's bench_nbody function. When pyperf is absent in that
+wrapper process, a small module stub supplies time.perf_counter; this does not
+run the pyperf worker/calibration machinery. The official pyperformance run is
+therefore retained as a separate harness cross-check, not mislabeled as the
+same measurement. Default baseline execution leaves advance unmodified.
+
+Data structures
+---------------
+BODIES is a dictionary keyed by body name. Each value is a three-element tuple:
+  (position_list, velocity_list, mass)
+The position and velocity lists each hold three Python floats and are mutable;
+mass is a scalar. SYSTEM is a list of these same body records. PAIRS is a list
+of the ten distinct unordered pairs of body records, constructed once with the
+module's combinations helper. The pair elements are references to the body
+records, not integer body indices and not copies of each evolving state.
+Consequently, writes through v1/v2 or r update the state also visible through
+SYSTEM and BODIES.
+
+The inner loop already unpacks both bodies' coordinates and masses into local
+variables. It does not repeatedly fetch bodies[i] to obtain them. This existing
+upstream structure must be considered before proposing a hoisting optimization.
+
+There are 35 physical scalar quantities (position, velocity, mass for five
+bodies). They are represented by Python objects, containers, and references;
+35 times 8 bytes is not the total Python working-set footprint. Interpreter
+code, stacks, temporary float objects, and imports also contribute to memory
+activity.
+
+Algorithm and work unit
+-----------------------
+At each step, advance(dt,n) first visits every pair. It computes displacement
+(dx,dy,dz), squared distance d2, and:
+  mag = dt * d2**(-1.5)
+It applies equal-and-opposite momentum contributions, using each body's mass,
+to the two velocity vectors. After all pairs have been processed, it updates
+each position using the newly updated velocity:
+  velocity <- velocity + acceleration(old positions) * dt   [kick]
+  position <- position + updated velocity * dt              [drift]
+
+This is kick-drift symplectic Euler integration. It is not velocity Verlet:
+the source has neither half velocity kicks nor a second force evaluation at
+the new positions. For N bodies and S steps, pair processing costs O(S*N^2);
+stored state costs O(N), and the materialized pair list costs O(N^2). Here N=5,
+there are 10 pairs, dt=0.01, and the default is 20,000 steps per benchmark loop.
+One loop performs 200,000 pair updates plus 100,000 body-position updates.
+
+bench_nbody calls offset_momentum for the reference body (the Sun) before
+starting its timer. Every timed loop then performs:
+  report_energy(); advance(0.01,20000); report_energy()
+Thus energy reporting is included in the benchmark; module loading, initial
+momentum setup, and the wrapper's final extra energy read/printing are outside
+the upstream timer. State continues across the loops of a batch, as it does
+in upstream. Each custom measurement starts from a fresh module, so a repeated
+batch begins from the same initial state.
+
+
+2. Initial Analysis
+===================
+
+Measurement setup and artifact identity
+--------------------------------------
+The baseline directory was created at 2026-09-19T22:28:49Z. Its manifest records
+Ubuntu 22.04.5, Linux 5.15.0-1106-kvm, KVM, one virtual CPU, and an exposed Intel
+Xeon E5-2630 v3 at 2.40 GHz. Release and debug Python are both 3.10.12, built with
+GCC 11.4.0; perf is 5.15.209. About 3.7 GiB memory was available, with no swap.
+
+The custom runs used CPU 0 affinity, PYTHONHASHSEED=0, and disabled cyclic GC.
+ASLR was enabled (kernel.randomize_va_space=2). The governor was unavailable
+inside the VM. These facts do not establish a fixed physical-host frequency
+or freedom from host contention. The manifest lists py-spy as installed, but
+there is no py-spy artifact in this run, so it is not used as evidence here.
+
+The phases serve different purposes:
+  - Clean release-Python runs: headline timing of upstream's timed region.
+  - Release-Python perf stat: process-wide hardware counter estimates.
+  - Debug-Python perf record: native cycle-sampled call chains and flame graph.
+  - cProfile: Python function attribution and call counts.
+  - Official pyperformance/pyperf: independent baseline timing cross-check.
+Instrumented timings are not pooled with clean timings. Perf stat covers the
+whole wrapper process, including startup, so its cycles/instruction counts do
+not have exactly the same measurement boundary as the upstream timer.
+
+Clean baseline timing
+---------------------
+Source: timing/clean_baseline.txt, 11 independent processes, 16 loops per process,
+20,000 steps per loop. Per-unit time is batch total_sec divided by 16.
+
+  Median:       227.248 ms per 20,000-step benchmark loop
+  Mean:         227.402 ms
+  Sample SD:      1.227 ms
+  CV:             0.540 percent
+  Minimum:      226.026 ms
+  Maximum:      229.676 ms
+
+The recovered per-unit observations, in their recorded order (ms), are:
+  226.026, 226.638, 228.679, 226.629, 227.248, 227.518,
+  226.387, 229.676, 229.089, 226.286, 227.251.
+The median batch time is 3.635962 seconds; division by 16 gives 227.247625 ms.
+The calculation used all 11 RESULT records, with matching loop and iteration
+fields. The 11 processes are the sampling units, not 176 independent observations.
+
+The original clean CSV has malformed cells such as “3.616409 loops”, and its
+derived summary says “no samples collected”. These statistics were therefore
+recovered from the intact numeric RESULT fields in the raw text, not copied
+from the broken summary. Current code fixes numeric extraction, but that does
+not retroactively repair stored artifacts. Keep the raw source, record recovery
+provenance, and regenerate derived outputs before final submission.
+
+Official pyperformance baseline
+-------------------------------
+Sources: raw/pyperf_baseline.json, raw/pyperf_baseline_stats.txt, and
+logs/pyperformance_baseline.log. The official suite ran the installed nbody
+benchmark with CPython 3.10.12, pyperformance 1.14.0, and pyperf 2.10.0.
+
+  20 measured workers; one warmup and three recorded values per worker.
+  One benchmark loop per value; 60 measured values in total.
+  Median 230 ms; mean 231 ms; SD 7 ms; minimum 225 ms; maximum 257 ms.
+
+The stored statistics warn that there are insufficient samples for their
+specified stability target. Values from one worker are not independent new
+processes. The warmup/state history and timing protocol differ from the custom
+16-loop batches; neither this warning nor the small numerical difference is
+hidden by pooling the two datasets. Their similar scale is a cross-check, not
+proof that every measurement condition is identical. No official optimized
+pyperf result is claimed by this draft.
+
+Correctness evidence
+--------------------
+logs/verify.log reports a successful baseline check at 20,000 steps:
+  Final energy:                   -0.16908926275527172
+  Relative initial/final drift:     8.339e-05
+  State repeatability:             all 30 position/velocity values identical
+  Total momentum magnitude:        2.051e-15
+The code compares two freshly initialized runs, checks relative energy drift
+below 1e-3, and checks momentum magnitude below 1e-10. Energy is a useful invariant
+check, not an exact oracle: distinct states can have the same total energy,
+and this integration method need not conserve it exactly. A single final-state
+check also does not establish a long-term bound on drift.
+
+The 16-loop clean batch ends at energy -0.1690801979358367. Its difference from
+the one-loop verification energy is expected because the simulated state has
+advanced for 320,000 steps, not 20,000. Comparisons must use the same work and
+state/reset policy. Future optimized correctness gates should compare all 30
+state values and energy against upstream at the actual measured batch sizes.
+
+Python-level profile: where to investigate
+-----------------------------------------
+Source: raw/cprofile_baseline.txt; one benchmark loop. It records one call to
+upstream/bm_nbody_upstream.py:78(advance), with 0.316 seconds self/cumulative time
+out of 0.328 seconds for that instrumented process. This identifies advance as
+the main Python-level region to investigate. The profiled seconds are not the
+clean runtime or an acceleration bound, because tracing changes execution.
+Its 4,911 recorded function calls do not count every bytecode-level multiply,
+list access, or float allocation as a Python function call.
+
+Native cycle profile: what work appears inside the hotspot
+----------------------------------------------------------
+Sources: perf/report_baseline_self.txt, perf/baseline_script.txt,
+flame/baseline.folded, and flame/baseline.svg. Sampling used python3-dbg,
+cycles with a fixed period of 5,000,000, DWARF unwinding, and an 8,192-byte stack
+capture. The run executed 5 benchmark loops and collected 1,174 samples, with
+zero reported lost samples. The configured F=999 is inactive in period mode.
+
+Largest native self shares (sampled leaf costs, not inclusive ancestors):
+  _PyEval_EvalFrameDefault       45.40 percent
+  binary_op1                     4.68 percent
+  float_mul                      3.75 percent
+  PyFloat_FromDouble             3.66 percent
+  float_dealloc                  3.66 percent
+  float_add                      3.15 percent
+  list_ass_item                  3.07 percent
+  PyObject_SetItem               2.04 percent
+  __ieee754_pow_fma              1.70 percent
+
+The graph shows substantial interpreter execution, numeric dispatch, float
+construction/destruction, and list-update work. Nbody is not allocation-free
+just because it mutates a small set of lists: its arithmetic creates Python
+float results. Nor is the interpreted execution branch-free.
+
+An actual resolved call-chain suffix is:
+  _PyEval_EvalFrameDefault
+    -> PyObject_SetItem -> list_ass_subscript -> list_ass_item
+This is consistent with the store part of an operation such as
+v1[0] -= dx*b2m. It does not uniquely identify that statement; velocity and
+position stores use the same native routines. Multiplication appears on a
+separate path:
+  _PyEval_EvalFrameDefault -> PyNumber_Multiply -> binary_op1 -> float_mul
+The native graph supplies operation-level evidence; cProfile and source
+inspection connect that evidence to the Python advance function.
+
+Reading the flame graph correctly
+--------------------------------
+Bar width represents an inclusive share of sampled cycles for that call path;
+height represents native call ancestry. Horizontal location is not chronological
+time, and width is not a count of function invocations. For example,
+PyObject_SetItem is the sampled leaf in 24/1174 samples (2.04 percent), but occurs
+somewhere in 134/1174 stacks (11.41 percent). The latter includes its callees;
+adding parent and child percentages would double-count work. Repeated evaluator
+frames do not give Python recursion depth or imply that all enclosed cost is
+bytecode dispatch itself.
+
+The sample-weighted folded depth is 41.43 frames. Unknown frames occur in 27 of
+1,174 samples, with an unknown leaf in 6 samples. Most user-space leaves are
+resolved, but the graph has no Python .py source-frame names. The file named
+baseline_python.folded is identical to the full folded file: the generator's
+filter retains whole stacks containing Python C symbols rather than providing
+Python source-only frames. Native stack depth is useful evidence of unwinding,
+not source-line resolution.
+
+All these proportions describe a debug build. They are not automatically the
+release runtime breakdown; debug object checks change relative costs. About
+one thousand samples support identification of broad hotspots, not precise
+claims about tiny differences or the disappearance of rarely sampled code.
+
+Power evaluation is a candidate, not the whole bottleneck
+--------------------------------------------------------
+The native power chain is:
+  eval -> PyNumber_Power -> ternary_op -> float_pow
+       -> pow -> __ieee754_pow_fma
+PyNumber_Power occurs in 37/1174 stacks (3.15 percent including descendants);
+the libm leaf accounts for 20 samples (1.70 percent). The generic non-integer
+power expression is worth testing, but these data do not justify claiming it
+dominates total runtime. Rewriting the expression also changes interpreter
+operations outside this chain, and these debug shares are not a quantitative
+release-build Amdahl bound.
+
+Hardware counters and limits of bottleneck classification
+---------------------------------------------------------
+Source: perf/stat_baseline.txt, five repeated release-Python processes with
+16 benchmark loops each. Counts below are the printed means divided by 16:
+
+  Instructions/unit:          1,689,598,189
+  Cycles/unit:                  547,086,396
+  Branches/unit:                193,654,711
+  Branch misses/unit:               721,760
+  L1 data loads/unit:           536,200,999
+  L1 data load misses/unit:         263,762
+
+The ratio of aggregate instructions to cycles is 3.0884 IPC. Perf prints 3.08;
+ratios of aggregate counts need not exactly equal internally averaged ratios.
+Reported branch miss rate is about 0.37 percent and L1 load miss rate about
+0.05 percent. There are no major page faults or CPU migrations, and average
+CPU utilization is 0.995. This is consistent with active CPU execution rather
+than spending most of the run waiting for paging or I/O. It does not prove a
+specific front-end, execution-port, or memory-stall bottleneck.
+
+Counters are multiplexed: cycles run for 49.82 percent of enabled time,
+instructions/branches for about 59.94 percent, and L1/dTLB events for about
+40 percent. Perf has already scaled the reported counts; dividing them by
+those fractions again would be wrong. LLC load events are unsupported, and
+there is no measured FP instruction count. General cache misses have 38.36
+percent reported variation. Do not turn a low miss rate or a guessed FLOP
+count into a precise “interpreter tax” or hardware speedup claim.
+
+perf/stat_baseline.csv comes from another five-repeat command, not from
+reformatting the same samples. Keep every derived ratio within one identified
+counter group. The topdown report contains -72.7 percent bad speculation;
+its category partition is invalid and is rejected. In particular, the accompanying
+89.6 percent backend-bound number is not a usable bottleneck conclusion.
+
+Baseline conclusion for optimization selection
+----------------------------------------------
+The strongest combined evidence is that the Python advance loop dominates
+the work and repeatedly invokes interpreter numeric/list operations. This
+motivates controlled experiments that reduce Python-level operations or make
+their implementation cheaper. The evidence does not select a successful
+optimization by itself, and it does not establish a precise microarchitectural
+stall breakdown on this virtualized PMU.
+
+
+3. Optimizations
+================
+
+Current source state
+--------------------
+variants/bm_nbody_upstream_opt.py already provides separately selectable
+upstream, sqrt, hoist, and full kernels. This draft records their mechanisms;
+it does not assert that any is an accepted performance improvement.
+
+sqrt rewrites dt*d2**(-1.5) as dt/(d2*sqrt(d2)), with sqrt bound as a local
+default argument. For positive distance this is algebraically equivalent in
+real arithmetic, but floating-point rounding differs. It substitutes a square
+root, multiplication, division, and a Python call for generic power; reduced
+math-library cost can be offset by added interpreter work. An exact hardware
+instruction sequence or fixed cycle saving is not established by these data.
+
+hoist explicitly loads the six velocity components into local variables before
+the six stores. It keeps the power expression. The six reads and six writes
+still occur, so its benefit is a hypothesis about bytecode/operation structure,
+not removal of all list traffic. The baseline already binds coordinates and
+masses locally; those are not new savings. full combines sqrt and hoist and
+is the current optimized default, which is not evidence that it is the best
+variant.
+
+The wrapper binds any replacement advance to the fresh module's SYSTEM/PAIRS,
+then calls upstream's bench_nbody. This retains the benchmark structure while
+making the selected kernel change auditable. No new optimization was applied
+for this report draft. The independently written bench/bm_nbody.py stand-in is
+not the baseline for these experiments.
+
+Next validation
+---------------
+First compare each candidate with upstream at the same iteration and loop
+counts, using full position/velocity state, energy, momentum, and finite-value
+checks. Document absolute and relative tolerances and report worst errors.
+The existing optimized state metric divides the maximum absolute component
+error by the largest reference component; that is a global scale measure,
+not a separate relative-error bound on every near-zero component.
+
+Then test baseline, sqrt, hoist, and full as separate ablations under the same
+release interpreter and reset policy. Preserve all measurements and eliminate
+variants whose apparent gain is not repeatable. Larger algorithm/layout changes
+should only follow a specific hypothesis and must preserve the benchmark's
+defined work or be explicitly presented as a changed workload.
+
+
+4. Performance Comparison
+=========================
+
+Current status
+--------------
+The baseline reference is 227.248 ms per unit from the recovered clean log.
+This baseline-focused draft has no accepted post-change comparison or verified
+7 percent improvement claim. The broken derived summaries must be repaired
+before a final automated comparison is cited. Existing variant code and an
+“optimized” filename are not substitutes for performance evidence.
+
+Planned comparison protocol
+---------------------------
+Use equal 16-loop batches of 20,000 steps, matching GC, hash seed, interpreter,
+CPU affinity, timer boundary, and module-reset policy. Interleave balanced
+baseline/candidate and candidate/baseline rounds, or randomize their order;
+record that order to expose drift. Repeat a control through the same wrapper
+without changing the kernel. Obtain clean timings separately from profiling.
+
+Report process count, all per-unit values, median and spread, and:
+  speedup         = median_baseline / median_candidate
+  time reduction  = 100 * (1 - median_candidate / median_baseline)
+  throughput gain = 100 * (median_baseline / median_candidate - 1)
+State the convention when discussing the course's 7 percent sufficient target.
+The assignment does not define which percentage formula it intends. A small
+effect in one sequential VM session is not a demonstrated causal improvement.
+
+For explanation, repeat a small cycles+instructions event group to reduce
+multiplexing, and collect other events separately when needed. Check that a
+change in measured cost agrees with the source mechanism. Retain raw data,
+commit IDs, configuration, and correctness outputs. Use matching pyperf runs
+if reporting an official-harness before/after result. No future result or
+confidence interval is filled in before it exists.
+
+
+5. Hardware Acceleration Proposal
+================================
+
+Status and decision still needed
+-------------------------------
+No complete hardware design is established by this report. Existing project
+notes are starting hypotheses, not an implemented accelerator or a measured
+hardware result. A promising component must first be selected using the
+profiled workload and an explicit software/hardware boundary.
+
+The pair-interaction calculation is a candidate for investigation, but simply
+adding a fast arithmetic primitive may leave most Python dispatch, object
+conversion, and call overhead in place. Conversely, moving a batch of steps
+requires transfer/state/control logic and changes the integration boundary.
+For only five bodies, launch and data-conversion costs can dominate a tiny
+offloaded call. These are design questions to quantify, not reasons to claim
+an unbuilt accelerator will be fast.
+
+Required completion (Project.pdf pp. 4-5)
+--------------------------------------
+Select the component; specify numeric representation and rounding/error policy;
+define input/output widths, protocol, and expected frequency; implement the
+datapath and control in Verilog, SystemVerilog, or PyXHDL; explain software
+packing/unpacking and integration; provide a block diagram; and estimate
+performance/area/power trade-offs with stated assumptions. An alternative HDL
+or framework requires prior instructor approval. Synthesis, fabrication, and
+physical testing are not required by the assignment.
+
+The performance model must include conversion, transfer, invocation, execution,
+and result-handling costs. Use a measured release-software fraction at the
+chosen boundary for any Amdahl calculation; do not insert debug-interpreter
+flame widths as if they were a validated release fraction. A functional testbench
+and software reference comparison would make the proposed logic reviewable;
+their test results must remain unclaimed until such a design exists.
+
+The final hardware section is therefore open. No invented data width, clock,
+latency, area, power, interface, HDL completion, or acceleration result is
+reported here.
+
+
+6. Conclusion
+=============
+
+The baseline is now tied to one identifiable upstream workload, measurement
+directory, source hash, and work unit. Its recovered clean median is 227.248 ms
+for 20,000 steps. Python-function attribution locates the advance loop, while
+native sampling shows interpreter arithmetic, float-object handling, and list
+updates as concrete optimization targets. The profiles are useful but their
+debug build, sampling limits, and invalid topdown output restrict causal claims.
+
+The next milestone is a correctness-checked, repeatable comparison of separate
+software candidates. The report will then be updated with the selected change,
+its measured impact, and the completed hardware design and cost model. At this
+stage, neither the 7 percent sufficient performance target nor the hardware
+deliverable is declared complete.

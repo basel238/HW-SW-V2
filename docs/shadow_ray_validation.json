@@ -1,0 +1,91 @@
+{
+  "purpose": "Call counts and correctness only; profiling durations are not performance evidence.",
+  "resolution": [
+    100,
+    100
+  ],
+  "loops": 1,
+  "counts": {
+    "upstream": {
+      "Ray.__init__": {
+        "primitive_calls": 98172,
+        "total_calls": 98172
+      },
+      "Vector.normalized": {
+        "primitive_calls": 109887,
+        "total_calls": 109887
+      },
+      "Vector.__init__": {
+        "primitive_calls": 452943,
+        "total_calls": 452943
+      },
+      "Scene._lightIsVisible": {
+        "primitive_calls": 10666,
+        "total_calls": 10666
+      }
+    },
+    "shadow_ray": {
+      "Ray.__init__": {
+        "primitive_calls": 26000,
+        "total_calls": 26000
+      },
+      "Vector.normalized": {
+        "primitive_calls": 37715,
+        "total_calls": 37715
+      },
+      "Vector.__init__": {
+        "primitive_calls": 308599,
+        "total_calls": 308599
+      },
+      "Scene._lightIsVisible": {
+        "primitive_calls": 10666,
+        "total_calls": 10666
+      }
+    }
+  },
+  "extra_pixel_checks": {
+    "101x97": {
+      "sha256_by_kernel": {
+        "upstream": "fdad52be5a274cf32078aea9f9d948d7c0cb2dd25bb15e9de43970ebbfb3b75e",
+        "guards": "fdad52be5a274cf32078aea9f9d948d7c0cb2dd25bb15e9de43970ebbfb3b75e",
+        "shadow_ray": "fdad52be5a274cf32078aea9f9d948d7c0cb2dd25bb15e9de43970ebbfb3b75e"
+      },
+      "pixel_bytes": 29391,
+      "baseline_after_matches": true
+    },
+    "128x128": {
+      "sha256_by_kernel": {
+        "upstream": "d1555a3e0e4ace2ed066949b68939492512ca7e77c125dc598486e97a763a49c",
+        "guards": "d1555a3e0e4ace2ed066949b68939492512ca7e77c125dc598486e97a763a49c",
+        "shadow_ray": "d1555a3e0e4ace2ed066949b68939492512ca7e77c125dc598486e97a763a49c"
+      },
+      "pixel_bytes": 49152,
+      "baseline_after_matches": true
+    }
+  },
+  "original_variant_sha256": "97c3613369dfbe48de982613f90880ac36752196db34286c584e4cd13cae4224",
+  "staged_variant_sha256": "1dddb7689f8c119992c7de19e9bcf1d5bcf2feb75cc23c5c3b81dbe0e9ac1fe8",
+  "validation_host": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "python_version": "3.14.6",
+  "profile_scope": "Upstream module loaded before cProfile; one timed-function invocation rendering one 100x100 frame. Excludes 12 module-import Vector objects counted in the historical full-process profile.",
+  "regression_tests": {
+    "command": "python3 -B -m unittest discover -s tests -v",
+    "passed": 11,
+    "checks_pixels_at": [
+      [
+        24,
+        24
+      ],
+      [
+        100,
+        100
+      ],
+      [
+        37,
+        23
+      ]
+    ],
+    "baseline_restoration": true
+  },
+  "upstream_sha256": "88ef4d9060d8e8f6ce40f376477aaf89cc808fa44813225a3071a05a1467f017"
+}
