@@ -1,0 +1,5 @@
+UPSTREAM raytrace — kernel=upstream (PASSTHROUGH, no optimizations)
+resolution=100x100 loops=1
+elapsed=1.896376 s  1896.376 ms/frame
+primary_rays=10000  5.27 kray/s
+RESULT total_sec=1.896376 loops=1 ms_per_frame=1896.3759 krays_per_sec=5.2732 kernel=upstream
