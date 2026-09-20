@@ -1,0 +1,63 @@
+{
+  "python": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "default": "full",
+  "upstream_modified": false,
+  "hashes": {
+    "variants/bm_raytrace_upstream_opt.py": "5badaf27f0f9519fd0d2779bd37c745feadcf76e31fbde833cd89dfbb5770d55",
+    "upstream/bm_raytrace_upstream.py": "88ef4d9060d8e8f6ce40f376477aaf89cc808fa44813225a3071a05a1467f017",
+    "tests/test_raytrace_full.py": "24bb18cab106caafffd46c2d6c37da66008149beb0abe2b2c3f5049397c089b6",
+    "tests/test_raytrace_shadow.py": "7a9141265a3204829e3720dcefc98cc06312c0e87f34e9dad944639b2c2669d3"
+  },
+  "correctness": "PASS for recorded cases; not a proof for arbitrary external Python objects",
+  "test_count": 24,
+  "commands": [
+    "python3 -B -m unittest discover -s tests -p test_raytrace_full.py -v",
+    "python3 -B -m unittest discover -s tests -p test_raytrace_shadow.py -v",
+    "python3 -B variants/bm_raytrace_upstream_opt.py --mode verify --loops 4 --width 100 --height 100"
+  ],
+  "evidence": {
+    "tests_full.txt": "test_all_patches_restore_on_render_exception (test_raytrace_full.RaytraceFullTests.test_all_patches_restore_on_render_exception) ... ok\ntest_batch_captures_each_frame_and_restores_canvas (test_raytrace_full.RaytraceFullTests.test_batch_captures_each_frame_and_restores_canvas) ... ok\ntest_camera_primary_rays_match_component_bits (test_raytrace_full.RaytraceFullTests.test_camera_primary_rays_match_component_bits) ... ok\ntest_checker_preserves_zero_size_exception_and_ignored_scale (test_raytrace_full.RaytraceFullTests.test_checker_preserves_zero_size_exception_and_ignored_scale) ... ok\ntest_custom_mutating_shadow_primitive_uses_fresh_rays (test_raytrace_full.RaytraceFullTests.test_custom_mutating_shadow_primitive_uses_fresh_rays) ... ok\ntest_nearest_ties_epsilon_and_all_primitives_are_visited (test_raytrace_full.RaytraceFullTests.test_nearest_ties_epsilon_and_all_primitives_are_visited) ... ok\ntest_raw_pixel_colours_match_before_quantization (test_raytrace_full.RaytraceFullTests.test_raw_pixel_colours_match_before_quantization) ... ok\ntest_scalar_falls_back_for_custom_point (test_raytrace_full.RaytraceFullTests.test_scalar_falls_back_for_custom_point) ... ok\ntest_slots_are_scoped_and_preserve_fresh_scene_class_behavior (test_raytrace_full.RaytraceFullTests.test_slots_are_scoped_and_preserve_fresh_scene_class_behavior) ... ok\ntest_sphere_random_and_edge_distances_are_bit_identical (test_raytrace_full.RaytraceFullTests.test_sphere_random_and_edge_distances_are_bit_identical) ... ok\ntest_subclass_guards_and_predicates_keep_polymorphism (test_raytrace_full.RaytraceFullTests.test_subclass_guards_and_predicates_keep_polymorphism) ... ok\ntest_varied_scene_images_all_candidates (test_raytrace_full.RaytraceFullTests.test_varied_scene_images_all_candidates) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in 0.115s\n\nOK\n",
+    "tests_shadow.txt": "test_all_kernel_pixels_and_same_process_baseline_restoration (test_raytrace_shadow.RaytraceShadowTests.test_all_kernel_pixels_and_same_process_baseline_restoration) ... ok\ntest_cli_defaults_to_full (test_raytrace_shadow.RaytraceShadowTests.test_cli_defaults_to_full) ... ok\ntest_combined_installs_both_changes_and_reuses_one_ray (test_raytrace_shadow.RaytraceShadowTests.test_combined_installs_both_changes_and_reuses_one_ray) ... ok\ntest_empty_scene_does_not_construct_or_normalize_ray (test_raytrace_shadow.RaytraceShadowTests.test_empty_scene_does_not_construct_or_normalize_ray) ... ok\ntest_epsilon_is_strict_and_first_blocker_exits_early (test_raytrace_shadow.RaytraceShadowTests.test_epsilon_is_strict_and_first_blocker_exits_early) ... ok\ntest_global_epsilon_is_not_captured_when_patch_is_built (test_raytrace_shadow.RaytraceShadowTests.test_global_epsilon_is_not_captured_when_patch_is_built) ... ok\ntest_intersection_exception_restores_method (test_raytrace_shadow.RaytraceShadowTests.test_intersection_exception_restores_method) ... ok\ntest_no_gc_applies_to_calibration_and_ablation (test_raytrace_shadow.RaytraceShadowTests.test_no_gc_applies_to_calibration_and_ablation) ... ok\ntest_reuses_one_ray_and_preserves_geometry_and_object_order (test_raytrace_shadow.RaytraceShadowTests.test_reuses_one_ray_and_preserves_geometry_and_object_order) ... ok\ntest_shadow_does_not_install_guard_specialization (test_raytrace_shadow.RaytraceShadowTests.test_shadow_does_not_install_guard_specialization) ... ok\ntest_verify_rejects_leaked_patch_even_when_pixels_match (test_raytrace_shadow.RaytraceShadowTests.test_verify_rejects_leaked_patch_even_when_pixels_match) ... ok\ntest_wrappers_restore_after_success_and_exception (test_raytrace_shadow.RaytraceShadowTests.test_wrappers_restore_after_success_and_exception) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in 4.608s\n\nOK\n",
+    "verify_full.txt": "  24x24   kernel=upstream   sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  24x24   kernel=guards     sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  24x24   kernel=shadow_ray sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  24x24   kernel=combined   sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  24x24   kernel=sphere_scalar sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  24x24   kernel=camera     sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  24x24   kernel=nearest_hit sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  24x24   kernel=checkerboard sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  24x24   kernel=full       sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  24x24   kernel=slots      sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  24x24   kernel=full_slots sha=7ec37e9f6eea4783 BIT-IDENTICAL; baseline restored\n  100x100  kernel=upstream   sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  100x100  kernel=guards     sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  100x100  kernel=shadow_ray sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  100x100  kernel=combined   sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  100x100  kernel=sphere_scalar sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  100x100  kernel=camera     sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  100x100  kernel=nearest_hit sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  100x100  kernel=checkerboard sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  100x100  kernel=full       sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  100x100  kernel=slots      sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  100x100  kernel=full_slots sha=11f2c36b02044f11 BIT-IDENTICAL; baseline restored\n  37x23   kernel=upstream   sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\n  37x23   kernel=guards     sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\n  37x23   kernel=shadow_ray sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\n  37x23   kernel=combined   sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\n  37x23   kernel=sphere_scalar sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\n  37x23   kernel=camera     sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\n  37x23   kernel=nearest_hit sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\n  37x23   kernel=checkerboard sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\n  37x23   kernel=full       sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\n  37x23   kernel=slots      sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\n  37x23   kernel=full_slots sha=a7650c079c4c8f8e BIT-IDENTICAL; baseline restored\nbatch verify: 4 frames at 100x100, kernel=full, all BIT-IDENTICAL\nverify: OK  all kernels; baseline before and after each candidate\n"
+  },
+  "coverage": [
+    "All 11 kernels: exact stock images 24x24,100x100,37x23; same-process baseline restoration",
+    "Full exact requested batch: all 4 raw frame buffers at 100x100",
+    "1000 deterministic randomized sphere intersections plus 36 geometric edge cases: packed IEEE754 result bits",
+    "10 varied scenes across all 11 kernels: empty/no-light, multiple spheres, reflective coefficients, checker sizes, nonsquare images",
+    "Raw pre-quantization pixel colour bits for full/full_slots in four varied scenes",
+    "Camera primary ray origin/direction component bits",
+    "Subclass guard/predicate and custom point fallbacks; original exception types",
+    "Strict EPSILON, ties, all object visits and recursion restoration",
+    "Custom mutating shadow primitive uses upstream fresh-ray fallback",
+    "Zero checker size raises and unused scale remains unused",
+    "Patch restoration on success/failure; slotted class restoration"
+  ],
+  "composition": {
+    "guards": "Safe exact stock operand fast paths; other operands call captured original method",
+    "shadow_ray": "Historical stock read-only primitive contract: one Ray per nonempty visibility query",
+    "sphere_scalar": "Same ordered subtractions/dot products/discriminant/sqrt; avoid cp Vector and dot calls",
+    "camera": "Precompute x components once per column and y component once per row, inside timing",
+    "nearest_hit": "Scan all primitives and track first strictly-nearest eligible hit; no full intersection list",
+    "checkerboard": "Omit unused Vector allocation and scale call; preserve division and component multiplies/exception behavior",
+    "full": "guards + safe shadow reuse + sphere_scalar + camera + nearest_hit + checkerboard",
+    "slots": "Optional replacement Point/Vector/Ray with slots; fresh stock scenes only",
+    "full_slots": "slots plus full"
+  },
+  "limitations": [
+    "No target Ubuntu measurement yet for these new candidates.",
+    "Optimized stock-scene fast paths assume no concurrent or monkey-patched scene mutation.",
+    "Slotted candidates change class identity and remove instance __dict__/weakrefs; therefore optional, not default.",
+    "Scalar arithmetic retains Python float results; no claim of reduced arithmetic float-result allocations.",
+    "Small isolated candidate timing differences may be noise and gains are not additive.",
+    "Guard fallback excludes arbitrary stock-instance monkey-patching from equivalence contract."
+  ],
+  "decisions": [
+    "Preserve upstream shadow occlusion and Halfspace behavior; do not fix physics.",
+    "Preserve checkerboard ignored scale bug; no image-changing fix.",
+    "No compiled libraries in agreed purePython track.",
+    "No BVH/tree algorithm added: eight-object scene and ordering/tie contract need a separate measured design.",
+    "Retain individually weak candidates for target ablation; combined gains must be measured as a combination."
+  ]
+}

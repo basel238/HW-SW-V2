@@ -17,7 +17,7 @@ class NbodyPipelineTests(unittest.TestCase):
         return dict(os.environ, RESULTS_DIR=str(results), USE_UPSTREAM="1",
                     SKIP_WORKLOAD_VERIFY="1", USE_TASKSET="0", CLEAN_REPS="1",
                     PY_REL=sys.executable, PY_DBG=sys.executable,
-                    PYTHONDONTWRITEBYTECODE="1", ENABLE_VERIFY="1")
+                    PYTHONDONTWRITEBYTECODE="1", ENABLE_VERIFY="1", CAPTURE_GIT_METADATA="0")
 
     def test_time_only_compares_reference_to_selected_kernel(self):
         for kernel in (None, "grouped", "flat_sqrt", "upstream"):
@@ -95,7 +95,7 @@ if tool == "python" and "--mode" in args:
     else:
         print("verify: OK")
 elif tool == "python" and args[:2] == ["-m", "cProfile"]:
-    sys.exit(1)
+    sys.exit(0)
 ''')
             env = self.environment(directory / "results")
             env.update(TEST_ROOT=str(ROOT), TEST_PYTHON=sys.executable,

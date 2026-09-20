@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# tools/ab_timing.sh — INTERLEAVED A/B timing, the statistically sound way to
+# tools/ab_timing.sh — INTERLEAVED A/B timing, a controlled way to
 # establish a speedup.
 #
 # WHY THIS EXISTS
@@ -14,7 +14,7 @@
 # This tool addresses both:
 #   * ALTERNATES baseline/optimized process by process (A B A B ...), optionally
 #     randomizing the order within each round, so drift affects both arms
-#     equally instead of loading onto one.
+#     more evenly rather than loading onto one.
 #   * Reports a bootstrap confidence interval for the speedup, not just a
 #     point estimate and a heuristic.
 #
@@ -33,7 +33,21 @@ source "$HERE/../lib/common.sh"
 
 BENCH="${1:?usage: ab_timing.sh <raytrace|nbody> [rounds] [--shuffle]}"
 ROUNDS="${2:-11}"
-case "${3:-}" in --shuffle) SHUFFLE=1 ;; *) SHUFFLE=0 ;; esac
+shift $(( $# > 1 ? 2 : 1 ))
+SHUFFLE=0; KERNEL=""
+while (( $# )); do
+  case "$1" in
+    --shuffle) SHUFFLE=1; shift;;
+    --kernel) KERNEL="${2:?missing kernel}"; shift 2;;
+    *) die "unknown option $1";;
+  esac
+done
+[[ "$ROUNDS" =~ ^[1-9][0-9]*$ && "$ROUNDS" -ge 3 ]] || die "rounds must be >=3"
+if [[ -z "$KERNEL" ]]; then
+  case "$BENCH" in nbody) KERNEL=flat_pow;; raytrace) KERNEL=full;; esac
+fi
+OPT_ARGS=()
+if [[ "${USE_UPSTREAM:-1}" == "1" ]]; then OPT_ARGS=(--kernel "$KERNEL"); fi
 
 case "$BENCH" in
   raytrace|nbody) ;;
@@ -50,8 +64,11 @@ else
   log "workload: custom stand-in"
 fi
 [[ -f "$BASE" && -f "$OPT" ]] || die "benchmark sources missing"
+if [[ "${USE_UPSTREAM:-1}" == "1" && "${SKIP_WORKLOAD_VERIFY:-0}" != "1" ]]; then
+  "$REPO_ROOT/tools/verify_upstream.sh" --quiet || die "upstream verification failed"
+fi
 
-OUT="$RESULTS_DIR/abtiming_${BENCH}_$(date +%Y%m%d-%H%M%S)"
+OUT="$RESULTS_DIR/abtiming_${BENCH}_$(date +%Y%m%d-%H%M%S)_$$"
 mkdir -p "$OUT"
 ( cd "$RESULTS_DIR" && ln -sfn "$(basename "$OUT")" "latest_abtiming_${BENCH}" )
 
@@ -66,10 +83,17 @@ LOOPS_FIXED="${LOOPS:-}"
 if [[ -z "$LOOPS_FIXED" ]]; then
   log "calibrating once on the baseline (both arms will use this value)"
   LOOPS_FIXED="$("$PY_REL" "$BASE" --mode calibrate 2>/dev/null | tail -1 | tr -dc '0-9')"
-  [[ -n "$LOOPS_FIXED" && "$LOOPS_FIXED" -gt 0 ]] 2>/dev/null || LOOPS_FIXED=16
+  [[ -n "$LOOPS_FIXED" && "$LOOPS_FIXED" -gt 0 ]] 2>/dev/null || die "calibration failed"
 fi
 ok "fixed loops = $LOOPS_FIXED for BOTH variants (equal work by construction)"
 
+[[ "$LOOPS_FIXED" =~ ^[1-9][0-9]*$ ]] || die "LOOPS must be positive"
+RUN_DIR="$OUT"; RUN_TAG="$(basename "$OUT")"; VARIANT=paired
+mkdir -p "$OUT/logs"
+capture_env "$BASE" "$OPT" ${OPT_ARGS[@]+"${OPT_ARGS[@]}"}
+"$PY_REL" "$BASE" --mode verify --loops "$LOOPS_FIXED" > "$OUT/logs/verify_baseline.log" 2>&1 || die "baseline verification failed"
+"$PY_REL" "$OPT" --mode verify --loops "$LOOPS_FIXED" ${OPT_ARGS[@]+"${OPT_ARGS[@]}"} > "$OUT/logs/verify_optimized.log" 2>&1 || die "optimized verification failed"
+printf '%s\n' "$LOOPS_FIXED" > "$OUT/loops.txt"
 build_pin
 CSV="$OUT/samples.csv"
 echo "round,order,variant,total_sec" > "$CSV"
@@ -77,10 +101,13 @@ echo "round,order,variant,total_sec" > "$CSV"
 run_one() { # run_one <variant> <script> <round> <order>
   local variant="$1" script="$2" round="$3" order="$4" out t
   local args=("$script" --mode raw --loops "$LOOPS_FIXED")
-  [[ "$DISABLE_GC" == "1" ]] && args+=(--no-gc)
+  if [[ "$DISABLE_GC" == "1" ]]; then args+=(--no-gc); fi
+  if [[ "$variant" == "optimized" ]]; then args+=(${OPT_ARGS[@]+"${OPT_ARGS[@]}"}); fi
   out="$(${PIN[@]+"${PIN[@]}"} "$PY_REL" "${args[@]}" 2>&1)" || {
-    warn "round $round $variant failed"; return 0; }
+    printf '%s\n' "$out" >&2; die "round $round $variant failed"; }
   t="$(printf '%s' "$out" | grep -oE 'total_sec=[0-9.]+' | head -1 | cut -d= -f2)"
+  [[ -n "$t" && "$t" != "0.000000" ]] || die "missing or zero timing"
+  printf '%s\n' "$out" > "$OUT/logs/${round}_${variant}.log"
   [[ -n "$t" ]] && echo "$round,$order,$variant,$t" >> "$CSV"
   printf '%s' "$t"
 }
@@ -121,13 +148,13 @@ print("=" * W)
 print()
 print(f"Design: processes alternated A/B/A/B, {loops} unit(s) of work each,")
 print("        identical loop count for both arms, no profiler attached.")
-print("        This separates the code change from monotonic host drift, which")
+print("        This reduces confounding by slow host drift; it does not eliminate it.\n        Separate")
 print("        sequential baseline-then-optimized blocks cannot do.")
 print()
 
 if len(b) < 3 or len(o) < 3:
     print(f"!! too few samples (baseline {len(b)}, optimized {len(o)})")
-    raise SystemExit(0)
+    raise SystemExit(1)
 
 def st(v):
     m = statistics.mean(v); sd = statistics.stdev(v) if len(v) > 1 else 0.0
@@ -148,12 +175,16 @@ timered = (1 - medo / medb) * 100
 # normality assumption, which matters because timing distributions are
 # right-skewed (a run can be slowed by interference, never sped up).
 random.seed(12345)
+paired_rows = {}
+for row in rows:
+    paired_rows.setdefault(row["round"], {})[row["variant"]] = float(row["total_sec"]) / loops
+pairs = [(v["baseline"], v["optimized"]) for v in paired_rows.values()]
 boots = []
 for _ in range(20000):
-    rb = statistics.median(random.choices(b, k=len(b)))
-    ro = statistics.median(random.choices(o, k=len(o)))
-    if rb and ro:
-        boots.append((1 - ro / rb) * 100)
+    draw = random.choices(pairs, k=len(pairs))
+    rb = statistics.median(p[0] for p in draw)
+    ro = statistics.median(p[1] for p in draw)
+    boots.append((1 - ro / rb) * 100)
 boots.sort()
 lo = boots[int(0.025 * len(boots))]
 hi = boots[int(0.975 * len(boots))]
@@ -161,7 +192,7 @@ hi = boots[int(0.975 * len(boots))]
 print("=" * W)
 print(f"  SPEEDUP        : {speedup:.4f}x")
 print(f"  TIME REDUCTION : {timered:.2f} %")
-print(f"  95% CI (boot)  : [{lo:.2f} %, {hi:.2f} %]   (20000 resamples)")
+print(f"  95% paired boot  : [{lo:.2f} %, {hi:.2f} %]   (20000 round resamples; assumes independent rounds)")
 print(f"  PROJECT BAR    : 7.00 % time reduction")
 print()
 
@@ -177,9 +208,8 @@ else:
 print("=" * W)
 print()
 
-# Paired analysis: within a round both arms saw the same machine state, so the
-# per-round difference cancels drift more effectively than comparing pooled
-# medians.
+# Paired analysis: nearby processes may share slow environmental effects.
+# Pairing reduces some drift sensitivity; it cannot guarantee equal state.
 rounds = {}
 for r in rows:
     rounds.setdefault(r["round"], {})[r["variant"]] = float(r["total_sec"]) / loops

@@ -1,0 +1,23 @@
+{
+  "date": "2026-09-20",
+  "integrated_software_tests": {
+    "passed": 63,
+    "command": "CAPTURE_GIT_METADATA=0 python3 -B -m unittest discover -s tests -v",
+    "log": "docs/evidence/integration_tests.txt"
+  },
+  "baseline_reference_sources_unchanged": {
+    "upstream/bm_raytrace_upstream.py": "88ef4d9060d8e8f6ce40f376477aaf89cc808fa44813225a3071a05a1467f017",
+    "upstream/bm_nbody_upstream.py": "d1385e816d7cfea361b7915e2cf70138cd6b84f40df8bd5152638851f7bcac2b",
+    "bench/bm_raytrace.py": "2ae5f3c3def7f295701276693cca7a46b2f0a4fc556eee94c3c739a2f9b0854c",
+    "bench/bm_raytrace_upstream.py": "9b4c032d8a1b056dadf00c2867e6ab631b7c4ae25ee9b73c6f8ba2185876003e",
+    "bench/bm_nbody_upstream.py": "1cf9b11c0ec65015d07bd46dfee167af7e809fc632b251b0ab3c7efecf47b13d",
+    "bench/bm_nbody.py": "dcc30b7244ebe74f0d33c8173bbfb458e61bee5da36987e6a3beda51e1476cc8"
+  },
+  "hardware_validation": "hardware/validation.json",
+  "pdf_qa": {
+    "raytrace_pages": 10,
+    "nbody_pages": 11,
+    "all_pages_rendered_and_visually_inspected": true
+  },
+  "git_operations_performed": false
+}

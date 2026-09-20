@@ -285,3 +285,29 @@ Evidence and limitations recorded in this stage:
 
 The student remains responsible for understanding the transformation, reviewing
 its assumptions, running the target-VM comparison, and appending future prompts.
+
+
+=== 20 September 2026: full exact software, reports and hardware design ===
+Actual user instructions (excerpts; earlier sections retain their historical status):
+"prepare the pdf documents that support and explain our findings per benchmark"
+"Implement the rest of the Improvements, for both raytrace and nbody"
+"I also want the script for run_all to run the baseline and the full optimized versions, full workflow"
+"I want to recognize the remaining bottleneck and propose HW optimizations"
+"Keep track of the section in the pdf that says What You Need to Submit"
+"don't perform git operations"
+"agree, 100% correctness, flat_sqrt as nice to have (maybe mention in report)"
+"I don't think we need to perform simulation, just estimate and make claims about what we think it will achieve ... unless it is required"
+"yes english"
+"I also now have the results for the nbody benchmark under the results dir. check it out"
+
+Agreed implementation scope: pure Python final software; exact successful-call
+benchmark outputs/state; optional approximate sqrt; English PDF plus required
+TXT; a complete logical HDL design with labelled analytical estimates; no Git.
+AI assisted with source changes, tests, full workflow, result analysis, report
+authoring, HDL architecture/source and host-format/syntax checks. Independent
+agent source review checked the HDL protocol/datapath; no HDL simulation occurred.
+The latest nbody full run is flat_pow, 37.53% lower median runtime. The raytrace
+shadow-only VM result is 22.63%; new full-kernel Mac timings are not VM claims.
+Final reports correct earlier unsupported claims about fixed call cost, debug
+Amdahl ceilings, disappearing float allocations and static bytecode percentages.
+The student must understand and defend these choices, limitations and evidence.

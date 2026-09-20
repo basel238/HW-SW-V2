@@ -27,18 +27,19 @@ run_variant() {
   fi
   capture_env "$script" ${extra[@]+"${extra[@]}"}
 
-  # --- Phase 1: correctness BEFORE performance -------------------------------
-  # Benchmarking incorrect code is worse than not benchmarking at all, so this
-  # gate is hard-fail (die) rather than a warning.
-  run_verify "$script" ${extra[@]+"${extra[@]}"}
-
-  # --- Calibration (once, on the release interpreter) -----------------------
-  # Every phase reuses this loop count so all phases do identical work and the
-  # numbers are mutually comparable.
   local loops
   loops="$(calibrate_loops "$script" ${extra[@]+"${extra[@]}"})"
-  log "calibrated loops=$loops (target ~${TARGET_SEC}s per pass)"
+  log "loops=$loops (target ~${TARGET_SEC}s per pass)"
   echo "$loops" > "$RUN_DIR/timing/loops.txt"
+  # Verify the complete timed batch, not a default one-loop smoke test.
+  [[ "$ENABLE_VERIFY" == "1" ]] || die "correctness verification cannot be disabled in this pipeline"
+  run_verify "$script" --loops "$loops" ${extra[@]+"${extra[@]}"}
+  phase_status verify passed "loops=$loops"
+  local p flag
+  for p in CLEAN_TIMING PERF_STAT PERF_RECORD CACHE_PROFILE CPROFILE PYSPY PYPERFORMANCE; do
+    flag="ENABLE_$p"
+    if [[ "${!flag}" == "1" ]]; then phase_status "$p" requested; else phase_status "$p" disabled; fi
+  done
 
   # --- Phases 2-6 -----------------------------------------------------------
   run_clean_timing  "$script" "$loops" ${extra[@]+"${extra[@]}"}  # QUOTABLE
@@ -53,10 +54,13 @@ run_variant() {
   if [[ "$variant" == "baseline" ]]; then
     run_pyperformance "$bench" "$variant"
   else
+    phase_status pyperformance not_applicable "optimized wrapper is outside upstream harness"
     log "skipping pyperformance for '$variant' (not an upstream benchmark)"
   fi
 
+  phase_status workflow completed "review unavailable phases separately"
   finish_run
+  LAST_RUN_DIR="$RUN_DIR"
 }
 
 # Standard CLI shared by all script_*.sh files.
@@ -64,8 +68,8 @@ pipeline_usage() {
   local bench="$1"
   local kernel_help=""
   if [[ "$bench" == "raytrace" ]]; then
-    kernel_help="  --kernel K      upstream | guards | shadow_ray | combined
-                  optimized arm only, USE_UPSTREAM=1 (default: shadow_ray)"
+    kernel_help="  --kernel K      upstream | guards | shadow_ray | combined | sphere_scalar | camera | nearest_hit | checkerboard | full | slots | full_slots
+                  optimized arm only, USE_UPSTREAM=1 (default: full)"
   elif [[ "$bench" == "nbody" ]]; then
     kernel_help="  --kernel K      upstream | grouped | flat_pow | flat_sqrt | sqrt | hoist | full
                   optimized arm only, USE_UPSTREAM=1 (default: flat_pow)"
@@ -89,10 +93,10 @@ ${kernel_help}
 PHASE PLAN (see config/bench.env for the rationale)
   1  verify          correctness gate           hard-fail on mismatch
   2  clean timing    NO profiler                <-- the only quotable numbers
-  3  perf stat       counting mode, ~1% ovh     IPC, cache, branch misses
+  3  perf stat       separate counter runs     IPC, cache, branch misses
   4  perf record     sampling, high ovh         flame graphs  (timing discarded)
   5  cProfile        tracing, 2-5x ovh          exact call counts
-  6  pyperformance   upstream harness           citable mean +- stdev
+  6  pyperformance   upstream-only cross-check   independent harness mean +- stdev
 
 EXAMPLES
   ./script_${bench}.sh                     # everything, both variants
@@ -118,8 +122,8 @@ pipeline_parse_args() {
         case "${BENCH_NAME:-}" in
           raytrace)
             case "${2:-}" in
-              upstream|guards|shadow_ray|combined) PIPELINE_KERNEL="$2" ;;
-              *) err "--kernel needs one of: upstream, guards, shadow_ray, combined"; return 2 ;;
+              upstream|guards|shadow_ray|combined|sphere_scalar|camera|nearest_hit|checkerboard|full|slots|full_slots) PIPELINE_KERNEL="$2" ;;
+              *) err "--kernel needs one of: upstream, guards, shadow_ray, combined, sphere_scalar, camera, nearest_hit, checkerboard, full, slots, full_slots"; return 2 ;;
             esac ;;
           nbody)
             case "${2:-}" in
@@ -157,5 +161,22 @@ pipeline_parse_args() {
     baseline|optimized|both) ;;
     *) err "--variant must be baseline, optimized, or both"; return 2 ;;
   esac
+  [[ -z "$LOOPS" || "$LOOPS" =~ ^[1-9][0-9]*$ ]] || { err "--loops must be a positive integer"; return 2; }
   export VARIANT_SEL
+}
+
+# A paired script invocation shares baseline-calibrated work and records exact
+# directories. latest_* remains a convenience for humans, never session input.
+prepare_benchmark_session() {
+  if [[ -z "${SESSION_DIR:-}" ]]; then
+    SESSION_DIR="$RESULTS_DIR/session_${BENCH_NAME}_$(date +%Y%m%d-%H%M%S)_$$"
+    export SESSION_DIR
+  fi
+  mkdir -p "$SESSION_DIR"
+  LOOPS="$(calibrate_loops "$BASELINE")"
+  export LOOPS
+  printf 'benchmark\t%s\nloops\t%s\n' "$BENCH_NAME" "$LOOPS" > "$SESSION_DIR/${BENCH_NAME}.tsv"
+}
+record_session_run() {
+  printf '%s\t%s\n' "$1" "$LAST_RUN_DIR" >> "$SESSION_DIR/${BENCH_NAME}.tsv"
 }

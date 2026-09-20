@@ -1,0 +1,25 @@
+{
+  "status": "hypothetical sensitivity; not measured hardware performance",
+  "assumptions": {
+    "tests": 179457,
+    "root_fraction": 1.0,
+    "mhz": 50.0,
+    "bandwidth_gbs": 1.0,
+    "batch": 1024,
+    "launch_us": 10.0,
+    "pack_ns": 100.0,
+    "software_s": 0.61102275,
+    "offloaded_fraction": 0.5
+  },
+  "result": {
+    "compute_s": 0.2871312,
+    "transfer_s": 0.018663528,
+    "launch_s": 0.0017599999999999998,
+    "pack_s": 0.017945700000000002,
+    "offload_s": 0.32550042799999995,
+    "estimated_total_s": 0.6310118029999999,
+    "speedup": 0.9683222201154295,
+    "time_reduction_percent": -3.271408961450284,
+    "break_even_offloaded_fraction": 0.5327140896145028
+  }
+}

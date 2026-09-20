@@ -1,0 +1,20 @@
+flowchart LR
+    PY["Optimized Python renderer<br/>shading, plane tests, ordered hit selection"]
+    BATCH["Proposed native batch adapter<br/>pack normalized rays and sphere records"]
+    TRANSPORT["Proposed transport / FIFO bridge<br/>platform-specific driver or on-chip link"]
+    REG["Implemented request registers<br/>10 x FP64 + 32-bit tag"]
+    FSM["Implemented FSM<br/>17 arithmetic steps, check,<br/>sqrt issue/wait, final subtract"]
+    ALU["HardFloat FP64 add/sub + multiply<br/>shared across sequential operations<br/>round-to-nearest-even, no FMA"]
+    SQRT["HardFloat iterative FP64 sqrt"]
+    OUT["Implemented response register<br/>t, tag, has_root, error, flags<br/>holds through backpressure"]
+    PY -. "future batched API" .-> BATCH
+    BATCH -. "88-byte request records" .-> TRANSPORT
+    TRANSPORT -. "in_valid / in_ready" .-> REG
+    REG --> ALU
+    FSM --> ALU
+    ALU --> FSM
+    FSM --> SQRT
+    SQRT --> FSM
+    FSM --> OUT
+    OUT -. "out_valid / out_ready<br/>16-byte response records" .-> TRANSPORT
+    TRANSPORT -. "ordered results; CPU fallback on error" .-> PY

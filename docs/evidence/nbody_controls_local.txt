@@ -1,0 +1,8 @@
+upstream: energy and all 30 state components BIT-IDENTICAL
+grouped: energy and all 30 state components BIT-IDENTICAL
+unpacked: energy and all 30 state components BIT-IDENTICAL
+grouped_indexed: energy and all 30 state components BIT-IDENTICAL
+unrolled_pairs: energy and all 30 state components BIT-IDENTICAL
+unrolled_lists: energy and all 30 state components BIT-IDENTICAL
+velocity_locals: energy and all 30 state components BIT-IDENTICAL
+flat_pow: energy and all 30 state components BIT-IDENTICAL

@@ -1,0 +1,37 @@
+{
+  "status": "syntax/elaboration and host-only checks; NOT simulated hardware",
+  "syntax": {
+    "tool": "pyslang",
+    "version": "11.0.0",
+    "errors": 0,
+    "warnings": 1,
+    "warning": "Unmodified HardFloat output/wire sqrtOpOut redeclaration, downgraded using -Wno-error=redefinition",
+    "top": "ray_sphere_accel",
+    "files": "hardware/files.f"
+  },
+  "host_reference": {
+    "deterministic_seed": 238,
+    "formula_and_record_roundtrip_cases": 256,
+    "edge_cases": [
+      "tangent zero root",
+      "interior negative root",
+      "miss",
+      "NaN/infinity rejected at host boundary"
+    ],
+    "upstream_formula": "Sphere.intersectionTime",
+    "status": "PASS; not RTL simulation"
+  },
+  "vendor": {
+    "files_checked": 14,
+    "status": "copied byte-for-byte from official HardFloat-1.zip and checked against archive"
+  },
+  "rtl_simulation": "not performed, as requested",
+  "synthesis": "not performed",
+  "timing": "not measured",
+  "hardware_benchmark": "not performed",
+  "own_rtl_sha256": {
+    "hardware/rtl/fp64_binary.sv": "8f042f8cde667e7d540345d861c2163bd0088a913ea2300f42a83453d3aa5f9f",
+    "hardware/rtl/fp64_sqrt.sv": "52567c2f64ad4c3795ee49d8137f355b77b52685ed7ae78cb15400e70a319f03",
+    "hardware/rtl/ray_sphere_accel.sv": "8be5541b6bb9b99cae4a92ee3a1d2e36ea83d51e0de1a7b1889e031ffafa2923"
+  }
+}

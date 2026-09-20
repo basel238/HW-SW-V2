@@ -12,6 +12,11 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$HERE/../lib/common.sh"
 
 HARD=0; SOFT=0
+if [[ "${1:-}" == "--time-only" ]]; then
+  have "$PY_REL" || die "release Python missing: $PY_REL"
+  ok "time-only preflight: release Python available; profiler checks disabled"
+  exit 0
+fi
 
 chk()  { # chk <label> <cmd> <hard|soft> <hint>
   local label="$1" cmd="$2" sev="$3" hint="${4:-}"
@@ -29,26 +34,26 @@ chk "bash >= 3.2"        '[[ ${BASH_VERSINFO[0]} -gt 3 || ( ${BASH_VERSINFO[0]} 
 chk "python3 ($PY_REL)"  "command -v $PY_REL"              hard "sudo ./setup/01_install_deps.sh"
 chk "perf"               "command -v perf"                 hard "sudo ./setup/01_install_deps.sh"
 chk "perf can count"     "perf stat -e task-clock true"     hard "sudo ./setup/03_tune_vm.sh"
-chk "benchmark sources"  "[[ -f $REPO_ROOT/bench/bm_raytrace.py && -f $REPO_ROOT/bench/bm_nbody.py ]]" hard "repo is incomplete"
+chk "benchmark sources"  "[[ -f \"$REPO_ROOT/bench/bm_raytrace.py\" && -f \"$REPO_ROOT/bench/bm_nbody.py\" ]]" hard "repo is incomplete"
 if [[ "${USE_UPSTREAM:-1}" == "1" ]]; then
-  chk "upstream kernels"   "[[ -f $REPO_ROOT/upstream/bm_raytrace_upstream.py && -f $REPO_ROOT/upstream/bm_nbody_upstream.py ]]" hard \
+  chk "upstream kernels"   "[[ -f \"$REPO_ROOT/upstream/bm_raytrace_upstream.py\" && -f \"$REPO_ROOT/upstream/bm_nbody_upstream.py\" ]]" hard \
       "run ./setup/05_get_upstream.sh (or set USE_UPSTREAM=0)"
-  chk "upstream provenance" "[[ -f $REPO_ROOT/upstream/PROVENANCE.txt ]]" soft \
+  chk "upstream provenance" "[[ -f \"$REPO_ROOT/upstream/PROVENANCE.txt\" ]]" soft \
       "version/sha256 record missing -> re-run ./setup/05_get_upstream.sh"
   printf '  %-34s %sUPSTREAM%s (real pyperformance kernels)\n' "measured workload" "$C_G" "$C_RST"
 else
   printf '  %-34s %sCUSTOM%s (stand-ins, NOT upstream)\n' "measured workload" "$C_Y" "$C_RST"
 fi
-chk "optimized variants" "[[ -f $REPO_ROOT/variants/bm_raytrace_opt.py && -f $REPO_ROOT/variants/bm_nbody_opt.py ]]" hard "repo is incomplete"
+chk "optimized variants" "[[ -f \"$REPO_ROOT/variants/bm_raytrace_opt.py\" && -f \"$REPO_ROOT/variants/bm_nbody_opt.py\" ]]" hard "repo is incomplete"
 
 hdr "preflight — optional (phase will be skipped if absent)"
 chk "python3-dbg ($PY_DBG)" "command -v $PY_DBG" soft \
     "apt install python3-dbg -> without it perf shows no CPython internals"
-chk "FlameGraph toolkit"   "[[ -x $FLAMEGRAPH_DIR/flamegraph.pl ]]" soft \
+chk "FlameGraph toolkit"   "[[ -x \"$FLAMEGRAPH_DIR/flamegraph.pl\" ]]" soft \
     "./setup/02_get_flamegraph.sh -> needed for flame graphs"
-chk "difffolded.pl"        "[[ -x $FLAMEGRAPH_DIR/difffolded.pl ]]" soft \
+chk "difffolded.pl"        "[[ -x \"$FLAMEGRAPH_DIR/difffolded.pl\" ]]" soft \
     "part of FlameGraph; needed for differential flame graphs"
-chk "pyperformance venv"   "[[ -f $VENV_DIR/bin/activate ]]" soft \
+chk "pyperformance venv"   "[[ -f \"$VENV_DIR/bin/activate\" ]]" soft \
     "./setup/04_make_venv.sh -> needed for phase 6"
 chk "py-spy"               "command -v py-spy" soft \
     "pip install py-spy -> optional cross-check profiler"

@@ -1,0 +1,170 @@
+root@ubuntu:~/HW-SW-V2# USE_UPSTREAM=1 ./script_nbody.sh \
+  --variant both --kernel flat_sqrt --loops 16 --time-only
+[03:15:33] --time-only: clean timing only, zero instrumentation
+
+>>> stage 0 — verifying the measured workload is the real benchmark
+  raytrace kernel present          OK (409 lines)
+  nbody kernel present             OK (156 lines)
+  raytrace authentic               OK (sha256 matches package)
+  nbody authentic                  OK (sha256 matches package)
+  raytrace attribution intact      OK
+  nbody attribution intact         OK
+  all 11 measured functions execute from upstream/
+  bytecode origin                  OK
+  raytrace tamper test             OK (edit changed it, restore recovered it)
+  nbody tamper test                OK (edit changed it, restore recovered it)
+
+[ ok ] workload verified: measuring the REAL pyperformance benchmarks
+
+>>> nbody — HWSW benchmark analysis pipeline
+[03:15:35] variant selection : both
+[03:15:35] workload          : UPSTREAM pyperformance kernel (unmodified)
+[03:15:35] baseline          : bench/bm_nbody_upstream.py
+[03:15:35] optimized         : variants/bm_nbody_upstream_opt.py
+[03:15:35] optimized kernel  : flat_sqrt
+[03:15:35] run dir: /root/HW-SW-V2/results/nbody_baseline_20260920-031535
+[03:15:35] perf phases disabled -> skipping perf preconditions and PMU probe
+[ ok ] environment captured -> manifest.txt
+
+=== PHASE 1  correctness verification ===
+verify: OK  iterations=20000
+  energy      = -0.16908926275527172
+  rel_drift   = 8.339e-05  (symplectic: bounded, not zero)
+  state deterministic over 30 values
+  |momentum|  = 2.051e-15
+  kernel source sha256 = d1385e816d7cfea361b7915e2cf70138
+[ ok ] correctness gate passed
+[03:15:35] calibrated loops=16 (target ~3.0s per pass)
+
+=== PHASE 2  clean timing — NO profiler attached (quote these numbers) ===
+[03:15:35] running 11 independent processes, loops=16
+  rep 1: 3.757421 s
+  rep 2: 3.705985 s
+  rep 3: 3.695644 s
+  rep 4: 3.607901 s
+  rep 5: 3.665246 s
+  rep 6: 3.652215 s
+  rep 7: 3.668674 s
+  rep 8: 3.616292 s
+  rep 9: 3.627272 s
+  rep 10: 3.684697 s
+  rep 11: 3.650856 s
+n        = 11
+min      = 3.607901 s
+median   = 3.665246 s   <-- headline
+mean     = 3.666564 s
+max      = 3.757421 s
+stdev    = 0.043537 s
+rel_sd   = 1.19 %
+[ ok ] clean timing -> timing/clean_baseline_summary.txt
+[03:16:16] cache profiling needs a real PMU, skipped
+
+>>> run complete
+[ ok ] artifacts: /root/HW-SW-V2/results/nbody_baseline_20260920-031535
+  QUOTABLE timing:       timing/clean_baseline_summary.txt
+  counters:              perf/stat_baseline.txt
+  flame graphs:          flame/*.svg
+  perf reports:          perf/report_*.txt
+  manifest:              manifest.txt
+
+[03:16:16] next: ./tools/compare.sh nbody   (once baseline + optimized both exist)
+[03:16:16] run dir: /root/HW-SW-V2/results/nbody_optimized_20260920-031616
+[03:16:16] perf phases disabled -> skipping perf preconditions and PMU probe
+[ ok ] environment captured -> manifest.txt
+
+=== PHASE 1  correctness verification ===
+reference (upstream advance), iterations=20000 loops=1
+  energy = -0.16908926275527172
+  grouped   energy bit-identical=True | all 30 state components bit-identical=True
+  flat_pow  energy bit-identical=True | all 30 state components bit-identical=True
+  flat_sqrt energy rel_diff=9.521e-15 | state max_abs=6.847e-12 norm_rel=2.391e-13 OK
+  sqrt      energy rel_diff=9.521e-15 | state max_abs=6.847e-12 norm_rel=2.391e-13 OK
+  hoist     energy rel_diff=0.000e+00 | state max_abs=0.000e+00 norm_rel=0.000e+00 OK
+  full      energy rel_diff=9.521e-15 | state max_abs=6.847e-12 norm_rel=2.391e-13 OK
+verify: OK  grouped/flat_pow are bit-identical; other kernels agree within 1e-9 relative energy / norm-relati
+[ ok ] correctness gate passed
+[03:16:18] calibrated loops=16 (target ~3.0s per pass)
+
+=== PHASE 2  clean timing — NO profiler attached (quote these numbers) ===
+[03:16:18] running 11 independent processes, loops=16
+  rep 1: 2.251233 s
+  rep 2: 2.252483 s
+  rep 3: 2.245512 s
+  rep 4: 2.274160 s
+  rep 5: 2.247409 s
+  rep 6: 2.250113 s
+  rep 7: 2.245859 s
+  rep 8: 2.281451 s
+  rep 9: 2.500017 s
+  rep 10: 2.249010 s
+  rep 11: 2.439710 s
+n        = 11
+min      = 2.245512 s
+median   = 2.251233 s   <-- headline
+mean     = 2.294269 s
+max      = 2.500017 s
+stdev    = 0.088638 s
+rel_sd   = 3.86 %
+[ ok ] clean timing -> timing/clean_optimized_summary.txt
+[03:16:44] cache profiling needs a real PMU, skipped
+[03:16:44] skipping pyperformance for 'optimized' (not an upstream benchmark)
+
+>>> run complete
+[ ok ] artifacts: /root/HW-SW-V2/results/nbody_optimized_20260920-031616
+  QUOTABLE timing:       timing/clean_optimized_summary.txt
+  counters:              perf/stat_optimized.txt
+  flame graphs:          flame/*.svg
+  perf reports:          perf/report_*.txt
+  manifest:              manifest.txt
+
+[03:16:44] next: ./tools/compare.sh nbody   (once baseline + optimized both exist)
+
+>>> before/after comparison
+
+>>> comparing nbody: baseline vs optimized
+[03:16:44] baseline : /root/HW-SW-V2/results/nbody_baseline_20260920-031535
+[03:16:44] optimized: /root/HW-SW-V2/results/nbody_optimized_20260920-031616
+==========================================================================
+                      PERFORMANCE COMPARISON — nbody                      
+==========================================================================
+
+Source: clean-timing phase only (no profiler attached).
+Statistic: MEDIAN of independent processes — robust to host hiccups.
+
+Work per process : baseline 16 unit(s), optimized 16 unit(s)
+  Loop counts match; figures below are per unit of work.
+Raw process medians: baseline 3.665246 s, optimized 2.251233 s  <- NOT comparable directly
+
+metric                baseline       optimized           delta
+--------------------------------------------------------------------------
+samples                     11              11                
+min/unit            0.225494 s      0.140345 s     -0.085149 s
+median/unit         0.229078 s      0.140702 s     -0.088376 s
+mean/unit           0.229160 s      0.143392 s     -0.085768 s
+max/unit            0.234839 s      0.156251 s     -0.078588 s
+stdev               0.002721 s      0.005540 s     +0.002819 s
+rel stdev                1.19%           3.86%                
+
+==========================================================================
+  SPEEDUP        : 1.6281x   (throughput ratio)
+  TIME REDUCTION : 38.58 %   <- compared against the 7% bar
+  THROUGHPUT GAIN: 62.81 %   (different metric; do not conflate)
+  PROJECT BAR    : 7.00 % time reduction
+  VERDICT        : PASS
+==========================================================================
+
+Signal check: improvement (38.58%) exceeds 2x noise (3.86%). OK.
+Margin over the 7% bar: +31.58 percentage points (8.2x the measured noise)
+
+Min-vs-min speedup (least-noise estimate): 1.6067x (37.76% improvement)
+[ ok ] counters -> counters.txt
+[warn] symbol CSVs missing; skipping symbol delta (need perf record for both variants)
+[warn] differential flame graph skipped (need difffolded.pl + both .folded files)
+
+>>> comparison complete
+[ ok ] output: /root/HW-SW-V2/results/comparison_nbody_20260920-031644
+  headline verdict:          summary.txt
+  counter deltas:            counters.txt
+  symbol deltas:             symbols_delta.txt
+  differential flame:        diff_flame.svg
+[ ok ] nbody pipeline complete

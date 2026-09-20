@@ -1,0 +1,26 @@
+{
+  "project": "Berkeley HardFloat",
+  "release": "1 (2019 July)",
+  "source_url": "https://www.jhauser.us/arithmetic/HardFloat-1.zip",
+  "documentation_url": "https://www.jhauser.us/arithmetic/HardFloat-1/doc/HardFloat-Verilog.html",
+  "archive_sha256": "6b3757c9fbfa2230c6a2b84605e39372cb589dd7500e979c4f0b8ecc8a03b14b",
+  "license": "BSD-3-Clause; original notices retained in each source and COPYING.txt",
+  "specialization": "8086-SSE",
+  "modifications": "None; selected source files copied byte-for-byte from the official archive. Unused operations, tests, and documentation omitted.",
+  "files": {
+    "COPYING.txt": "c791a6bdcef33feddaa0cb7ab99c233fb63d93bb385f06d58f9f1b9a8182b418",
+    "README.txt": "27cb3cc402c14dbfa9fa7755f3aa03116919b8876134f60bf4c6b6f3dc12e3ca",
+    "source/HardFloat_consts.vi": "53d4c22ee61b9b81bc763330959327914d8e1952e15f3f66361d1a4e34e2802f",
+    "source/HardFloat_localFuncs.vi": "e6e8d53f362dc2c9fe14c9b0edbc73bc6367d8899276b3384e947a17029b5d50",
+    "source/HardFloat_primitives.v": "5a1d0823a066395eda8191b3a556c414e6120b8085ff43ce383980d84af47f9f",
+    "source/HardFloat_rawFN.v": "353cad0b733c601f5c2449dc75f1ddefa34dc5c2466ac82540302303899fe355",
+    "source/isSigNaNRecFN.v": "77e37250ec9c18c4484c23eda48bfcf7df8dec1a3d3b2c1a1e5804386a25de8b",
+    "source/fNToRecFN.v": "7aca940370a4ecf1b52774cec62e90252d090f20a4acd5f577cf88565266426c",
+    "source/recFNToFN.v": "62d42a8f004f00f9a688c5e45302ceff22148313b3602840e5d05a13e9391e96",
+    "source/addRecFN.v": "15fb5387ab0deff63670ed144189e9f263c61ffc909d06697974c49d11ba5dc3",
+    "source/mulRecFN.v": "5a6a263dcde9f38f0fabef87ceb41e1bdff63c46d151c7c65e404467354bee43",
+    "source/divSqrtRecFN_small.v": "f76feb5557faa8bcb2868e51bf2ce7d1297be46dd67ae51d509b1ae91066a522",
+    "source/8086-SSE/HardFloat_specialize.vi": "a6a6a3b7b86f7cc2e32e147dc9f6943422a611fd6da362f37e18950002a571c4",
+    "source/8086-SSE/HardFloat_specialize.v": "5978254ad3781165833345616e4c1c3447cac4a1d8fb73689c2def15f71f52e3"
+  }
+}

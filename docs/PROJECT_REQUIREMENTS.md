@@ -66,18 +66,40 @@ There is an inconsistency: p. 8 labels “HW Files and Additional Files” optio
 
 The PDF says Git repository, not specifically GitHub or public repository. No particular remote visibility, repository hosting service, slide file format, or report page limit should be invented. A local checkout cannot by itself confirm that upload/presentation requirements have been fulfilled elsewhere.
 
-## Current status and remaining completion
+## Current status and remaining completion - 20 September 2026
 
-Both required TXT reports have been drafted with the six required sections and explicit references to their baseline artifacts. The baseline Overview and Initial Analysis sections are authored; later sections distinguish implemented code, proposed experiments, and incomplete hardware work. The `shadow_ray` change has been implemented and tested for correctness; performance measurement on the target VM is pending. It is not yet a demonstrated speedup.
+Both required TXT reports and supplemental English PDFs now use the six required
+sections and one shared reviewed content source. They describe exact algorithms,
+measurement definitions, tools, selected artifacts, optimization decisions,
+correctness contracts, results, hardware architecture and limitations.
 
-The README reflects the current project status, and the AI prompt log has been updated. The execution/setup scripts and recorded baseline artifacts are available. Legacy script comments, the report generator, and hardware proposal notes still require reconciliation with the authentic upstream measurements. A complete HDL implementation, hardware interface specification, and integrated block diagram remain to be established. Repository upload and presentation status must be checked directly rather than inferred from local files.
+Measured target-VM runtime reductions are 22.63% for raytrace shadow reuse and
+37.53% for nbody flat_pow; grouped remains an intermediate 3.40% result. The new
+full raytrace kernel has local exact tests and exploratory Mac timing, but needs
+its own Ubuntu comparison. The newest nbody full profiles are incorporated.
 
-Remaining completion items:
+The full workflow defaults to baseline plus full exact candidates, verifies the
+actual batch and records explicit session paths/hashes. All 63 integrated tests
+pass. Optional profiling failures are visible, authored reports are preserved,
+and no Git operations are performed by default.
 
-1. Keep both report drafts synchronized with their exact source and result directories as validated changes and measurements are added.
-2. Measure the shadow-ray change on the target VM, and finish nbody ablation/validation against its authentic baseline. Record equal-work before/after results with honest uncertainty. Neither working code nor draft text is a claim of 7% success.
-3. Preserve raw measurements and repair/regenerate derived summaries from the malformed latest clean-timing CSVs, without overwriting raw evidence or substituting historical stand-in results.
-4. Reconcile legacy script comments, the report generator, and hardware notes with the measured upstream workload. Old stand-in speedups, claims of ASLR being off, “branch-free/allocation-free” nbody, and an exact energy oracle must not become unsupported report claims. Keep README current as new results arrive.
-5. Choose and implement the hardware component and complete all pp. 4-5 design/diagram/interface/trade-off requirements. Proposed tests and model assumptions must be labeled as proposed.
-6. Continue recording the real AI prompts used for later stages in prompt.txt (or prompt.docx), preserving accurate history.
-7. Verify reproduction instructions and clear commit history; verify the repository upload and prepare the 20-25-minute presentation with working demonstration code.
+A complete sequential FP64 ray-sphere HDL core, licensed arithmetic RTL, control,
+interfaces, architecture diagram, host record helpers and analytical estimates
+are included in hardware/ and docs/HARDWARE_DESIGN.md. Syntax/elaboration and
+host-side checks pass. HDL behavioral simulation and synthesis were not performed;
+there is no claimed achieved clock, deployed transport/driver or hardware speedup.
+These are explicit implementation/validation boundaries, not hidden completion
+claims. Simulation is not expressly required by the assignment.
+
+Remaining actions:
+
+1. Measure the full raytrace kernel on the target VM; retain exact session paths
+   and source hashes and revise its report deliberately.
+2. Preserve raw results and capture authenticity output when running; historical
+   dirty manifests and an UNVERIFIED provenance placeholder are documented.
+3. If pursuing hardware performance beyond the course design, verify RTL behavior,
+   implement batch transport/driver integration and compare against a native CPU
+   batch. Current estimates must remain labelled assumptions.
+4. Prepare the 20-25-minute presentation plus working demo. Repository upload,
+   commit history and scheduled presentation are author actions not verified here.
+5. Continue recording actual prompts and new decisions in prompt.txt.

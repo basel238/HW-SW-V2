@@ -1,5 +1,12 @@
 # Raytrace experiment: reuse the shadow ray
 
+> Historical shadow-only experiment. Current default: `full`. Select
+> `--kernel shadow_ray` explicitly to reproduce this candidate. The later
+> Ubuntu comparison measured 22.63% lower runtime; see report_raytrace.txt.
+> Current generic fallbacks, all kernels and exact tests are documented in
+> [RAYTRACE_FULL_EXPERIMENT.md](RAYTRACE_FULL_EXPERIMENT.md). The older
+> restrictions and pending-measurement statements below describe that stage.
+
 This is the first isolated change based on the latest upstream baseline, `results/raytrace_baseline_20260919-220048/`. It changes `variants/bm_raytrace_upstream_opt.py`; the reference in `upstream/` remains unchanged. Full baseline analysis is in `report_raytrace.txt`.
 
 ## What changes
@@ -13,11 +20,11 @@ The kernel is installed only around upstream's own benchmark function and restor
 | Kernel | Meaning |
 |---|---|
 | `upstream` | Unmodified reference |
-| `shadow_ray` | Shadow-ray reuse only; new default for the optimized pipeline |
+| `shadow_ray` | Shadow-ray reuse only; default at this historical stage |
 | `guards` | Existing exact-class guard specialization, retained as a separate experiment |
 | `combined` | R1 guard specialization plus shadow-ray reuse |
 
-The `combined` kernel explicitly enables both changes; `shadow_ray` remains the default. The guard experiment narrows general behavior for subclasses and custom predicates; fixed-scene pixel equality does not prove general API equivalence. The combined kernel inherits that restriction and the read-only-ray contract, and its speedup must be measured independently because the saved work can overlap.
+The `combined` kernel explicitly enables both changes; `shadow_ray` was the default at this historical stage; the current default is `full`. The guard experiment narrows general behavior for subclasses and custom predicates; fixed-scene pixel equality does not prove general API equivalence. The combined kernel inherits that restriction and the read-only-ray contract, and its speedup must be measured independently because the saved work can overlap.
 
 Run either choice directly from the repository root after verification:
 

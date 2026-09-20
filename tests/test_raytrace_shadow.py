@@ -101,13 +101,14 @@ class RaytraceShadowTests(unittest.TestCase):
             for cls, name, _, fn in self.state:
                 if cls is not up.Scene:
                     self.assertIs(getattr(cls, name), fn)
-            self.assertIsNot(up.Scene._lightIsVisible, self.state[-1][3])
+            self.assertIsNot(up.Scene._lightIsVisible, dict(((cls, name), fn) for cls, name, _, fn in self.state)[(up.Scene, "_lightIsVisible")])
             self.assertIs(variant.base.load_upstream(), up)
 
     def test_combined_installs_both_changes_and_reuses_one_ray(self):
         with variant._patched(self.up, "combined"):
             for cls, name, _, original in self.state:
-                self.assertIsNot(getattr(cls, name), original)
+                changed = (cls in (self.up.Vector, self.up.Point) or name == "_lightIsVisible")
+                self.assertEqual(getattr(cls, name) is not original, changed)
         baseline = self.query([None, -1, 0, self.up.EPSILON], "upstream")
         candidate = self.query([None, -1, 0, self.up.EPSILON], "combined")
         self.assertEqual(candidate[:2], baseline[:2])
@@ -125,8 +126,8 @@ class RaytraceShadowTests(unittest.TestCase):
                     def bench(loops, width, height, filename):
                         self.assertEqual((loops, width, height, filename), (1, 24, 24, None))
                         for cls, name, _, original in self.state:
-                            changed = (kernel == "combined" or
-                                       (cls is up.Scene) == (kernel == "shadow_ray"))
+                            changed = ((kernel in ("combined", "guards") and cls in (up.Vector, up.Point)) or
+                                       (kernel in ("combined", "shadow_ray") and name == "_lightIsVisible"))
                             if changed:
                                 self.assertIsNot(getattr(cls, name), original)
                             else:
@@ -175,13 +176,13 @@ class RaytraceShadowTests(unittest.TestCase):
         finally:
             up.Scene._lightIsVisible = original
 
-    def test_cli_defaults_to_shadow_ray(self):
+    def test_cli_defaults_to_full(self):
         args = ["raytrace", "--loops", "1", "--width", "24", "--height", "24"]
         with mock.patch.object(sys, "argv", args):
             with mock.patch.object(variant.base, "benchmark", return_value=(1.0, None)) as bench:
                 with contextlib.redirect_stdout(io.StringIO()):
                     self.assertEqual(variant.main(), 0)
-                self.assertIs(bench.call_args.args[3], variant.KERNELS["shadow_ray"])
+                self.assertIs(bench.call_args.args[3], variant.KERNELS["full"])
 
     def test_no_gc_applies_to_calibration_and_ablation(self):
         enabled = gc.isenabled()

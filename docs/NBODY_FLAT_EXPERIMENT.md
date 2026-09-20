@@ -11,7 +11,7 @@ independently. The term `flat_unrolled` describes this shared structure;
 
 The reference under `upstream/` is unchanged. This experiment changes execution
 structure, not the number of timesteps, the force calculation, or the initial
-conditions. No target-VM speedup is established by adding this implementation.
+conditions. The latest full target-VM result establishes a 37.53% median runtime reduction (228.249 to 142.578 ms/unit); see report_nbody.txt for the matched runs and limits.
 
 ## Hypothesis
 
@@ -207,3 +207,14 @@ container overhead. It would not independently prove that a MAC/reciprocal-squar
 root accelerator is the best hardware design. Such a proposal must account for
 offload granularity, transfer/setup costs, state residency and numerical
 equivalence, and should be compared with a compiled CPU implementation.
+
+## Final integration update - 20 September 2026
+
+The full profile pair nbody_baseline_20260920-031836 /
+nbody_optimized_20260920-032819 explicitly selects flat_pow and matches the
+current variant source hash. Generic GetItem/SetItem subtree samples fall from
+226 to 2; instructions fall about 35%. Arithmetic and boxed-float work remain.
+The pipeline now verifies the actual requested batch and run_all.sh selects
+flat_pow for nbody and full for raytrace. Separate structural controls are
+available in experiments/nbody_controls.py. See the current reports for the
+complete decision history and evidence.

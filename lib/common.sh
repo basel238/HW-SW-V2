@@ -8,7 +8,7 @@
 # from a profiled process. Each phase runs its own fresh process:
 #
 #   phase 2  clean timing   -> the ONLY source of speedup claims
-#   phase 3  perf stat      -> counting mode, ~1% overhead, gives IPC/cache
+#   phase 3  perf stat      -> counting mode; timing not quoted, gives IPC/cache
 #   phase 4  perf record    -> sampling, high overhead, gives flame graphs
 #   phase 5  cProfile       -> tracing, huge overhead, gives exact call counts
 #   phase 6  pyperformance  -> independent harness, citable mean +- stdev
@@ -22,6 +22,7 @@ set -Eeuo pipefail
 LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$LIB_DIR/.." && pwd)"
 export REPO_ROOT
+export CAPTURE_GIT_METADATA="${CAPTURE_GIT_METADATA:-0}"
 
 # shellcheck source=../config/bench.env
 source "$REPO_ROOT/config/bench.env"
@@ -48,7 +49,7 @@ have()  { command -v "$1" >/dev/null 2>&1; }
 # =============================================================================
 init_run() {
   local bench="$1" variant="${2:-baseline}"
-  RUN_TAG="${bench}_${variant}_$(date +%Y%m%d-%H%M%S)"
+  RUN_TAG="${bench}_${variant}_$(date +%Y%m%d-%H%M%S)_$$"
   RUN_DIR="$RESULTS_DIR/$RUN_TAG"
   mkdir -p "$RUN_DIR"/{perf,flame,logs,raw,timing}
   export RUN_DIR RUN_TAG BENCH="$bench" VARIANT="$variant"
@@ -70,8 +71,18 @@ capture_env() {
       printf '\n'
     fi
     echo " date (UTC) : $(date -u +%FT%TZ)"
-    echo " git commit : $(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo 'not-a-git-repo')"
-    echo " git dirty  : $(git -C "$REPO_ROOT" status --porcelain 2>/dev/null | wc -l | tr -d ' ') file(s)"
+    if [[ "$CAPTURE_GIT_METADATA" == "1" ]]; then
+      echo " git commit : $(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo unavailable)"
+      echo " git dirty  : $(git -C "$REPO_ROOT" status --porcelain 2>/dev/null | wc -l)"
+    else
+      echo " git metadata: disabled (CAPTURE_GIT_METADATA=0)"
+    fi
+    echo " session    : ${SESSION_DIR:-standalone}"
+    for source in "$@" "$REPO_ROOT/lib/common.sh" "$REPO_ROOT/lib/pipeline.sh" "$REPO_ROOT/config/bench.env" "$REPO_ROOT/bench/bm_${BENCH}_upstream.py" "$REPO_ROOT/upstream/bm_${BENCH}_upstream.py"; do
+      [[ -f "$source" ]] || continue
+      printf ' source sha256: '
+      { sha256sum "$source" 2>/dev/null || shasum -a 256 "$source"; }
+    done
     echo "=============================================================="
     echo; echo "--- host ---"
     echo "uname      : $(uname -a)"
@@ -84,7 +95,11 @@ capture_env() {
     echo; echo "--- memory ---"
     free -h 2>/dev/null || head -3 /proc/meminfo || true
     echo; echo "--- toolchain ---"
-    echo "perf       : $(perf --version 2>/dev/null || echo MISSING)"
+    if [[ "$ENABLE_PERF_STAT" == "1" || "$ENABLE_PERF_RECORD" == "1" || "$ENABLE_CACHE_PROFILE" == "1" ]]; then
+      echo "perf       : $(perf --version 2>/dev/null || echo MISSING)"
+    else
+      echo "perf       : not requested"
+    fi
     echo "PY_REL     : $PY_REL -> $($PY_REL -VV 2>&1 | tr '\n' ' ' || echo MISSING)"
     echo "PY_DBG     : $PY_DBG -> $($PY_DBG -VV 2>&1 | tr '\n' ' ' || echo MISSING)"
     echo "py-spy     : $(py-spy --version 2>/dev/null || echo 'not installed')"
@@ -152,8 +167,8 @@ require_perf() {
 
 require_python_dbg() {
   if ! have "$PY_DBG"; then
-    warn "$PY_DBG missing -> perf will show one opaque _PyEval_EvalFrameDefault"
-    warn "block with nothing below it. Install: sudo apt install -y python3-dbg"
+    warn "$PY_DBG missing -> sampling uses release Python; available symbols may differ."
+    warn "Install python3-dbg for a separate debug attribution run if needed."
     warn "Falling back to $PY_REL for the sampling phase."
     PY_DBG="$PY_REL"
   fi
@@ -192,7 +207,7 @@ probe_pmu() {
     PMU_OK=0
     warn "NO hardware PMU events available."
     warn "You are in a QEMU guest without PMU passthrough."
-    warn "Flame graphs still work (perf uses the cpu-clock software event),"
+    warn "Sampling availability depends on the explicitly selected event;"
     warn "but cycles/IPC/cache counters will be missing."
     warn "Fix: restart QEMU with  -enable-kvm -cpu host   (see docs/VM_SETUP.md)"
   fi
@@ -201,6 +216,7 @@ probe_pmu() {
                  | sed 's/,\{2,\}/,/g; s/^,//; s/,$//')"
   export PMU_OK PERF_EVENTS
   printf '%s\n' "$PERF_EVENTS" | tr ',' '\n' > "$RUN_DIR/perf/events_used.txt"
+  phase_status hardware_pmu "$([[ "$PMU_OK" == "1" ]] && echo available || echo unavailable)" "$PERF_EVENTS"
   ok "events: $PERF_EVENTS"
 }
 
@@ -278,10 +294,10 @@ run_clean_timing() {
   log "running $CLEAN_REPS independent processes, loops=$loops"
   local i t
   for (( i=1; i<=CLEAN_REPS; i++ )); do
-    # Fresh process every rep: no warm caches carried across reps, no profiler,
-    # no perf, no tracing. This is as close to the true cost as we can get.
+    # Fresh process every rep: no reused interpreter state or profiler.
+    # OS/hardware cache and thermal state can still carry across processes.
     ${PIN[@]+"${PIN[@]}"} "$PY_REL" ${WL[@]+"${WL[@]}"} > "$RUN_DIR/timing/.rep$i" 2>&1 || {
-      warn "rep $i failed"; cat "$RUN_DIR/timing/.rep$i" >&2; continue; }
+      cat "$RUN_DIR/timing/.rep$i" >&2; die "clean timing rep $i failed"; }
     cat "$RUN_DIR/timing/.rep$i" >> "$out"
     # NOTE: a `grep ... | head -1` here SIGPIPEs grep -> 141 -> set -e abort.
     # Single-process awk reads the file directly and cannot short-circuit a pipe.
@@ -291,6 +307,7 @@ run_clean_timing() {
     t="$(awk 'match($0,/total_sec=[0-9.]+/){
                 print substr($0,RSTART+10,RLENGTH-10); exit }' \
          "$RUN_DIR/timing/.rep$i")"
+    [[ -n "$t" && "$t" != "0" && "$t" != "0.000000" ]] || die "missing/zero timing in rep $i"
     [[ -n "$t" ]] && { echo "$i,$t" >> "$csv"; printf '  rep %d: %s s\n' "$i" "$t"; }
     rm -f "$RUN_DIR/timing/.rep$i"
   done
@@ -321,17 +338,18 @@ if mean and sd/mean > 0.05:
     print("         trustworthy. Close other work, re-run setup/03_tune_vm.sh,")
     print("         or raise CLEAN_REPS.")
 PY
+  phase_status clean_timing completed "reps=$CLEAN_REPS loops=$loops"
   ok "clean timing -> timing/clean_${VARIANT}_summary.txt"
 }
 
 # =============================================================================
-# PHASE 3 — perf stat (counting mode: near-zero overhead)
+# PHASE 3 — perf stat (counting mode; separate from clean timing)
 # =============================================================================
 run_perf_stat() {
   local script="$1" loops="$2"
   shift 2
   [[ "$ENABLE_PERF_STAT" == "1" ]] || return 0
-  phase "3  perf stat — hardware counters (counting mode, ~1% overhead)"
+  phase "3  perf stat — hardware counters (counting mode; timing not quoted)"
 
   build_pin; py_env
   workload_args "$script" --mode raw --loops "$loops" "$@"
@@ -345,11 +363,11 @@ run_perf_stat() {
   log "perf stat -r $REPS (mean +- stddev over $REPS runs)"
   perf stat ${ev[@]+"${ev[@]}"} -r "$REPS" -o "$base.txt" \
       -- ${PIN[@]+"${PIN[@]}"} "$PY_REL" ${WL[@]+"${WL[@]}"} \
-      > "$base.workload.log" 2>&1 || warn "perf stat returned non-zero"
+      > "$base.workload.log" 2>&1 || { warn "perf stat returned non-zero"; phase_status perf_stat unavailable "see workload log"; }
   # Machine-readable copy for tools/compare.sh
   perf stat ${ev[@]+"${ev[@]}"} -r "$REPS" -x, -o "$base.csv" \
       -- ${PIN[@]+"${PIN[@]}"} "$PY_REL" ${WL[@]+"${WL[@]}"} \
-      > /dev/null 2>&1 || true
+      > /dev/null 2>&1 || phase_status perf_stat_csv unavailable "separate counter run failed"
 
   [[ -f "$base.txt" ]] && { ok "-> perf/stat_${VARIANT}.txt"; sed -n '1,45p' "$base.txt"; }
 
@@ -372,7 +390,7 @@ run_perf_record() {
   if (( $# >= 3 )); then shift 3; else shift 2; fi
   [[ "$ENABLE_PERF_RECORD" == "1" ]] || return 0
   phase "4  perf record — call-graph sampling for flame graphs"
-  warn "this phase uses $PY_DBG and dwarf unwinding: wall time here is"
+  warn "this phase uses $PY_DBG and $CALLGRAPH unwinding: wall time here is"
   warn "inflated on purpose and is NOT a performance result."
 
   build_pin; py_env
@@ -380,6 +398,7 @@ run_perf_record() {
   # around TARGET_SEC. Sample COUNT is what matters for a flame graph, not
   # wall time, so this costs us nothing analytically.
   local rloops=$(( loops / 3 )); (( rloops < 1 )) && rloops=1
+  phase_status sampling_workload configured "loops=$rloops interpreter=$PY_DBG"
   workload_args "$script" --mode raw --loops "$rloops" "$@"
 
   local data="$RUN_DIR/perf/${tag}.data"
@@ -400,7 +419,7 @@ run_perf_record() {
   if ! perf record ${sev[@]+"${sev[@]}"} ${samp[@]+"${samp[@]}"} ${cg[@]+"${cg[@]}"} -m "$PERF_MMAP_PAGES" \
         --output="$data" -- ${PIN[@]+"${PIN[@]}"} "$PY_DBG" ${WL[@]+"${WL[@]}"} \
         > "$RUN_DIR/logs/${tag}_record.log" 2>&1; then
-    warn "perf record failed:"; tail -20 "$RUN_DIR/logs/${tag}_record.log" >&2; return 0
+    phase_status perf_record unavailable "command failed"; warn "perf record failed:"; tail -20 "$RUN_DIR/logs/${tag}_record.log" >&2; return 0
   fi
 
   # Quarantine the inflated timing so it can never be mistaken for a result.
@@ -430,11 +449,13 @@ run_perf_record() {
     err "    PERF_RECORD_MODE=period       # if currently freq"
     err "    SAMPLE_PERIOD=<smaller>       # currently ${SAMPLE_PERIOD:-?}"
     err "    PERF_RECORD_EVENT=cpu-clock   # only if the PMU cannot sample"
+    phase_status perf_record unavailable "insufficient samples: $nsamp"
     err "Flame graph SKIPPED for ${tag}."
     return 0
   fi
   ok "$(du -h "$data" 2>/dev/null | cut -f1) perf.data, $nsamp samples"
 
+  phase_status perf_record completed "samples=$nsamp loops=$rloops interpreter=$PY_DBG"
   make_reports "$tag" "$data"
   make_flamegraph "$tag" "$data"
 }
@@ -493,14 +514,14 @@ make_flamegraph() {
   [[ "$ENABLE_FLAMEGRAPH" == "1" ]] || return 0
   local sc="$FLAMEGRAPH_DIR/stackcollapse-perf.pl" fg="$FLAMEGRAPH_DIR/flamegraph.pl"
   [[ -x "$sc" && -x "$fg" ]] || {
-    warn "FlameGraph missing in $FLAMEGRAPH_DIR -> run ./setup/02_get_flamegraph.sh"; return 0; }
+    phase_status flamegraph unavailable "toolkit missing"; warn "FlameGraph missing in $FLAMEGRAPH_DIR -> run ./setup/02_get_flamegraph.sh"; return 0; }
 
   hdr "flame graphs — $tag"
   local script="$RUN_DIR/perf/${tag}_script.txt"
   [[ -s "$script" ]] || { warn "empty perf script output"; return 0; }
 
   local folded="$RUN_DIR/flame/${tag}.folded"
-  "$sc" "$script" > "$folded" 2>/dev/null || { warn "stackcollapse failed"; return 0; }
+  "$sc" "$script" > "$folded" 2>/dev/null || { phase_status flamegraph failed "stackcollapse failed"; warn "stackcollapse failed"; return 0; }
   [[ -s "$folded" ]] || { warn "no stacks folded"; return 0; }
 
   local subtitle="$(date -u +%FT%TZ) | F=$SAMPLE_FREQ | $CALLGRAPH | $(basename "$PY_DBG")"
@@ -513,14 +534,15 @@ make_flamegraph() {
   "$fg" --inverted --reverse --title "$BENCH/$VARIANT — icicle (top-down)" \
         --width 1800 "$folded" > "$RUN_DIR/flame/${tag}_icicle.svg" 2>/dev/null || true
 
-  # Python-frames-only view: drops C/kernel frames so the graph maps onto
-  # source lines the student can actually edit.
+  # Select whole stacks containing interpreter symbols; this DOES NOT remove
+  # native frames or resolve Python source function names.
   grep -E '\.py|Py[A-Z_]|_PyEval' "$folded" > "$RUN_DIR/flame/${tag}_python.folded" 2>/dev/null || true
   [[ -s "$RUN_DIR/flame/${tag}_python.folded" ]] && \
-    "$fg" --title "$BENCH/$VARIANT — Python frames only" --width 1800 \
+    "$fg" --title "$BENCH/$VARIANT — Stacks containing Python/interpreter symbols" --width 1800 \
           "$RUN_DIR/flame/${tag}_python.folded" \
           > "$RUN_DIR/flame/${tag}_python.svg" 2>/dev/null || true
 
+  phase_status flamegraph completed
   ok "flame/${tag}.svg (+ _icicle, _python)"
   sort -k2 -nr "$folded" | head -30 > "$RUN_DIR/flame/${tag}_top30_stacks.txt" || true
 }
@@ -530,11 +552,13 @@ make_flamegraph() {
 run_cache_profile() {
   local script="$1" loops="$2" tag="${3:-$VARIANT}"
   if (( $# >= 3 )); then shift 3; else shift 2; fi
-  [[ "$ENABLE_CACHE_PROFILE" == "1" && "${PMU_OK:-0}" == "1" ]] || {
-    log "cache profiling needs a real PMU, skipped"; return 0; }
+  [[ "$ENABLE_CACHE_PROFILE" == "1" ]] || return 0
+  [[ "${PMU_OK:-0}" == "1" ]] || {
+    phase_status cache_profile unavailable "no PMU"; log "cache profiling needs a real PMU, skipped"; return 0; }
   hdr "cache-miss attribution — $tag"
   build_pin; py_env
   local rloops=$(( loops / 3 )); (( rloops < 1 )) && rloops=1
+  phase_status sampling_workload configured "loops=$rloops interpreter=$PY_DBG"
   workload_args "$script" --mode raw --loops "$rloops" "$@"
   local data="$RUN_DIR/perf/${tag}_cachemiss.data"
   # -c 10000: sample every 10k misses (period, not frequency) to bound overhead.
@@ -545,6 +569,7 @@ run_cache_profile() {
        > "$RUN_DIR/perf/report_${tag}_cachemiss.txt" 2>/dev/null || true
     ok "-> perf/report_${tag}_cachemiss.txt"
   else
+    phase_status cache_profile unavailable "sampling command failed"
     log "cache-miss sampling unavailable (event likely emulated), skipped"
   fi
 }
@@ -597,10 +622,12 @@ PY
       echo
       cat "$RUN_DIR/raw/cprofile_${VARIANT}.txt"
     } > "$RUN_DIR/raw/.cp.tmp" && mv "$RUN_DIR/raw/.cp.tmp" "$RUN_DIR/raw/cprofile_${VARIANT}.txt"
+    phase_status cprofile completed "loops=$cloops"
     ok "-> raw/cprofile_${VARIANT}.txt (loops=$cloops, normalize before comparing)"
     grep -A12 'TOP 40 BY TOTTIME' "$RUN_DIR/raw/cprofile_${VARIANT}.txt" 2>/dev/null | head -20 || true
   else
-    warn "cProfile failed; see logs/cprofile.log"
+    phase_status cprofile failed "see logs/cprofile.log"
+    die "cProfile workload failed; see logs/cprofile.log"
   fi
 }
 
@@ -610,7 +637,7 @@ run_pyspy() {
   local script="$1" loops="$2"
   shift 2
   [[ "$ENABLE_PYSPY" == "1" ]] || return 0
-  have py-spy || { log "py-spy not installed, skipped"; return 0; }
+  have py-spy || { phase_status pyspy unavailable "not installed"; log "py-spy not installed, skipped"; return 0; }
   hdr "py-spy — native Python flame graph (cross-check)"
   build_pin; py_env
   workload_args "$script" --mode raw --loops "$loops" "$@"
@@ -618,7 +645,7 @@ run_pyspy() {
       --output "$RUN_DIR/flame/${VARIANT}_pyspy.svg" \
       -- "$PY_REL" ${WL[@]+"${WL[@]}"} > "$RUN_DIR/logs/pyspy.log" 2>&1 \
     && ok "-> flame/${VARIANT}_pyspy.svg" \
-    || warn "py-spy failed (may need: sudo sysctl -w kernel.yama.ptrace_scope=0)"
+    || { phase_status pyspy unavailable "see logs/pyspy.log"; warn "py-spy failed; see logs/pyspy.log"; }
 }
 
 # =============================================================================
@@ -634,11 +661,13 @@ run_pyperformance() {
   local bench="$1" tag="${2:-$VARIANT}"
   [[ "$ENABLE_PYPERFORMANCE" == "1" ]] || return 0
   phase "6  pyperformance — upstream harness (calibration + warmups + stdev)"
+  [[ -f "$VENV_DIR/bin/activate" ]] || { phase_status pyperformance unavailable "venv missing"; warn "pyperformance venv missing; skipped"; return 0; }
   activate_venv; py_env; build_pin
 
   local json="$RUN_DIR/raw/pyperf_${tag}.json"
   if ${PIN[@]+"${PIN[@]}"} pyperformance run --benchmarks "$bench" \
         --output "$json" > "$RUN_DIR/logs/pyperformance_${tag}.log" 2>&1; then
+    phase_status pyperformance completed "upstream harness baseline only"
     ok "-> raw/pyperf_${tag}.json"
     python -m pyperf stats "$json" > "$RUN_DIR/raw/pyperf_${tag}_stats.txt" 2>/dev/null || true
     # Distribution, not just the mean — cf. the Histogram/PDF/CDF lecture.
@@ -647,6 +676,7 @@ run_pyperformance() {
     grep -E 'Mean|Median|Minimum|Maximum|stdev|MAD' \
         "$RUN_DIR/raw/pyperf_${tag}_stats.txt" 2>/dev/null | head -12 || true
   else
+    phase_status pyperformance failed "see log"
     warn "pyperformance failed; tail of log:"
     tail -25 "$RUN_DIR/logs/pyperformance_${tag}.log" >&2
   fi
@@ -663,8 +693,8 @@ calibrate_loops() {
   shift
   if [[ -n "$LOOPS" ]]; then echo "$LOOPS"; return; fi
   py_env
-  local n; n="$("$PY_REL" "$script" --mode calibrate "$@" 2>/dev/null | tail -1 | tr -dc '0-9')"
-  [[ -n "$n" && "$n" -gt 0 ]] 2>/dev/null || n=64
+  local n; n="$("$PY_REL" "$script" --mode calibrate "$@" 2>/dev/null | tail -1 | tr -dc '0-9')" || die "calibration command failed"
+  [[ -n "$n" && "$n" -gt 0 ]] 2>/dev/null || die "calibration failed: $script"
   echo "$n"
 }
 
@@ -673,11 +703,13 @@ finish_run() {
   { echo; echo "--- artifacts ---"
     find "$RUN_DIR" -type f | sed "s|$RUN_DIR/||" | sort; } >> "$RUN_DIR/manifest.txt"
   ok "artifacts: $RUN_DIR"
-  printf '  %-22s %s\n' "QUOTABLE timing:" "timing/clean_${VARIANT}_summary.txt"
-  printf '  %-22s %s\n' "counters:"        "perf/stat_${VARIANT}.txt"
-  printf '  %-22s %s\n' "flame graphs:"    "flame/*.svg"
-  printf '  %-22s %s\n' "perf reports:"    "perf/report_*.txt"
-  printf '  %-22s %s\n' "manifest:"        "manifest.txt"
-  echo
-  log "next: ./tools/compare.sh $BENCH   (once baseline + optimized both exist)"
+  printf '  Manifest: %s\n' "$RUN_DIR/manifest.txt"
+  printf '  Phase status: %s\n' "$RUN_DIR/phases.tsv"
+  [[ ! -f "$RUN_DIR/timing/clean_${VARIANT}_summary.txt" ]] || printf '  Clean timing: %s\n' "$RUN_DIR/timing/clean_${VARIANT}_summary.txt"
+  return 0
+}
+
+# Append-only status: later entries refine earlier requested/complete entries.
+phase_status() {
+  printf '%s\t%s\t%s\n' "$(printf %s "$1" | tr '[:upper:]' '[:lower:]')" "$2" "${3:-}" >> "$RUN_DIR/phases.tsv"
 }

@@ -68,7 +68,7 @@ fi
 # The baseline wrapper always runs the unmodified upstream benchmark.
 OPT_ARGS=()
 if [[ "${USE_UPSTREAM:-1}" == "1" ]]; then
-  RAYTRACE_KERNEL="${PIPELINE_KERNEL:-shadow_ray}"
+  RAYTRACE_KERNEL="${PIPELINE_KERNEL:-full}"
   OPT_ARGS=(--kernel "$RAYTRACE_KERNEL")
 fi
 
@@ -82,6 +82,7 @@ if [[ "${USE_UPSTREAM:-1}" == "1" && "${SKIP_WORKLOAD_VERIFY:-0}" != "1" ]]; the
 fi
 
 mkdir -p "$RESULTS_DIR"
+prepare_benchmark_session
 
 hdr "raytrace — HWSW benchmark analysis pipeline"
 log "variant selection : $VARIANT_SEL"
@@ -94,16 +95,21 @@ fi
 
 if [[ "$VARIANT_SEL" == "baseline" || "$VARIANT_SEL" == "both" ]]; then
   run_variant "$BENCH_NAME" "baseline" "$BASELINE"
+  BASE_RUN_DIR="$LAST_RUN_DIR"
+  record_session_run baseline
 fi
 
 if [[ "$VARIANT_SEL" == "optimized" || "$VARIANT_SEL" == "both" ]]; then
   run_variant "$BENCH_NAME" "optimized" "$OPTIMIZED" ${OPT_ARGS[@]+"${OPT_ARGS[@]}"}
+  OPT_RUN_DIR="$LAST_RUN_DIR"
+  record_session_run optimized
 fi
 
 # Auto-compare when both halves exist in this session.
 if [[ "$VARIANT_SEL" == "both" ]]; then
   hdr "before/after comparison"
-  "$HERE/tools/compare.sh" "$BENCH_NAME" || warn "compare.sh reported a problem"
+  "$HERE/tools/compare.sh" "$BENCH_NAME" "$BASE_RUN_DIR" "$OPT_RUN_DIR" "$SESSION_DIR/comparison_${BENCH_NAME}" || die "comparison failed"
+  printf 'comparison\t%s\n' "$SESSION_DIR/comparison_${BENCH_NAME}" >> "$SESSION_DIR/${BENCH_NAME}.tsv"
 fi
 
 ok "raytrace pipeline complete"

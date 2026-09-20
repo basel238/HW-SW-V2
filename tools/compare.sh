@@ -32,9 +32,16 @@ Run: ./script_${BENCH}.sh --variant baseline"
 [[ -d "$OPT_DIR"  ]] || die "no optimized run found at $OPT_DIR
 Run: ./script_${BENCH}.sh --variant optimized"
 
-OUT="$RESULTS_DIR/comparison_${BENCH}_$(date +%Y%m%d-%H%M%S)"
+OUT="${4:-$RESULTS_DIR/comparison_${BENCH}_$(date +%Y%m%d-%H%M%S)_$$}"
 mkdir -p "$OUT"
-ln -sfn "$OUT" "$RESULTS_DIR/latest_comparison_${BENCH}"
+"$PY_REL" - "$RESULTS_DIR" "$OUT" "$BENCH" <<'PYLINK'
+import os, sys
+root, out, bench = sys.argv[1:]
+p = os.path.join(root, "latest_comparison_" + bench)
+if os.path.islink(p): os.unlink(p)
+os.symlink(os.path.relpath(out, root), p)
+PYLINK
+printf 'baseline\t%s\noptimized\t%s\n' "$BASE_DIR" "$OPT_DIR" > "$OUT/inputs.tsv"
 
 hdr "comparing $BENCH: baseline vs optimized"
 log "baseline : $(readlink -f "$BASE_DIR" 2>/dev/null || echo "$BASE_DIR")"
@@ -45,7 +52,7 @@ log "optimized: $(readlink -f "$OPT_DIR"  2>/dev/null || echo "$OPT_DIR")"
 # -----------------------------------------------------------------------------
 export CMP_OUT="$OUT"
 SUMMARY="$OUT/summary.txt"
-"$PY_REL" - "$BENCH" "$BASE_DIR" "$OPT_DIR" > "$SUMMARY" 2>&1 <<'PY' || warn "summary generation had problems"
+"$PY_REL" - "$BENCH" "$BASE_DIR" "$OPT_DIR" > "$SUMMARY" 2>&1 <<'PY' || die "summary generation failed"
 import csv, os, statistics, sys
 
 bench, base_dir, opt_dir = sys.argv[1], sys.argv[2], sys.argv[3]
@@ -113,7 +120,7 @@ if not b or not o:
         print("   per process is unknown. Comparing raw totals across independently")
         print("   calibrated runs would be invalid, so no speedup is reported.")
         print("   Re-run the affected variant, or set LOOPS=N to fix work explicitly.")
-    raise SystemExit(0)
+    raise SystemExit(1 if os.environ.get("ENABLE_CLEAN_TIMING", "1") == "1" else 0)
 
 print(f"Work per process : baseline {b_loops} unit(s), optimized {o_loops} unit(s)")
 if b_loops != o_loops:
@@ -123,7 +130,8 @@ if b_loops != o_loops:
 else:
     print("  Loop counts match; figures below are per unit of work.")
 print(f"Raw process medians: baseline {statistics.median(b_raw):.6f} s, "
-      f"optimized {statistics.median(o_raw):.6f} s  <- NOT comparable directly")
+      f"optimized {statistics.median(o_raw):.6f} s"
+      + ("  (matched batch sizes)" if b_loops == o_loops else "  (normalize unequal batch sizes)"))
 print()
 
 def stats(v):
@@ -394,7 +402,7 @@ print("=" * 78)
 print(" SYMBOL-LEVEL DELTA (self overhead %, sampled profile)")
 print("=" * 78)
 print("Note: percentages are shares of each profile, so they sum to ~100 in")
-print("both columns. A symbol dropping to 0.00 means it was eliminated.")
+print("both columns. An absent symbol means no samples observed, not proof of elimination.")
 print()
 print(f"{'symbol':<46}{'base%':>9}{'opt%':>9}{'delta':>10}")
 print("-" * 78)
@@ -404,13 +412,13 @@ for sym in sorted(set(b) | set(o), key=lambda s: -(b.get(s, 0) + o.get(s, 0)))[:
 print()
 gone = sorted((s for s in b if b[s] >= 1.0 and s not in o), key=lambda s: -b[s])
 if gone:
-    print("ELIMINATED (>=1% in baseline, absent from optimized):")
+    print("NOT OBSERVED (>=1% in baseline; absence may reflect sampling noise):")
     for s in gone[:20]:
         print(f"  {b[s]:6.2f}%  {s}")
 PY
   ok "symbol delta -> symbols_delta.txt"
 else
-  warn "symbol CSVs missing; skipping symbol delta (need perf record for both variants)"
+  log "symbol comparison unavailable: no paired symbol CSVs"
 fi
 
 # -----------------------------------------------------------------------------
@@ -421,22 +429,22 @@ FG="$FLAMEGRAPH_DIR/flamegraph.pl"
 BF="$BASE_DIR/flame/baseline.folded"
 OF="$OPT_DIR/flame/optimized.folded"
 if [[ -x "$DF" && -x "$FG" && -s "$BF" && -s "$OF" ]]; then
-  # -n normalizes sample counts so the two profiles are comparable even though
-  # they ran different loop counts; without it the diff is meaningless.
+  # -n equalizes total sample weight. Colors show relative stack share,
+  # not absolute time or per-unit work; inspect event and loop metadata too.
   "$DF" -n "$BF" "$OF" > "$OUT/diff.folded" 2>/dev/null || true
   if [[ -s "$OUT/diff.folded" ]]; then
-    "$FG" --title "$BENCH — differential (red = more time in optimized, blue = less)" \
-          --subtitle "baseline -> optimized | normalized" --width 1800 \
+    "$FG" --title "$BENCH — differential (red = larger relative share, blue = smaller)" \
+          --subtitle "baseline -> optimized | equal total sample weight" --width 1800 \
           "$OUT/diff.folded" > "$OUT/diff_flame.svg" 2>/dev/null || true
     ok "differential flame graph -> diff_flame.svg"
   fi
   # Reverse direction: highlights what the baseline spent time on that is gone.
   "$DF" -n "$OF" "$BF" > "$OUT/diff_rev.folded" 2>/dev/null || true
   [[ -s "$OUT/diff_rev.folded" ]] && \
-    "$FG" --title "$BENCH — differential reversed (red = baseline-only cost)" \
+    "$FG" --title "$BENCH — differential reversed (red = larger relative baseline share)" \
           --width 1800 "$OUT/diff_rev.folded" > "$OUT/diff_flame_inv.svg" 2>/dev/null || true
 else
-  warn "differential flame graph skipped (need difffolded.pl + both .folded files)"
+  log "differential flame graph unavailable: toolkit or paired profiles absent"
 fi
 
 # -----------------------------------------------------------------------------
@@ -444,14 +452,13 @@ fi
 # -----------------------------------------------------------------------------
 BJ="$BASE_DIR/raw/pyperf_baseline.json"
 if [[ -f "$BJ" ]] && have python; then
-  activate_venv 2>/dev/null || true
+  [[ ! -f "$VENV_DIR/bin/activate" ]] || source "$VENV_DIR/bin/activate"
   python -m pyperf stats "$BJ" > "$OUT/pyperformance_baseline_stats.txt" 2>/dev/null || true
   deactivate 2>/dev/null || true
 fi
 
 hdr "comparison complete"
 ok "output: $OUT"
-printf '  %-26s %s\n' "headline verdict:"  "summary.txt"
-printf '  %-26s %s\n' "counter deltas:"    "counters.txt"
-printf '  %-26s %s\n' "symbol deltas:"     "symbols_delta.txt"
-printf '  %-26s %s\n' "differential flame:" "diff_flame.svg"
+for artifact in summary.txt counters.txt symbols_delta.txt diff_flame.svg diff_flame_inv.svg; do
+  if [[ -s "$OUT/$artifact" ]]; then printf '  %s\n' "$artifact"; fi
+done

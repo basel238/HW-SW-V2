@@ -6,7 +6,7 @@
 > selects `flat_pow` unless explicitly overridden. See [the flat-kernel guide](NBODY_FLAT_EXPERIMENT.md).
 
 The implemented experiment is `grouped` in
-`variants/bm_nbody_upstream_opt.py`. It is now the default optimized kernel.
+`variants/bm_nbody_upstream_opt.py`. It was the initial default optimized kernel; the current default is flat_pow.
 The files under `upstream/` and the baseline wrapper
 `bench/bm_nbody_upstream.py` are unchanged. Existing `upstream`, `sqrt`, `hoist`,
 and `full` selections remain available; grouping is not combined with the square

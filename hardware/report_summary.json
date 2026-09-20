@@ -1,0 +1,68 @@
+{
+  "implementation": "Sequential FP64 ray-sphere core with ready/valid, sticky FP flags and error response",
+  "scope": "Complete arithmetic/controller core; proposed batching/transport/driver integration not implemented",
+  "source": "hardware/rtl/ray_sphere_accel.sv",
+  "fp_rtl": "Berkeley HardFloat Release 1, selected unmodified BSD-3-Clause sources; see vendor provenance",
+  "arithmetic": "IEEE binary64 nearest-even; gradual underflow; same upstream expression tree; no FMA or approximation",
+  "ports": {
+    "request_data_bits": 640,
+    "tag_bits": 32,
+    "response_t_bits": 64,
+    "exception_flag_bits": 5,
+    "handshake": "ready/valid; one outstanding request; stable response through stalls"
+  },
+  "frequency": {
+    "target_mhz": 50,
+    "achieved_mhz": null,
+    "status": "analytical assumption; no synthesis/timing analysis"
+  },
+  "cycle_budget": {
+    "miss_initiation_interval": 20,
+    "root_initiation_interval": 80,
+    "status": "source-derived schedule budget, no behavioral simulation; excludes backpressure"
+  },
+  "software_evidence": {
+    "upstream_s_per_frame": 0.7897555,
+    "shadow_ray_s_per_frame": 0.61102275,
+    "time_reduction_percent": 22.631403010172146,
+    "source": "results/comparison_raytrace_20260920-015451/summary.txt"
+  },
+  "profile_planning_count": {
+    "sphere_calls_per_frame": 179457,
+    "status": "older upstream profile; new optimized/batched query counts require measurement"
+  },
+  "example": {
+    "status": "hypothetical sensitivity; not measured hardware performance",
+    "assumptions": {
+      "tests": 179457,
+      "root_fraction": 1.0,
+      "mhz": 50.0,
+      "bandwidth_gbs": 1.0,
+      "batch": 1024,
+      "launch_us": 10.0,
+      "pack_ns": 100.0,
+      "software_s": 0.61102275,
+      "offloaded_fraction": 0.5
+    },
+    "result": {
+      "compute_s": 0.2871312,
+      "transfer_s": 0.018663528,
+      "launch_s": 0.0017599999999999998,
+      "pack_s": 0.017945700000000002,
+      "offload_s": 0.32550042799999995,
+      "estimated_total_s": 0.6310118029999999,
+      "speedup": 0.9683222201154295,
+      "time_reduction_percent": -3.271408961450284,
+      "break_even_offloaded_fraction": 0.5327140896145028
+    }
+  },
+  "nbody": "Deferred: exact host nonintegral pow and dependent velocity updates require a distinct design",
+  "remaining": [
+    "HDL behavioral verification",
+    "timing/synthesis if performance claims are sought",
+    "native batch scheduling and transport/driver implementation",
+    "end-to-end pixel checks",
+    "updated optimized release-time boundary measurements",
+    "compiled CPU batch comparator"
+  ]
+}
