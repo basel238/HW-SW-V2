@@ -1,5 +1,10 @@
 # Nbody: retain the first body's state across consecutive pairs
 
+> Historical guide for the `grouped` candidate. The optimized variant now
+> defaults to `flat_pow`; use `--kernel grouped` in the Python or shell
+> commands when reproducing this experiment. The normal shell pipeline
+> selects `flat_pow` unless explicitly overridden. See [the flat-kernel guide](NBODY_FLAT_EXPERIMENT.md).
+
 The implemented experiment is `grouped` in
 `variants/bm_nbody_upstream_opt.py`. It is now the default optimized kernel.
 The files under `upstream/` and the baseline wrapper
@@ -140,7 +145,7 @@ After committing/pushing the change and updating the VM checkout, run the
 explicit verification above, followed by:
 
 ```bash
-USE_UPSTREAM=1 ./script_nbody.sh --variant both --loops 16
+USE_UPSTREAM=1 ./script_nbody.sh --variant both --kernel grouped --loops 16
 ```
 
 The baseline arm uses the unmodified reference; the optimized arm now selects

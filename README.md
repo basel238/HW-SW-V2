@@ -33,23 +33,31 @@ new kernel removes 72,172 duplicate Ray constructions/normalizations and 144,344
 Vector constructions per 100×100 frame. These are work reductions, not measured
 VM speedups. A matching target-VM optimized result is still needed.
 
-The upstream nbody variant now defaults to **`grouped`**. It keeps the first
-body's position and velocity in local variables across consecutive pair
-interactions, then writes its velocity once per group. Pair order, arithmetic
-order, the original power expression, and the final position-update phase are
-preserved. The upstream reference and baseline wrapper are unchanged.
-`upstream`, `sqrt`, `hoist`, and `full` remain separate selectable experiments.
-There is no combined `grouped_sqrt` kernel in this change.
+The upstream nbody variant now defaults to **`flat_pow`**, the fully unrolled
+five-body kernel with all 30 position/velocity components kept in locals across
+all timesteps. It expands the ten pair interactions and five position updates,
+preserves the original power expression and arithmetic order, and writes back
+state once per advance call. `flat_sqrt` combines the same structure with the
+square-root rewrite. `grouped`, `upstream`, `sqrt`, `hoist`, and `full` remain
+available as separate comparisons. The upstream reference and timed baseline
+wrapper are unchanged.
 
-All 28 regression tests pass (13 nbody, 12 raytrace, and 3 shell-pipeline checks).
-Local checks match all 30 state
-components and energy bit-for-bit, including the 16 × 20,000-step batch.
+Both flat kernels validate the fixed-five input layout and canonical pair order
+once inside the timed call. They use actual passed state and masses; no results
+are precomputed. Delayed writeback excludes intermediate observers and partial
+updates on exceptions. All state lists retain their identity on return.
 
-For 20,000 steps, grouping removes 720,000 reads and 360,000 writes of numeric
-list components, including unpacking in the source-level counts. This is not a
-count of machine instructions or a predicted runtime percentage. The new
-target-VM comparison is pending; neither source-level work reductions nor local
-correctness checks establish the course's sufficient 7% improvement outcome.
+Regression checks compare all 30 state components and energy, including the
+16 × 20,000-step batch. `flat_pow` and `grouped` require bit identity;
+`flat_sqrt` and the legacy arithmetic candidates use the existing 1e-9 relative
+energy / norm-relative state tolerance. See the validation evidence below.
+
+The latest recorded Ubuntu grouped result reduced median clean runtime by
+3.40% (227.314 to 219.589 ms per 20,000 steps), below the 7% runtime target.
+The new flat variants still need target-VM timing. Source-level reductions,
+local correctness checks, and results on another interpreter/CPU do not
+establish their speedup. Python locals remain boxed floats; unchanged arithmetic
+still produces float objects.
 
 - [Raytrace report](report_raytrace.txt): baseline evidence, implemented change,
   validation, performance experiment, and hardware status.
@@ -57,14 +65,18 @@ correctness checks establish the course's sufficient 7% improvement outcome.
   implementation, correctness contract, and remaining measurements.
 - [Raytrace experiment instructions](docs/SHADOW_RAY_EXPERIMENT.md): explicit kernels,
   correctness checks, profile interpretation, and VM measurement protocol.
-- [Nbody experiment instructions](docs/NBODY_GROUPED_EXPERIMENT.md): state reuse,
-  source-level access counts, correctness checks, and VM measurement protocol.
+- [Nbody flat experiment](docs/NBODY_FLAT_EXPERIMENT.md): combined unrolling/local
+  state candidates, correctness contracts, and target-VM measurement commands.
+- [Earlier nbody grouped experiment](docs/NBODY_GROUPED_EXPERIMENT.md): the
+  intermediate state-reuse candidate and source-level access counts.
 - [Project requirements](docs/PROJECT_REQUIREMENTS.md): PDF page references and
   remaining deliverables, including a complete hardware design.
 - [Raytrace validation evidence](docs/shadow_ray_validation.json): operation counts
   and pixel hashes; not a target-VM timing record.
-- [Nbody validation evidence](docs/nbody_grouped_validation.json): exact-state
-  checks and access counts; not a target-VM timing record.
+- [Nbody grouped validation evidence](docs/nbody_grouped_validation.json):
+  exact-state checks and access counts; not a target-VM timing record.
+- [Nbody flat validation evidence](docs/nbody_flat_validation.json): local
+  full-batch verification and test results; not a target-VM timing record.
 
 ## Quick start on the Ubuntu VM
 
@@ -85,12 +97,16 @@ Verify and run the new nbody experiment:
 ```bash
 python3 -B -m unittest discover -s tests -v
 python3 -B variants/bm_nbody_upstream_opt.py --mode verify --loops 16 --iterations 20000
-USE_UPSTREAM=1 ./script_nbody.sh --variant both --loops 16
+USE_UPSTREAM=1 ./script_nbody.sh --variant both --kernel flat_pow --loops 16
 ```
 
-The optimized arm selects `grouped` by default. Verification compares all 30
+The optimized arm selects `flat_pow` by default. The shell script accepts
+`--kernel grouped` or `--kernel flat_sqrt` (and all legacy nbody kernels) to
+select another candidate consistently across phases. `flat_unrolled` describes
+the structure shared by `flat_pow` and `flat_sqrt`, not an additional kernel.
+Verification compares all 30
 position/velocity components and energy at the requested batch size, with exact
-comparison for `grouped` and the existing tolerance contracts for candidates
+comparison for `grouped` / `flat_pow` and the existing tolerance contracts for candidates
 that change floating-point evaluation. `--no-gc` is applied before calibration
 and exploratory ablation as well as raw timing. The explicit 16-loop verification
 passes all kernels; the pipeline verification phase itself still defaults to
@@ -103,7 +119,20 @@ performance claim. To select the nbody kernel directly:
 ```bash
 python3 -B variants/bm_nbody_upstream_opt.py --kernel upstream --mode raw --loops 16 --iterations 20000 --no-gc
 python3 -B variants/bm_nbody_upstream_opt.py --kernel grouped --mode raw --loops 16 --iterations 20000 --no-gc
+python3 -B variants/bm_nbody_upstream_opt.py --kernel flat_pow --mode raw --loops 16 --iterations 20000 --no-gc
+python3 -B variants/bm_nbody_upstream_opt.py --kernel flat_sqrt --mode raw --loops 16 --iterations 20000 --no-gc
 ```
+
+For an exploratory comparison of all kernels, rotate the run order and save
+all observations (release Python; this is separate from the full pipeline):
+
+```bash
+python3 -B variants/bm_nbody_upstream_opt.py --mode ablate --loops 16 --iterations 20000 --reps 15 --no-gc --ablation-json nbody_flat_ablation.json
+```
+
+The JSON records samples, run order, interpreter/platform, and upstream/variant
+source hashes. Standard deviation describes sample spread, not a confidence
+interval. Confirm the selected candidate with the clean process timing above.
 
 Verify and run the new raytrace experiment:
 
@@ -207,7 +236,7 @@ reports before interpreting those fields as bottleneck evidence.
 | `variants/bm_*_upstream_opt.py` | Independently selectable software experiments |
 | `tests/test_raytrace_shadow.py` | Shadow-ray correctness and baseline-isolation checks |
 | `tests/test_raytrace_pipeline.py` | Shell kernel selection and forwarding through timing/profiling phases |
-| `tests/test_nbody_grouped.py` | Grouping, state binding, and numerical verification |
+| `tests/test_nbody_grouped.py`, `tests/test_nbody_flat.py` | Grouping, unrolled state, fresh binding, and numerical verification |
 | `script_nbody.sh`, `script_raytrace.sh` | Required per-benchmark execution scripts |
 | `lib/`, `config/`, `setup/` | Measurement phases, settings, dependencies and VM setup |
 | `results/` | Timestamped logs, raw timings, profiles, graphs and manifests |

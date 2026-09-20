@@ -64,6 +64,14 @@ if [[ "${PIPELINE_LIST_ONLY:-0}" == "1" ]]; then
   pipeline_usage "$BENCH_NAME"; exit 0
 fi
 
+# Kernel selection applies only to the optimized wrapper, in every phase.
+# The baseline wrapper always runs the unmodified upstream benchmark.
+OPT_ARGS=()
+if [[ "${USE_UPSTREAM:-1}" == "1" ]]; then
+  RAYTRACE_KERNEL="${PIPELINE_KERNEL:-shadow_ray}"
+  OPT_ARGS=(--kernel "$RAYTRACE_KERNEL")
+fi
+
 [[ -f "$BASELINE"  ]] || die "missing baseline: $BASELINE"
 [[ -f "$OPTIMIZED" ]] || die "missing optimized variant: $OPTIMIZED"
 # STAGE 0: verify the measured workload is the genuine benchmark before any
@@ -80,13 +88,16 @@ log "variant selection : $VARIANT_SEL"
 log "workload          : $WORKLOAD_KIND"
 log "baseline          : ${BASELINE#$HERE/}"
 log "optimized         : ${OPTIMIZED#$HERE/}"
+if [[ "${USE_UPSTREAM:-1}" == "1" ]]; then
+  log "optimized kernel  : $RAYTRACE_KERNEL"
+fi
 
 if [[ "$VARIANT_SEL" == "baseline" || "$VARIANT_SEL" == "both" ]]; then
   run_variant "$BENCH_NAME" "baseline" "$BASELINE"
 fi
 
 if [[ "$VARIANT_SEL" == "optimized" || "$VARIANT_SEL" == "both" ]]; then
-  run_variant "$BENCH_NAME" "optimized" "$OPTIMIZED"
+  run_variant "$BENCH_NAME" "optimized" "$OPTIMIZED" ${OPT_ARGS[@]+"${OPT_ARGS[@]}"}
 fi
 
 # Auto-compare when both halves exist in this session.

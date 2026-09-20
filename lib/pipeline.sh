@@ -25,28 +25,28 @@ run_variant() {
     log "perf phases disabled -> skipping perf preconditions and PMU probe"
     PMU_OK=0; PERF_EVENTS=""; export PMU_OK PERF_EVENTS
   fi
-  capture_env
+  capture_env "$script" ${extra[@]+"${extra[@]}"}
 
   # --- Phase 1: correctness BEFORE performance -------------------------------
   # Benchmarking incorrect code is worse than not benchmarking at all, so this
   # gate is hard-fail (die) rather than a warning.
-  run_verify "$script"
+  run_verify "$script" ${extra[@]+"${extra[@]}"}
 
   # --- Calibration (once, on the release interpreter) -----------------------
   # Every phase reuses this loop count so all phases do identical work and the
   # numbers are mutually comparable.
   local loops
-  loops="$(calibrate_loops "$script")"
+  loops="$(calibrate_loops "$script" ${extra[@]+"${extra[@]}"})"
   log "calibrated loops=$loops (target ~${TARGET_SEC}s per pass)"
   echo "$loops" > "$RUN_DIR/timing/loops.txt"
 
   # --- Phases 2-6 -----------------------------------------------------------
-  run_clean_timing  "$script" "$loops"        # QUOTABLE numbers
-  run_perf_stat     "$script" "$loops"        # counters, ~1% overhead
-  run_perf_record   "$script" "$loops" "$variant"
-  run_cache_profile "$script" "$loops" "$variant"
-  run_cprofile      "$script" "$loops"        # call counts only
-  run_pyspy         "$script" "$loops"
+  run_clean_timing  "$script" "$loops" ${extra[@]+"${extra[@]}"}  # QUOTABLE
+  run_perf_stat     "$script" "$loops" ${extra[@]+"${extra[@]}"}
+  run_perf_record   "$script" "$loops" "$variant" ${extra[@]+"${extra[@]}"}
+  run_cache_profile "$script" "$loops" "$variant" ${extra[@]+"${extra[@]}"}
+  run_cprofile      "$script" "$loops" ${extra[@]+"${extra[@]}"}
+  run_pyspy         "$script" "$loops" ${extra[@]+"${extra[@]}"}
 
   # Only the upstream benchmark name is meaningful to pyperformance, and only
   # for the baseline: our optimized variant is not an upstream benchmark.
@@ -62,6 +62,14 @@ run_variant() {
 # Standard CLI shared by all script_*.sh files.
 pipeline_usage() {
   local bench="$1"
+  local kernel_help=""
+  if [[ "$bench" == "raytrace" ]]; then
+    kernel_help="  --kernel K      upstream | guards | shadow_ray | combined
+                  optimized arm only, USE_UPSTREAM=1 (default: shadow_ray)"
+  elif [[ "$bench" == "nbody" ]]; then
+    kernel_help="  --kernel K      upstream | grouped | flat_pow | flat_sqrt | sqrt | hoist | full
+                  optimized arm only, USE_UPSTREAM=1 (default: flat_pow)"
+  fi
   cat <<EOF
 Usage: ./script_${bench}.sh [OPTIONS]
 
@@ -74,6 +82,7 @@ OPTIONS
   --time-only     only clean timing (no profilers at all) — fastest path to a
                   defensible speedup number
   --loops N       force the loop count instead of auto-calibrating
+${kernel_help}
   --list-phases   print the phase plan and exit
   -h, --help      this message
 
@@ -97,10 +106,29 @@ EOF
 # Parses the shared flags. Sets VARIANT_SEL and mutates the ENABLE_* toggles.
 pipeline_parse_args() {
   VARIANT_SEL="both"
+  PIPELINE_KERNEL=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --variant)      VARIANT_SEL="${2:?--variant needs a value}"; shift 2 ;;
       --loops)        LOOPS="${2:?--loops needs a value}"; export LOOPS; shift 2 ;;
+      --kernel)
+        if [[ "${USE_UPSTREAM:-1}" != "1" ]]; then
+          err "--kernel requires USE_UPSTREAM=1"; return 2
+        fi
+        case "${BENCH_NAME:-}" in
+          raytrace)
+            case "${2:-}" in
+              upstream|guards|shadow_ray|combined) PIPELINE_KERNEL="$2" ;;
+              *) err "--kernel needs one of: upstream, guards, shadow_ray, combined"; return 2 ;;
+            esac ;;
+          nbody)
+            case "${2:-}" in
+              upstream|grouped|flat_pow|flat_sqrt|sqrt|hoist|full) PIPELINE_KERNEL="$2" ;;
+              *) err "--kernel needs one of: upstream, grouped, flat_pow, flat_sqrt, sqrt, hoist, full"; return 2 ;;
+            esac ;;
+          *) err "--kernel is supported only for raytrace or nbody with USE_UPSTREAM=1"; return 2 ;;
+        esac
+        shift 2 ;;
       --quick)
         # Smoke test: keep the cheap, high-signal phases; drop the slow ones.
         CLEAN_REPS=3; REPS=2; TARGET_SEC=1.0

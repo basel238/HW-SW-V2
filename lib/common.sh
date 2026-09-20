@@ -64,6 +64,11 @@ capture_env() {
     echo "=============================================================="
     echo " run tag    : $RUN_TAG"
     echo " benchmark  : $BENCH        variant: $VARIANT"
+    if (( $# )); then
+      printf ' workload   :'
+      printf ' %q' "$@"
+      printf '\n'
+    fi
     echo " date (UTC) : $(date -u +%FT%TZ)"
     echo " git commit : $(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo 'not-a-git-repo')"
     echo " git dirty  : $(git -C "$REPO_ROOT" status --porcelain 2>/dev/null | wc -l | tr -d ' ') file(s)"
@@ -244,10 +249,11 @@ workload_args() {
 # =============================================================================
 run_verify() {
   local script="$1"
+  shift
   [[ "$ENABLE_VERIFY" == "1" ]] || return 0
   phase "1  correctness verification"
   py_env
-  if "$PY_REL" "$script" --mode verify 2>&1 | tee "$RUN_DIR/logs/verify.log"; then
+  if "$PY_REL" "$script" --mode verify "$@" 2>&1 | tee "$RUN_DIR/logs/verify.log"; then
     ok "correctness gate passed"
   else
     die "VERIFY FAILED — refusing to benchmark incorrect code. See logs/verify.log"
@@ -259,11 +265,12 @@ run_verify() {
 # =============================================================================
 run_clean_timing() {
   local script="$1" loops="$2"
+  shift 2
   [[ "$ENABLE_CLEAN_TIMING" == "1" ]] || return 0
   phase "2  clean timing — NO profiler attached (quote these numbers)"
 
   build_pin; py_env
-  workload_args "$script" --mode raw --loops "$loops"
+  workload_args "$script" --mode raw --loops "$loops" "$@"
   local out="$RUN_DIR/timing/clean_${VARIANT}.txt"
   local csv="$RUN_DIR/timing/clean_${VARIANT}.csv"
   : > "$out"; echo "rep,total_sec" > "$csv"
@@ -322,11 +329,12 @@ PY
 # =============================================================================
 run_perf_stat() {
   local script="$1" loops="$2"
+  shift 2
   [[ "$ENABLE_PERF_STAT" == "1" ]] || return 0
   phase "3  perf stat — hardware counters (counting mode, ~1% overhead)"
 
   build_pin; py_env
-  workload_args "$script" --mode raw --loops "$loops"
+  workload_args "$script" --mode raw --loops "$loops" "$@"
   local base="$RUN_DIR/perf/stat_${VARIANT}"
   local ev=(); [[ -n "$PERF_EVENTS" ]] && ev=(-e "$PERF_EVENTS")
 
@@ -361,6 +369,7 @@ run_perf_stat() {
 # =============================================================================
 run_perf_record() {
   local script="$1" loops="$2" tag="${3:-$VARIANT}"
+  if (( $# >= 3 )); then shift 3; else shift 2; fi
   [[ "$ENABLE_PERF_RECORD" == "1" ]] || return 0
   phase "4  perf record — call-graph sampling for flame graphs"
   warn "this phase uses $PY_DBG and dwarf unwinding: wall time here is"
@@ -371,7 +380,7 @@ run_perf_record() {
   # around TARGET_SEC. Sample COUNT is what matters for a flame graph, not
   # wall time, so this costs us nothing analytically.
   local rloops=$(( loops / 3 )); (( rloops < 1 )) && rloops=1
-  workload_args "$script" --mode raw --loops "$rloops"
+  workload_args "$script" --mode raw --loops "$rloops" "$@"
 
   local data="$RUN_DIR/perf/${tag}.data"
   local cg=(--call-graph "$CALLGRAPH")
@@ -520,12 +529,13 @@ make_flamegraph() {
 # come from", which time-based sampling structurally cannot.
 run_cache_profile() {
   local script="$1" loops="$2" tag="${3:-$VARIANT}"
+  if (( $# >= 3 )); then shift 3; else shift 2; fi
   [[ "$ENABLE_CACHE_PROFILE" == "1" && "${PMU_OK:-0}" == "1" ]] || {
     log "cache profiling needs a real PMU, skipped"; return 0; }
   hdr "cache-miss attribution — $tag"
   build_pin; py_env
   local rloops=$(( loops / 3 )); (( rloops < 1 )) && rloops=1
-  workload_args "$script" --mode raw --loops "$rloops"
+  workload_args "$script" --mode raw --loops "$rloops" "$@"
   local data="$RUN_DIR/perf/${tag}_cachemiss.data"
   # -c 10000: sample every 10k misses (period, not frequency) to bound overhead.
   if perf record -e cache-misses -c 10000 --call-graph "$CALLGRAPH" \
@@ -544,6 +554,7 @@ run_cache_profile() {
 # =============================================================================
 run_cprofile() {
   local script="$1" loops="$2"
+  shift 2
   [[ "$ENABLE_CPROFILE" == "1" ]] || return 0
   phase "5  cProfile — exact call counts (deterministic tracing)"
   warn "cProfile adds 2-5x overhead; use it for CALL COUNTS, never for timing."
@@ -555,7 +566,7 @@ run_cprofile() {
   # variant's unless divided by this number, so record it next to the output.
   local cloops=$(( loops / 10 )); (( cloops < 1 )) && cloops=1
   echo "$cloops" > "$RUN_DIR/raw/cprofile_${VARIANT}_loops.txt"
-  workload_args "$script" --mode raw --loops "$cloops"
+  workload_args "$script" --mode raw --loops "$cloops" "$@"
   local pstats="$RUN_DIR/raw/cprofile_${VARIANT}.pstats"
 
   if ${PIN[@]+"${PIN[@]}"} "$PY_REL" -m cProfile -o "$pstats" ${WL[@]+"${WL[@]}"} \
@@ -597,11 +608,12 @@ PY
 # check that perf's attribution is not an artifact of dwarf unwinding.
 run_pyspy() {
   local script="$1" loops="$2"
+  shift 2
   [[ "$ENABLE_PYSPY" == "1" ]] || return 0
   have py-spy || { log "py-spy not installed, skipped"; return 0; }
   hdr "py-spy — native Python flame graph (cross-check)"
   build_pin; py_env
-  workload_args "$script" --mode raw --loops "$loops"
+  workload_args "$script" --mode raw --loops "$loops" "$@"
   py-spy record --rate 999 --subprocesses --format flamegraph \
       --output "$RUN_DIR/flame/${VARIANT}_pyspy.svg" \
       -- "$PY_REL" ${WL[@]+"${WL[@]}"} > "$RUN_DIR/logs/pyspy.log" 2>&1 \
@@ -648,9 +660,10 @@ run_pyperformance() {
 # all phases so every phase does identical work.
 calibrate_loops() {
   local script="$1"
+  shift
   if [[ -n "$LOOPS" ]]; then echo "$LOOPS"; return; fi
   py_env
-  local n; n="$("$PY_REL" "$script" --mode calibrate 2>/dev/null | tail -1 | tr -dc '0-9')"
+  local n; n="$("$PY_REL" "$script" --mode calibrate "$@" 2>/dev/null | tail -1 | tr -dc '0-9')"
   [[ -n "$n" && "$n" -gt 0 ]] 2>/dev/null || n=64
   echo "$n"
 }

@@ -4,11 +4,13 @@ import contextlib
 import gc
 import importlib.util
 import io
+import json
 import math
 from pathlib import Path
 import struct
 import subprocess
 import sys
+import tempfile
 import unittest
 from unittest import mock
 
@@ -102,16 +104,17 @@ class NbodyGroupedTests(unittest.TestCase):
             variant.advance_grouped(.01, 1, up.SYSTEM, up.PAIRS)
             self.assertEqual(group.call_count, 2)
 
-    def test_cli_defaults_to_grouped_and_keeps_legacy_choices(self):
-        self.assertEqual(set(variant.KERNELS), {"upstream", "grouped", "sqrt", "hoist", "full"})
+    def test_cli_defaults_to_flat_pow_and_keeps_legacy_choices(self):
+        self.assertEqual(set(variant.KERNELS),
+                         {"upstream", "grouped", "flat_pow", "flat_sqrt", "sqrt", "hoist", "full"})
         args = ["nbody", "--loops", "1", "--iterations", "10"]
         up = variant.base.load_upstream()
         with mock.patch.object(sys, "argv", args):
             with mock.patch.object(variant, "_run", return_value=(1., -.1, up)) as run:
                 with contextlib.redirect_stdout(io.StringIO()) as output:
                     self.assertEqual(variant.main(), 0)
-        run.assert_called_once_with(1, 10, variant.advance_grouped)
-        self.assertIn("kernel=grouped", output.getvalue())
+        run.assert_called_once_with(1, 10, variant.advance_flat_pow)
+        self.assertIn("kernel=flat_pow", output.getvalue())
 
     def test_cli_verification_honors_loops_and_defaults_to_one(self):
         for extra_args, loops in (([], 1), (["--loops", "16"], 16)):
@@ -133,16 +136,18 @@ class NbodyGroupedTests(unittest.TestCase):
                         variant.verify(3, 10)
                 self.assertEqual(run.call_args_list, [mock.call(3, 10, None), mock.call(3, 10, fn)])
 
-    def test_verify_rejects_one_bit_of_grouped_state_or_energy_difference(self):
+    def test_verify_rejects_one_bit_of_exact_kernel_state_or_energy_difference(self):
         changed = [float(i) for i in range(1, 31)]
         changed[0] = math.nextafter(changed[0], math.inf)
-        with self.assertRaisesRegex(AssertionError, "verification failed for: grouped"):
-            self.check_fake_verify(state=changed)
-        with self.assertRaisesRegex(AssertionError, "verification failed for: grouped"):
-            self.check_fake_verify(energy=math.nextafter(-.1, math.inf))
+        for name in ("grouped", "flat_pow"):
+            with self.subTest(kernel=name):
+                with self.assertRaisesRegex(AssertionError, f"verification failed for: {name}"):
+                    self.check_fake_verify(state=changed, kernel=name)
+                with self.assertRaisesRegex(AssertionError, f"verification failed for: {name}"):
+                    self.check_fake_verify(energy=math.nextafter(-.1, math.inf), kernel=name)
 
     def test_verify_rejects_nonfinite_values_for_every_kernel(self):
-        for name in ("grouped", "sqrt", "hoist", "full"):
+        for name in ("grouped", "flat_pow", "flat_sqrt", "sqrt", "hoist", "full"):
             for value in (math.inf, -math.inf, math.nan):
                 with self.subTest(kernel=name, energy=value):
                     with self.assertRaisesRegex(AssertionError, "non-finite"):
@@ -158,7 +163,7 @@ class NbodyGroupedTests(unittest.TestCase):
     def test_verify_preserves_norm_relative_tolerance_for_legacy_candidates(self):
         changed = [float(i) for i in range(1, 31)]
         changed[0] += 1e-8  # Relative to max component (30), below 1e-9.
-        for name in ("sqrt", "hoist", "full"):
+        for name in ("flat_sqrt", "sqrt", "hoist", "full"):
             with self.subTest(kernel=name):
                 self.check_fake_verify(state=changed, kernel=name)
         changed[0] += 1e-6
@@ -166,17 +171,100 @@ class NbodyGroupedTests(unittest.TestCase):
             self.check_fake_verify(state=changed, kernel="hoist")
 
     def test_verify_failure_is_active_under_python_optimized_mode(self):
-        code = f'''import importlib.util
+        for name in ("grouped", "flat_pow"):
+            code = f'''import importlib.util
 spec = importlib.util.spec_from_file_location("candidate", {str(VARIANT_PATH)!r})
 v = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(v)
-v.KERNELS = {{"upstream": None, "grouped": lambda *a, **k: None}}
+v.KERNELS = {{"upstream": None, {name!r}: lambda *a, **k: None}}
 v.verify(1, 10)
 '''
-        result = subprocess.run([sys.executable, "-B", "-O", "-c", code],
-                                text=True, capture_output=True, check=False)
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("verification failed for: grouped", result.stderr)
+            with self.subTest(kernel=name):
+                result = subprocess.run([sys.executable, "-B", "-O", "-c", code],
+                                        text=True, capture_output=True, check=False)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(f"verification failed for: {name}", result.stderr)
+
+    def test_ablation_honors_reps_and_rotates_kernel_order(self):
+        up = variant.base.load_upstream()
+        names = list(variant.KERNELS)
+        for reps in (1, 3):
+            args = ["nbody", "--mode", "ablate", "--loops", "2",
+                    "--iterations", "7", "--reps", str(reps)]
+            with self.subTest(reps=reps), mock.patch.object(sys, "argv", args):
+                with mock.patch.object(variant, "_run", return_value=(1., -.1, up)) as run:
+                    with contextlib.redirect_stdout(io.StringIO()) as output:
+                        self.assertEqual(variant.main(), 0)
+            expected = []
+            for rep in range(reps):
+                order = names[rep:] + names[:rep]
+                expected.extend(mock.call(2, 7, variant.KERNELS[name]) for name in order)
+            self.assertEqual(run.call_args_list, expected)
+            self.assertIn(f"reps={reps}", output.getvalue())
+
+    def test_ablation_rejects_nonpositive_repetitions(self):
+        for reps in ("0", "-1"):
+            args = ["nbody", "--mode", "ablate", "--reps", reps]
+            with self.subTest(reps=reps), mock.patch.object(sys, "argv", args):
+                with mock.patch.object(variant, "_run") as run:
+                    with contextlib.redirect_stderr(io.StringIO()):
+                        with self.assertRaises(SystemExit) as error:
+                            variant.main()
+                self.assertNotEqual(error.exception.code, 0)
+                run.assert_not_called()
+
+    def test_ablation_json_preserves_raw_samples_order_and_statistics(self):
+        up = variant.base.load_upstream()
+        names = list(variant.KERNELS)
+        names_by_fn = {fn: name for name, fn in variant.KERNELS.items()}
+        counts = dict.fromkeys(names, 0)
+
+        def run(loops, iterations, fn):
+            name = names_by_fn[fn]
+            counts[name] += 1
+            return float((names.index(name) + 1) * counts[name]), -.1, up
+
+        with tempfile.TemporaryDirectory() as tmp:
+            evidence = Path(tmp) / "ablation.json"
+            args = ["nbody", "--mode", "ablate", "--loops", "2",
+                    "--iterations", "7", "--reps", "3",
+                    "--ablation-json", str(evidence)]
+            with mock.patch.object(sys, "argv", args), mock.patch.object(variant, "_run", run):
+                with contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(variant.main(), 0)
+            data = json.loads(evidence.read_text())
+        self.assertEqual(data["kind"], "exploratory_in_process_ablation")
+        self.assertEqual((data["loops"], data["iterations"], data["reps"]), (2, 7, 3))
+        self.assertEqual(data["python"], sys.version)
+        self.assertEqual(data["upstream_sha256"], variant.base.upstream_sha256())
+        self.assertRegex(data["variant_sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(len(data["records"]), len(names) * 3)
+        for index, name in enumerate(names, 1):
+            self.assertEqual(data["samples_sec"][name], [float(index * i) for i in (1, 2, 3)])
+            summary = data["summary"][name]
+            self.assertEqual(summary["median_sec"], float(index * 2))
+            self.assertEqual(summary["mean_sec"], float(index * 2))
+            self.assertEqual(summary["stdev_sec"], float(index))
+            self.assertAlmostEqual(summary["speedup"], 1. / index)
+            self.assertAlmostEqual(summary["time_reduction_pct"], (1. - index) * 100.)
+        for rep in (1, 2, 3):
+            records = [record for record in data["records"] if record["rep"] == rep]
+            self.assertEqual([record["position"] for record in records], list(range(1, len(names) + 1)))
+            order = names[rep - 1:] + names[:rep - 1]
+            self.assertEqual([record["kernel"] for record in records], order)
+            for record in records:
+                self.assertEqual(record["total_sec"], data["samples_sec"][record["kernel"]][rep - 1])
+
+    def test_ablation_json_requires_ablation_mode(self):
+        for mode in ("raw", "calibrate", "verify"):
+            args = ["nbody", "--mode", mode, "--ablation-json", "unused.json"]
+            with self.subTest(mode=mode), mock.patch.object(sys, "argv", args):
+                with mock.patch.object(variant, "_run") as run:
+                    with contextlib.redirect_stderr(io.StringIO()):
+                        with self.assertRaises(SystemExit) as error:
+                            variant.main()
+                self.assertNotEqual(error.exception.code, 0)
+                run.assert_not_called()
 
     def test_no_gc_applies_to_calibration_and_ablation(self):
         enabled = gc.isenabled()

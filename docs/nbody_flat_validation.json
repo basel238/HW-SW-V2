@@ -1,0 +1,51 @@
+{
+  "scope": "Local correctness and pipeline integration; no target-VM speedup claim",
+  "python": "3.14.6 (v3.14.6:c63aec69bd5, Jun 10 2026, 08:07:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "upstream_sha256": "d1385e816d7cfea361b7915e2cf70138cd6b84f40df8bd5152638851f7bcac2b",
+  "upstream_unchanged": true,
+  "source_sha256": {
+    "variants/bm_nbody_upstream_opt.py": "5b0dbb3b3f9d7d74331679d208e4a721c04f219f13a0740cf3ab4369f406bbcb",
+    "lib/pipeline.sh": "9fb994d12306005abe8099535a5339fd823601e1ce8977470b01f3552593acb2",
+    "script_nbody.sh": "b5b8b9a63b59d40e64da845b45dfe4b5b0c522db7f8ef5c1d7d74bebc548b083",
+    "tests/test_nbody_grouped.py": "554133778e07b7d9d7e420de3137c7d305e83333007c1680f1ff1ed387caec58",
+    "tests/test_nbody_flat.py": "8ddd7e5b191d509ba308be452adf914e9ad69160128fa2b8d76c583b60c0c7c1",
+    "tests/test_nbody_pipeline.py": "08a5532815ac0bcbe840e962a6bea00bd558cdbc5f4fdded417e12a09aaa7ab0"
+  },
+  "full_batch_verify": {
+    "command": "python3 -B variants/bm_nbody_upstream_opt.py --mode verify --loops 16 --iterations 20000",
+    "loops": 16,
+    "iterations": 20000,
+    "reference_energy": -0.16908019793585344,
+    "grouped": {
+      "energy_bit_identical": true,
+      "all_30_state_components_bit_identical": true
+    },
+    "flat_pow": {
+      "energy_bit_identical": true,
+      "all_30_state_components_bit_identical": true
+    },
+    "flat_sqrt": {
+      "energy_relative_error": 7.535e-14,
+      "state_max_absolute_error": 5.675e-10,
+      "state_norm_relative_error": 2.259e-11,
+      "passed_1e_minus9_contract": true
+    },
+    "all_candidates_passed": true
+  },
+  "tests": {
+    "command": "python3 -B -m unittest discover -s tests -v",
+    "count": 43,
+    "passed": true,
+    "transcript": "test_all_state_and_energy_at_zero_short_default_and_accumulated_steps (test_nbody_flat.NbodyFlatTests.test_all_state_and_energy_at_zero_short_default_and_accumulated_steps) ... ok\ntest_benchmark_runs_start_fresh_and_do_not_replace_baseline (test_nbody_flat.NbodyFlatTests.test_benchmark_runs_start_fresh_and_do_not_replace_baseline) ... ok\ntest_rejects_invalid_step_count_or_dt_before_mutating_state (test_nbody_flat.NbodyFlatTests.test_rejects_invalid_step_count_or_dt_before_mutating_state) ... ok\ntest_rejects_noncanonical_pair_sequences_before_mutating_state (test_nbody_flat.NbodyFlatTests.test_rejects_noncanonical_pair_sequences_before_mutating_state) ... ok\ntest_rejects_unsupported_shape_aliases_and_component_types (test_nbody_flat.NbodyFlatTests.test_rejects_unsupported_shape_aliases_and_component_types) ... ok\ntest_repeated_advance_preserves_identity_and_uses_current_input_state (test_nbody_flat.NbodyFlatTests.test_repeated_advance_preserves_identity_and_uses_current_input_state) ... ok\ntest_varied_state_masses_and_dt_preserve_the_reference_calculation (test_nbody_flat.NbodyFlatTests.test_varied_state_masses_and_dt_preserve_the_reference_calculation) ... ok\ntest_ablation_honors_reps_and_rotates_kernel_order (test_nbody_grouped.NbodyGroupedTests.test_ablation_honors_reps_and_rotates_kernel_order) ... ok\ntest_ablation_json_preserves_raw_samples_order_and_statistics (test_nbody_grouped.NbodyGroupedTests.test_ablation_json_preserves_raw_samples_order_and_statistics) ... ok\ntest_ablation_json_requires_ablation_mode (test_nbody_grouped.NbodyGroupedTests.test_ablation_json_requires_ablation_mode) ... ok\ntest_ablation_rejects_nonpositive_repetitions (test_nbody_grouped.NbodyGroupedTests.test_ablation_rejects_nonpositive_repetitions) ... ok\ntest_benchmark_runs_start_fresh_and_leave_baseline_independent (test_nbody_grouped.NbodyGroupedTests.test_benchmark_runs_start_fresh_and_leave_baseline_independent) ... ok\ntest_bit_identical_at_short_default_and_accumulated_batch_sizes (test_nbody_grouped.NbodyGroupedTests.test_bit_identical_at_short_default_and_accumulated_batch_sizes) ... ok\ntest_cli_defaults_to_flat_pow_and_keeps_legacy_choices (test_nbody_grouped.NbodyGroupedTests.test_cli_defaults_to_flat_pow_and_keeps_legacy_choices) ... ok\ntest_cli_verification_honors_loops_and_defaults_to_one (test_nbody_grouped.NbodyGroupedTests.test_cli_verification_honors_loops_and_defaults_to_one) ... ok\ntest_consecutive_groups_use_identity_without_sorting_or_merging (test_nbody_grouped.NbodyGroupedTests.test_consecutive_groups_use_identity_without_sorting_or_merging) ... ok\ntest_group_construction_is_once_per_advance_not_per_timestep (test_nbody_grouped.NbodyGroupedTests.test_group_construction_is_once_per_advance_not_per_timestep) ... ok\ntest_no_gc_applies_to_calibration_and_ablation (test_nbody_grouped.NbodyGroupedTests.test_no_gc_applies_to_calibration_and_ablation) ... ok\ntest_nonconsecutive_groups_reload_values_updated_as_second_body (test_nbody_grouped.NbodyGroupedTests.test_nonconsecutive_groups_reload_values_updated_as_second_body) ... ok\ntest_repeated_advance_preserves_body_and_list_identity (test_nbody_grouped.NbodyGroupedTests.test_repeated_advance_preserves_body_and_list_identity) ... ok\ntest_verify_failure_is_active_under_python_optimized_mode (test_nbody_grouped.NbodyGroupedTests.test_verify_failure_is_active_under_python_optimized_mode) ... ok\ntest_verify_preserves_norm_relative_tolerance_for_legacy_candidates (test_nbody_grouped.NbodyGroupedTests.test_verify_preserves_norm_relative_tolerance_for_legacy_candidates) ... ok\ntest_verify_rejects_nonfinite_values_for_every_kernel (test_nbody_grouped.NbodyGroupedTests.test_verify_rejects_nonfinite_values_for_every_kernel) ... ok\ntest_verify_rejects_one_bit_of_exact_kernel_state_or_energy_difference (test_nbody_grouped.NbodyGroupedTests.test_verify_rejects_one_bit_of_exact_kernel_state_or_energy_difference) ... ok\ntest_all_nbody_kernel_names_are_accepted_without_starting_measurement (test_nbody_pipeline.NbodyPipelineTests.test_all_nbody_kernel_names_are_accepted_without_starting_measurement) ... ok\ntest_invalid_or_unsupported_kernel_is_rejected_before_measurement (test_nbody_pipeline.NbodyPipelineTests.test_invalid_or_unsupported_kernel_is_rejected_before_measurement) ... ok\ntest_kernel_reaches_every_workload_phase_without_leaking_to_baseline (test_nbody_pipeline.NbodyPipelineTests.test_kernel_reaches_every_workload_phase_without_leaking_to_baseline) ... ok\ntest_time_only_compares_reference_to_selected_kernel (test_nbody_pipeline.NbodyPipelineTests.test_time_only_compares_reference_to_selected_kernel) ... ok\ntest_invalid_or_unsupported_kernel_is_rejected_before_measurement (test_raytrace_pipeline.RaytracePipelineTests.test_invalid_or_unsupported_kernel_is_rejected_before_measurement) ... ok\ntest_kernel_reaches_every_workload_phase_without_leaking_to_baseline (test_raytrace_pipeline.RaytracePipelineTests.test_kernel_reaches_every_workload_phase_without_leaking_to_baseline) ... ok\ntest_time_only_compares_reference_to_selected_kernel (test_raytrace_pipeline.RaytracePipelineTests.test_time_only_compares_reference_to_selected_kernel) ... ok\ntest_all_kernel_pixels_and_same_process_baseline_restoration (test_raytrace_shadow.RaytraceShadowTests.test_all_kernel_pixels_and_same_process_baseline_restoration) ... ok\ntest_cli_defaults_to_shadow_ray (test_raytrace_shadow.RaytraceShadowTests.test_cli_defaults_to_shadow_ray) ... ok\ntest_combined_installs_both_changes_and_reuses_one_ray (test_raytrace_shadow.RaytraceShadowTests.test_combined_installs_both_changes_and_reuses_one_ray) ... ok\ntest_empty_scene_does_not_construct_or_normalize_ray (test_raytrace_shadow.RaytraceShadowTests.test_empty_scene_does_not_construct_or_normalize_ray) ... ok\ntest_epsilon_is_strict_and_first_blocker_exits_early (test_raytrace_shadow.RaytraceShadowTests.test_epsilon_is_strict_and_first_blocker_exits_early) ... ok\ntest_global_epsilon_is_not_captured_when_patch_is_built (test_raytrace_shadow.RaytraceShadowTests.test_global_epsilon_is_not_captured_when_patch_is_built) ... ok\ntest_intersection_exception_restores_method (test_raytrace_shadow.RaytraceShadowTests.test_intersection_exception_restores_method) ... ok\ntest_no_gc_applies_to_calibration_and_ablation (test_raytrace_shadow.RaytraceShadowTests.test_no_gc_applies_to_calibration_and_ablation) ... ok\ntest_reuses_one_ray_and_preserves_geometry_and_object_order (test_raytrace_shadow.RaytraceShadowTests.test_reuses_one_ray_and_preserves_geometry_and_object_order) ... ok\ntest_shadow_does_not_install_guard_specialization (test_raytrace_shadow.RaytraceShadowTests.test_shadow_does_not_install_guard_specialization) ... ok\ntest_verify_rejects_leaked_patch_even_when_pixels_match (test_raytrace_shadow.RaytraceShadowTests.test_verify_rejects_leaked_patch_even_when_pixels_match) ... ok\ntest_wrappers_restore_after_success_and_exception (test_raytrace_shadow.RaytraceShadowTests.test_wrappers_restore_after_success_and_exception) ... ok\n\n----------------------------------------------------------------------\nRan 43 tests in 20.020s\n\nOK\n"
+  },
+  "python_3_10_grammar_check": true,
+  "ablation_json_smoke": {
+    "reps": 2,
+    "iterations": 20000,
+    "loops": 1,
+    "all_seven_kernels_recorded": true,
+    "purpose": "CLI/output integration only; not a performance result"
+  },
+  "remaining": "Repeat correctness and collect clean runtime on release Python in the Ubuntu VM."
+}

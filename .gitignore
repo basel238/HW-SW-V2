@@ -5,5 +5,4 @@ __pycache__/
 *.bak.*
 .venv/
 venv/
-/results/*
 !/results/.gitkeep

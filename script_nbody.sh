@@ -11,22 +11,21 @@
 #   accumulation, 20000 timesteps per simulation.
 #
 # WHY IT WAS CHOSEN
-#   * The inner loop is a textbook multiply-accumulate over 3-vectors, repeated
-#     for all 10 body pairs every timestep. That maps DIRECTLY onto the brief's
-#     own suggestion: "Extend ISA with instructions [that] can accelerate
-#     workloads but are not too workload-specific (e.g., multiple-accumulate)".
-#   * Perfectly regular control flow and a tiny working set (5 bodies = 280 B,
-#     fits in L1) -> this is a PURE compute/dispatch bottleneck with no memory
-#     confound, which makes the accelerator argument clean.
-#   * Total energy is a conserved physical quantity -> an exact correctness
-#     oracle. The optimized variant is cross-checked against the baseline's
-#     energy to 1e-9 relative.
+#   * Ten pair interactions repeat on every timestep, making recurring Python
+#     arithmetic, container access and loop overhead useful optimization targets.
+#   * Five bodies are a small numerical workload, but Python objects occupy
+#     more than their raw doubles. Cache and instruction counters must be
+#     measured; source size alone does not establish a hardware bottleneck.
+#   * Correctness compares energy AND every final position/velocity component
+#     against upstream at the same step count. Grouped and flat_pow require
+#     bit-identical results; sqrt-based candidates use numerical tolerances.
+#     The integrator does not conserve physical energy exactly.
 #
 # COMPLEMENTARITY WITH raytrace
-#   raytrace is branch-heavy and allocation-heavy (object churn); nbody is
-#   branch-free and allocation-free. Together they isolate the two distinct
-#   CPython overheads — object protocol vs bytecode dispatch — which is a much
-#   stronger story than two benchmarks that fail the same way.
+#   Raytrace performs many small method calls and constructs geometry objects.
+#   Nbody concentrates work in a repeated numerical loop, but still executes
+#   interpreter branches and produces Python float objects. Their profiles
+#   distinguish the costs and support separate, measured optimization choices.
 #
 # WHAT IT PRODUCES / MEASUREMENT INTEGRITY
 #   Identical to script_raytrace.sh; see that file's header and --help.
@@ -63,6 +62,13 @@ if [[ "${PIPELINE_LIST_ONLY:-0}" == "1" ]]; then
   pipeline_usage "$BENCH_NAME"; exit 0
 fi
 
+# Apply selection only to the optimized wrapper, consistently in every phase.
+OPT_ARGS=()
+if [[ "${USE_UPSTREAM:-1}" == "1" ]]; then
+  NBODY_KERNEL="${PIPELINE_KERNEL:-flat_pow}"
+  OPT_ARGS=(--kernel "$NBODY_KERNEL")
+fi
+
 [[ -f "$BASELINE"  ]] || die "missing baseline: $BASELINE"
 [[ -f "$OPTIMIZED" ]] || die "missing optimized variant: $OPTIMIZED"
 # STAGE 0: verify the measured workload is the genuine benchmark before any
@@ -79,13 +85,16 @@ log "variant selection : $VARIANT_SEL"
 log "workload          : $WORKLOAD_KIND"
 log "baseline          : ${BASELINE#$HERE/}"
 log "optimized         : ${OPTIMIZED#$HERE/}"
+if [[ "${USE_UPSTREAM:-1}" == "1" ]]; then
+  log "optimized kernel  : $NBODY_KERNEL"
+fi
 
 if [[ "$VARIANT_SEL" == "baseline" || "$VARIANT_SEL" == "both" ]]; then
   run_variant "$BENCH_NAME" "baseline" "$BASELINE"
 fi
 
 if [[ "$VARIANT_SEL" == "optimized" || "$VARIANT_SEL" == "both" ]]; then
-  run_variant "$BENCH_NAME" "optimized" "$OPTIMIZED"
+  run_variant "$BENCH_NAME" "optimized" "$OPTIMIZED" ${OPT_ARGS[@]+"${OPT_ARGS[@]}"}
 fi
 
 if [[ "$VARIANT_SEL" == "both" ]]; then
