@@ -68,7 +68,7 @@ fi
 # The baseline wrapper always runs the unmodified upstream benchmark.
 OPT_ARGS=()
 if [[ "${USE_UPSTREAM:-1}" == "1" ]]; then
-  RAYTRACE_KERNEL="${PIPELINE_KERNEL:-full}"
+  RAYTRACE_KERNEL="${PIPELINE_KERNEL:-sphere_shadow}"
   OPT_ARGS=(--kernel "$RAYTRACE_KERNEL")
 fi
 

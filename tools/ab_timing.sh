@@ -44,7 +44,7 @@ while (( $# )); do
 done
 [[ "$ROUNDS" =~ ^[1-9][0-9]*$ && "$ROUNDS" -ge 3 ]] || die "rounds must be >=3"
 if [[ -z "$KERNEL" ]]; then
-  case "$BENCH" in nbody) KERNEL=flat_pow;; raytrace) KERNEL=full;; esac
+  case "$BENCH" in nbody) KERNEL=flat_pow;; raytrace) KERNEL=sphere_shadow;; esac
 fi
 OPT_ARGS=()
 if [[ "${USE_UPSTREAM:-1}" == "1" ]]; then OPT_ARGS=(--kernel "$KERNEL"); fi

@@ -20,7 +20,7 @@ class RaytracePipelineTests(unittest.TestCase):
                     PYTHONDONTWRITEBYTECODE="1", ENABLE_VERIFY="1", CAPTURE_GIT_METADATA="0")
 
     def test_time_only_compares_reference_to_selected_kernel(self):
-        for kernel in (None, "guards", "combined", "upstream"):
+        for kernel in (None, "sphere_shadow", "full", "guards", "combined", "upstream"):
             with self.subTest(kernel=kernel), tempfile.TemporaryDirectory() as tmp:
                 results = Path(tmp) / "results"
                 args = ["bash", str(ROOT / "script_raytrace.sh"),
@@ -30,7 +30,7 @@ class RaytracePipelineTests(unittest.TestCase):
                 proc = subprocess.run(args, cwd=ROOT, env=self.environment(results),
                                       capture_output=True, text=True, timeout=60)
                 self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
-                selected = kernel or "full"
+                selected = kernel or "sphere_shadow"
                 baseline = results / "latest_raytrace_baseline"
                 optimized = results / "latest_raytrace_optimized"
                 base_raw = (baseline / "timing/clean_baseline.txt").read_text()
@@ -106,7 +106,7 @@ run_pyperformance() { record_tool pyperformance "$@"; }
 PY_REL=python_probe
 PY_DBG=python_probe
 run_variant raytrace baseline "$TEST_ROOT/bench/bm_raytrace_upstream.py"
-run_variant raytrace optimized "$TEST_ROOT/variants/bm_raytrace_upstream_opt.py" --kernel combined
+run_variant raytrace optimized "$TEST_ROOT/variants/bm_raytrace_upstream_opt.py" --kernel sphere_shadow
 '''
             proc = subprocess.run(["bash", "-c", script], cwd=ROOT, env=env,
                                   capture_output=True, text=True, timeout=30)
@@ -124,7 +124,7 @@ run_variant raytrace optimized "$TEST_ROOT/variants/bm_raytrace_upstream_opt.py"
                     self.assertNotIn("--kernel", args)
                 else:
                     self.assertEqual(args.count("--kernel"), 1)
-                    self.assertEqual(args[args.index("--kernel") + 1], "combined")
+                    self.assertEqual(args[args.index("--kernel") + 1], "sphere_shadow")
                 if tool == "perf":
                     phase = "cache" if "cache-misses" in args else "perf_" + args[0]
                 elif tool == "py-spy":

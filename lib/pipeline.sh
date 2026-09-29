@@ -68,8 +68,9 @@ pipeline_usage() {
   local bench="$1"
   local kernel_help=""
   if [[ "$bench" == "raytrace" ]]; then
-    kernel_help="  --kernel K      upstream | guards | shadow_ray | combined | sphere_scalar | camera | nearest_hit | checkerboard | full | slots | full_slots
-                  optimized arm only, USE_UPSTREAM=1 (default: full)"
+    kernel_help="  --kernel K      upstream | guards | shadow_ray | combined | sphere_scalar | sphere_shadow | camera | nearest_hit | checkerboard | full | slots | full_slots
+                  optimized arm only, USE_UPSTREAM=1 (default: sphere_shadow)
+                  sphere_shadow = scalar sphere intersections + shadow-ray reuse only"
   elif [[ "$bench" == "nbody" ]]; then
     kernel_help="  --kernel K      upstream | grouped | flat_pow | flat_sqrt | sqrt | hoist | full
                   optimized arm only, USE_UPSTREAM=1 (default: flat_pow)"
@@ -122,8 +123,8 @@ pipeline_parse_args() {
         case "${BENCH_NAME:-}" in
           raytrace)
             case "${2:-}" in
-              upstream|guards|shadow_ray|combined|sphere_scalar|camera|nearest_hit|checkerboard|full|slots|full_slots) PIPELINE_KERNEL="$2" ;;
-              *) err "--kernel needs one of: upstream, guards, shadow_ray, combined, sphere_scalar, camera, nearest_hit, checkerboard, full, slots, full_slots"; return 2 ;;
+              upstream|guards|shadow_ray|combined|sphere_scalar|sphere_shadow|camera|nearest_hit|checkerboard|full|slots|full_slots) PIPELINE_KERNEL="$2" ;;
+              *) err "--kernel needs one of: upstream, guards, shadow_ray, combined, sphere_scalar, sphere_shadow, camera, nearest_hit, checkerboard, full, slots, full_slots"; return 2 ;;
             esac ;;
           nbody)
             case "${2:-}" in

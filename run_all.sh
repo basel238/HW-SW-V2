@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$HERE/lib/common.sh"
-PASSTHRU=(); NBODY_KERNEL=flat_pow; RAYTRACE_KERNEL=full; DOCTOR_ARGS=()
+PASSTHRU=(); NBODY_KERNEL=flat_pow; RAYTRACE_KERNEL=sphere_shadow; DOCTOR_ARGS=()
 while (( $# )); do
   case "$1" in
     --nbody-kernel) NBODY_KERNEL="${2:?missing kernel}"; shift 2 ;;
@@ -12,7 +12,7 @@ while (( $# )); do
     --time-only) PASSTHRU+=("$1"); DOCTOR_ARGS=(--time-only); shift ;;
     -h|--help)
       echo "Usage: ./run_all.sh [--time-only|--quick|--profile-only] [--loops N]"
-      echo "       [--nbody-kernel flat_pow] [--raytrace-kernel full]"
+      echo "       [--nbody-kernel flat_pow] [--raytrace-kernel sphere_shadow]"
       echo "Default: both variants of both benchmarks, all configured phases."
       exit 0 ;;
     *) PASSTHRU+=("$1"); shift ;;

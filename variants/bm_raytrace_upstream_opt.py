@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Exact pure-Python optimizations of the upstream raytrace benchmark.
 
-``full`` is the default: safe guard fast paths, shadow-ray reuse, scalar sphere
-intersections, invariant camera work, nearest-hit scanning and removal of a
-checkerboard temporary. Arithmetic order, pixel conversion, EPSILON comparisons,
-object order and the upstream scene are unchanged. Historical kernels remain
-independently selectable. Fast paths target ordinary stock classes; subclasses
+``sphere_shadow`` is the default: scalar sphere intersections and shadow-ray
+reuse only. ``full`` remains selectable and additionally enables guard fast
+paths, camera reuse, nearest-hit scanning and checkerboard temporary removal.
+Arithmetic order, pixel conversion, EPSILON comparisons, object order and the
+upstream scene are unchanged. Fast paths target ordinary stock classes; subclasses
 and custom primitives use original methods where specialization bypasses their
 behavior. Rendering assumes scenes are not mutated concurrently or monkey-patched.
 
@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "bench"))
 import bm_raytrace_upstream as base  # noqa: E402  (shared loader + harness)
 
 TARGET_SEC = float(os.environ.get("TARGET_SEC", "3.0"))
+DEFAULT_KERNEL = "sphere_shadow"
 
 
 # ---------------------------------------------------------------------------
@@ -245,6 +246,10 @@ def _extra_methods(up, kernel):
                         (up.Scene, "render", trusted_render)],
         "checkerboard": [(up.CheckerboardSurface, "baseColourAt", checker)],
     }
+    if kernel == "sphere_shadow":
+        # Reuse full's safe shadow path without installing guards, camera,
+        # nearest-hit or checkerboard patches. Custom scenes retain upstream.
+        return entries["sphere_scalar"] + [(up.Scene, "_lightIsVisible", visibility)]
     if kernel == "full":
         return (_r1_methods(up) + [(up.Scene, "_lightIsVisible", visibility)] +
                 [entry for name, group in entries.items() for entry in group
@@ -289,7 +294,7 @@ def _methods(up, kernel):
         return _r1_methods(up) + _shadow_methods(up)
     if kernel == "upstream":
         return []
-    if kernel in ("sphere_scalar", "camera", "nearest_hit", "checkerboard", "full"):
+    if kernel in ("sphere_scalar", "sphere_shadow", "camera", "nearest_hit", "checkerboard", "full"):
         return _extra_methods(up, kernel)
     raise ValueError(f"unknown kernel: {kernel}")
 
@@ -361,7 +366,7 @@ def _make_bench(kernel):
     return bench
 
 
-for _name in ("sphere_scalar", "camera", "nearest_hit", "checkerboard", "full", "slots", "full_slots"):
+for _name in ("sphere_scalar", "sphere_shadow", "camera", "nearest_hit", "checkerboard", "full", "slots", "full_slots"):
     KERNELS[_name] = _make_bench(_name)
 
 def _method_state(up):
@@ -392,7 +397,7 @@ def _render_frames(up, loops, width, height, kernel):
         up.Canvas.__init__ = original
 
 
-def verify(width, height, loops=1, kernel="full"):
+def verify(width, height, loops=1, kernel=DEFAULT_KERNEL):
 
     """Check all kernels against pre-patch and post-patch baseline renders."""
     up = base.load_upstream()
@@ -446,8 +451,8 @@ def main():
     p.add_argument("--loops", type=int, default=0)
     p.add_argument("--width", type=int, default=up.DEFAULT_WIDTH)
     p.add_argument("--height", type=int, default=up.DEFAULT_HEIGHT)
-    p.add_argument("--kernel", choices=tuple(KERNELS), default="full",
-                   help="timed kernel (verify always checks all kernels)")
+    p.add_argument("--kernel", choices=tuple(KERNELS), default=DEFAULT_KERNEL,
+                   help=f"timed kernel (default: {DEFAULT_KERNEL}; verify always checks all kernels)")
     p.add_argument("--reps", type=int, default=7, help="ablation repetitions with rotating order")
     p.add_argument("--json", dest="json_path", help="save ablation samples and source hashes")
     p.add_argument("--no-gc", action="store_true")
@@ -511,6 +516,7 @@ def main():
              "shadow_ray": "one shadow ray per visibility query",
              "combined": "guard specialization + shadow-ray reuse",
              "sphere_scalar": "scalar sphere arithmetic",
+             "sphere_shadow": "scalar sphere arithmetic + shadow-ray reuse only",
              "camera": "reuse camera components",
              "nearest_hit": "fused nearest intersection scan",
              "checkerboard": "remove discarded vector allocation",

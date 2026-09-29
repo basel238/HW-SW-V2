@@ -176,13 +176,13 @@ class RaytraceShadowTests(unittest.TestCase):
         finally:
             up.Scene._lightIsVisible = original
 
-    def test_cli_defaults_to_full(self):
+    def test_cli_defaults_to_sphere_shadow(self):
         args = ["raytrace", "--loops", "1", "--width", "24", "--height", "24"]
         with mock.patch.object(sys, "argv", args):
             with mock.patch.object(variant.base, "benchmark", return_value=(1.0, None)) as bench:
                 with contextlib.redirect_stdout(io.StringIO()):
                     self.assertEqual(variant.main(), 0)
-                self.assertIs(bench.call_args.args[3], variant.KERNELS["full"])
+                self.assertIs(bench.call_args.args[3], variant.KERNELS["sphere_shadow"])
 
     def test_no_gc_applies_to_calibration_and_ablation(self):
         enabled = gc.isenabled()

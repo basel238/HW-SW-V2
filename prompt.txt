@@ -326,3 +326,17 @@ and optional candidates without invented individual VM speedups. Update PDF/TXT
 reports and hardware analytical inputs using measured 6,934/179,457 root mix.
 Hardware remains a candidate with unmeasured release removal/transport costs.
 No Git operations, source-kernel edits, RTL changes or raw-result changes.
+
+
+2026-09-29 - Raytrace default narrowed to two optimizations
+Actual user request:
+"I want to run raytrace with only sphere scalar and ray shadow improvements. I want to make this the default. can you update the code / run scripts"
+
+Implementation: add sphere_shadow, containing scalar sphere intersections and
+shadow-ray reuse only, with existing generic fallbacks. Select it by default in
+the Python CLI, raytrace workflow, run_all and interleaved A/B timing. Preserve
+full and the individual experiments as explicit selections. Add coverage for
+exact primitive/image results, the two-method scope, fallback behavior, script
+routing and the full override. Historical reports/results are not relabelled as
+measurements of this new kernel; a new target-VM measurement is still required.
+No upstream, nbody implementation, hardware, raw-result or Git changes requested.

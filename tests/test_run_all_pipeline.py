@@ -70,7 +70,7 @@ else:
         self.assertEqual(p.returncode, 0, p.stdout+p.stderr)
         session, = (self.repo/'results').glob('session_all_*')
         calls = [json.loads(x) for x in (self.repo/'calls.jsonl').read_text().splitlines()]
-        for bench, kernel in (('nbody', 'flat_pow'), ('raytrace', 'full')):
+        for bench, kernel in (('nbody', 'flat_pow'), ('raytrace', 'sphere_shadow')):
             refs = dict(line.split('\t',1) for line in (session/f'{bench}.tsv').read_text().splitlines())
             self.assertNotIn('latest', refs['baseline']+refs['optimized'])
             self.assertTrue(Path(refs['comparison']).is_dir())
@@ -86,6 +86,16 @@ else:
             self.assertIn('CAPTURE_GIT_METADATA=0', manifest)
         # Metadata may check perf --version even though perf execution is disabled.
         # It must not execute any perf command in time-only mode.
+        self.assertFalse((self.repo/'forbidden').exists())
+
+    def test_run_all_can_still_select_full_raytrace(self):
+        p = self.run_script('run_all.sh', '--time-only', '--raytrace-kernel', 'full')
+        self.assertEqual(p.returncode, 0, p.stdout+p.stderr)
+        calls = [json.loads(x) for x in (self.repo/'calls.jsonl').read_text().splitlines()]
+        optimized = [args for name, args in calls if name == 'bm_raytrace_upstream_opt.py']
+        self.assertTrue(optimized)
+        for args in optimized:
+            self.assertEqual(args[args.index('--kernel')+1], 'full')
         self.assertFalse((self.repo/'forbidden').exists())
 
     def test_full_workflow_surfaces_unavailable_profilers(self):
@@ -136,6 +146,23 @@ else:
         p=self.run_script('tools/gen_report.sh','nbody',str(directory),str(directory),str(directory),str(report))
         self.assertNotEqual(p.returncode,0)
         self.assertIn('[TODO]',report.read_text())
+
+    def test_ab_raytrace_defaults_to_sphere_shadow(self):
+        # Disable profiler metadata probes: this test only exercises clean A/B
+        # timing, including its correctness and kernel-forwarding commands.
+        p = self.run_script('tools/ab_timing.sh', 'raytrace', '3', LOOPS='2',
+                            ENABLE_PERF_STAT='0', ENABLE_PERF_RECORD='0',
+                            ENABLE_CACHE_PROFILE='0')
+        self.assertEqual(p.returncode, 0, p.stdout+p.stderr)
+        calls = [json.loads(x) for x in (self.repo/'calls.jsonl').read_text().splitlines()]
+        optimized = [args for name, args in calls if name == 'bm_raytrace_upstream_opt.py']
+        self.assertTrue(optimized)
+        for name, args in calls:
+            if name == 'bm_raytrace_upstream_opt.py':
+                self.assertEqual(args[args.index('--kernel')+1], 'sphere_shadow')
+            else:
+                self.assertNotIn('--kernel', args)
+        self.assertFalse((self.repo/'forbidden').exists())
 
 
 if __name__ == '__main__': unittest.main()

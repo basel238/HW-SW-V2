@@ -38,7 +38,7 @@ class RaytraceFullTests(unittest.TestCase):
         for centre, radius, point, direction in cases:
             sphere, ray = u.Sphere(centre, radius), u.Ray(point, direction)
             ref = sphere.intersectionTime(ray)
-            for kernel in ("sphere_scalar", "full"):
+            for kernel in ("sphere_scalar", "sphere_shadow", "full"):
                 with v._patched(u, kernel):
                     self.assertEqual(bits(sphere.intersectionTime(ray)), bits(ref))
 
@@ -65,9 +65,31 @@ class RaytraceFullTests(unittest.TestCase):
             def __sub__(self, other):
                 raise ValueError("custom point")
         sphere = u.Sphere(CustomPoint(0, 0, 0), 1)
-        with v._patched(u, "full"):
-            with self.assertRaisesRegex(ValueError, "custom point"):
-                sphere.intersectionTime(u.Ray(u.Point(1, 2, 3), u.Vector(0, 0, 1)))
+        for kernel in ("sphere_shadow", "full"):
+            with v._patched(u, kernel):
+                with self.assertRaisesRegex(ValueError, "custom point"):
+                    sphere.intersectionTime(u.Ray(u.Point(1, 2, 3), u.Vector(0, 0, 1)))
+
+    def test_sphere_shadow_changes_only_two_methods_and_reuses_shadow_ray(self):
+        u = self.up
+        expected_changes = {(u.Sphere, "intersectionTime"), (u.Scene, "_lightIsVisible")}
+        with v._patched(u, "sphere_shadow"):
+            changed = {(cls, name) for cls, name, owned, method in self.state
+                       if getattr(cls, name) is not method}
+            self.assertEqual(changed, expected_changes)
+
+        scene = u.Scene()
+        for x in (10., 20., 30.):
+            scene.addObject(u.Sphere(u.Point(x, 0., 1.), 1.), u.SimpleSurface())
+        original_init = u.Ray.__init__
+        for kernel, count in (("upstream", 3), ("sphere_shadow", 1)):
+            rays = []
+            def capture(ray, point, vector):
+                original_init(ray, point, vector)
+                rays.append(ray)
+            with v._patched(u, kernel), mock.patch.object(u.Ray, "__init__", capture):
+                self.assertTrue(scene._lightIsVisible(u.Point(0., 0., 1.), u.Point.ZERO))
+            self.assertEqual(len(rays), count, kernel)
 
     def make_scene(self, seed):
         u = self.up
@@ -128,7 +150,7 @@ class RaytraceFullTests(unittest.TestCase):
             return colours
         for seed in (3, 4, 7, 9):
             reference = capture("upstream", seed)
-            for kernel in ("full", "full_slots"):
+            for kernel in ("sphere_shadow", "full", "full_slots"):
                 self.assertEqual(capture(kernel, seed), reference, (seed, kernel))
 
     def test_nearest_ties_epsilon_and_all_primitives_are_visited(self):
@@ -163,9 +185,11 @@ class RaytraceFullTests(unittest.TestCase):
                 return None
         scene = u.Scene()
         scene.objects = [(Custom(), None), (Custom(), None)]
-        with v._patched(u, "full"):
-            self.assertTrue(scene._lightIsVisible(u.Point(0, 0, 1), u.Point(0, 0, 0)))
-        self.assertEqual(seen, [1., 1.])
+        for kernel in ("sphere_shadow", "full"):
+            seen.clear()
+            with v._patched(u, kernel):
+                self.assertTrue(scene._lightIsVisible(u.Point(0, 0, 1), u.Point(0, 0, 0)))
+            self.assertEqual(seen, [1., 1.], kernel)
 
     def test_checker_preserves_zero_size_exception_and_ignored_scale(self):
         u = self.up
@@ -207,10 +231,11 @@ class RaytraceFullTests(unittest.TestCase):
         u = self.up
         init = u.Canvas.__init__
         baseline = v._render_frames(u, 3, 24, 24, "upstream")
-        candidate = v._render_frames(u, 3, 24, 24, "full")
-        self.assertEqual(len(candidate), 3)
-        self.assertEqual(candidate, baseline)
-        self.assertIs(u.Canvas.__init__, init)
+        for kernel in ("sphere_shadow", "full"):
+            candidate = v._render_frames(u, 3, 24, 24, kernel)
+            self.assertEqual(len(candidate), 3)
+            self.assertEqual(candidate, baseline, kernel)
+            self.assertIs(u.Canvas.__init__, init)
 
 
 if __name__ == "__main__":

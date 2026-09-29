@@ -14,18 +14,22 @@ ray-sphere accelerator design with explicitly analytical estimates.
 | Nbody flat_pow, previous full run | 228.249 ms/unit | 142.578 ms/unit | 37.53% |
 | Nbody flat_pow, newest matched session | 227.196 ms/unit | 143.374 ms/unit | **36.89%** |
 
-Both selected exact improvements exceed the declared 7% runtime target on the
-Ubuntu CPython 3.10.12 VM. Clean timing, not profiler elapsed time or cycle counts,
+The measured raytrace `full` and nbody `flat_pow` improvements exceed the 7%
+runtime target on the Ubuntu CPython 3.10.12 VM. Clean timing, not profiler elapsed time or cycle counts,
 is the criterion. Eleven independent processes per arm were collected in separate
 blocks; host drift remains a limitation. The newest pairs are selected by
 `results/session_all_20260920-074308_674/`: raytrace 074314_1800 / 075734_1800,
-and nbody 080806_16940 / 081744_16940. Captured source hashes match current files.
+and nbody 080806_16940 / 081744_16940. Captured source hashes identify those
+measured versions.
 Both optimized verification logs cover the actual batch (4 frames / 16 units).
 
-**Current defaults:** nbody `flat_pow`, raytrace `full`. Keep the exact full
-raytrace bundle: its new VM result supports the combined changes. Individual
-VM contributions are not isolated; diagnostic kernels and optional slots remain.
-Nbody uses the same source as the preceding full run; this is confirmation.
+**Current defaults (29 September 2026):** nbody `flat_pow`, raytrace `sphere_shadow`.
+The raytrace default enables only scalar sphere intersections and shadow-ray
+reuse. It does not enable the guard, camera, nearest-hit, checkerboard or slots
+experiments. The historical `full` bundle remains selectable with `--kernel full`.
+The 42.78% result above belongs to `full`; measure `sphere_shadow` on the VM before
+claiming a runtime reduction for the new default. Existing reports retain their
+historical measurements. Nbody's default and implementation are unchanged.
 Canonical reports are the filenames below, without a copied " 2" suffix.
 
 - [Raytrace PDF](docs/reports/report_raytrace.pdf) and [required TXT](report_raytrace.txt)
@@ -54,8 +58,8 @@ helper. The authenticity phase should be retained with the run output.
 ```
 
 This selects the upstream workloads, both baseline and optimized arms, the full
-workflow, nbody `flat_pow` and raytrace `full`. It uses a common calibrated loop
-count within each comparison and verifies that actual batch before measurement.
+workflow, nbody `flat_pow` and raytrace `sphere_shadow`. It uses a common calibrated
+loop count within each comparison and verifies that actual batch before measurement.
 It creates `results/session_all_<timestamp>_<pid>/` with explicit manifests and
 comparison paths. Missing optional profiling tools are recorded in `phases.tsv`;
 correctness, clean timing and cProfile workload failures stop the run.
@@ -64,7 +68,8 @@ correctness, clean timing and cProfile workload failures stop the run.
 ./run_all.sh --time-only
 ./run_all.sh --nbody-kernel grouped --raytrace-kernel shadow_ray
 ./script_nbody.sh --variant both --kernel flat_pow --loops 16
-./script_raytrace.sh --variant both --kernel full --loops 4
+./script_raytrace.sh --variant both --loops 4  # default: sphere_shadow
+./script_raytrace.sh --variant both --kernel full --loops 4  # historical bundle
 ```
 
 `--time-only` avoids profiler preconditions. `--quick` is a smoke test, not final
@@ -75,7 +80,7 @@ For stronger confirmation with balanced AB/BA independent-process ordering:
 
 ```bash
 LOOPS=16 ./tools/ab_timing.sh nbody 16 --kernel flat_pow
-LOOPS=4 ./tools/ab_timing.sh raytrace 16 --kernel full
+LOOPS=4 ./tools/ab_timing.sh raytrace 16  # default: sphere_shadow
 ```
 
 The second positional number is the number of paired rounds. Raw process logs,
@@ -102,6 +107,15 @@ not bit-identical and is not the final default. `flat_unrolled` describes the
 structure, not another kernel. The new [structural controls](docs/NBODY_CONTROL_EXPERIMENTS.md)
 separate container and traversal changes without claiming extra default gains.
 
+Raytrace `sphere_shadow` patches only `Sphere.intersectionTime` and
+`Scene._lightIsVisible`: it computes sphere intersections from scalar components
+and reuses one shadow ray across objects in each visibility query. Arithmetic
+order, hit thresholds, early exit and object order are preserved. The scalar
+method retains its subclass fallback; custom scenes use upstream visibility.
+The direct Python runner, `script_raytrace.sh`, `run_all.sh` and `tools/ab_timing.sh`
+all select this kernel by default. It is also explicitly selectable with
+`--kernel sphere_shadow` (or `--raytrace-kernel sphere_shadow` in `run_all.sh`).
+
 Raytrace `full` combines shadow reuse, stock-object guard fast paths with generic
 fallbacks, scalar sphere arithmetic, camera component reuse, direct nearest-hit
 selection and removal of a discarded checkerboard object. It preserves the
@@ -116,8 +130,8 @@ python3 -B variants/bm_raytrace_upstream_opt.py --mode verify --loops 4
 python3 -B experiments/nbody_controls.py --mode verify --loops 16 --iterations 20000
 ```
 
-The integrated suite passes 63 tests. Exact nbody checks compare energy and every
-state component; raytrace checks every requested frame plus raw colours, geometry,
+The integrated suite checks kernel selection and behavior. Exact nbody checks
+compare energy and every state component; raytrace checks every requested frame plus raw colours, geometry,
 edge cases and baseline restoration. These are tested contracts, not formal
 proofs for all Python inputs. Saved evidence is under `docs/evidence/`.
 
@@ -168,7 +182,7 @@ The builder does not choose results or invent new analysis. `tools/gen_report.sh
 creates an evidence appendix from explicit directories; it never overwrites an
 authored report. Review new measurements before updating the source JSON.
 
-Remaining submission work: measure the new full raytrace kernel on Ubuntu,
+Remaining submission work: measure the new `sphere_shadow` raytrace default on Ubuntu,
 prepare the 20-25 minute presentation and working demo, and upload the repository
 when the author chooses. No Git operations were performed during this work;
 measurement Git metadata is off by default (`CAPTURE_GIT_METADATA=0`).
