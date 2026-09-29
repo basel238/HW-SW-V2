@@ -1,0 +1,25 @@
+UPSTREAM raytrace — kernel=sphere_shadow (scalar sphere arithmetic + shadow-ray reuse only)
+resolution=100x100 loops=4
+elapsed=2.198262 s  549.566 ms/frame
+primary_rays=40000  18.20 kray/s
+RESULT total_sec=2.198262 loops=4 ms_per_frame=549.5656 krays_per_sec=18.1962 kernel=sphere_shadow
+UPSTREAM raytrace — kernel=sphere_shadow (scalar sphere arithmetic + shadow-ray reuse only)
+resolution=100x100 loops=4
+elapsed=2.146566 s  536.642 ms/frame
+primary_rays=40000  18.63 kray/s
+RESULT total_sec=2.146566 loops=4 ms_per_frame=536.6416 krays_per_sec=18.6344 kernel=sphere_shadow
+UPSTREAM raytrace — kernel=sphere_shadow (scalar sphere arithmetic + shadow-ray reuse only)
+resolution=100x100 loops=4
+elapsed=2.205510 s  551.377 ms/frame
+primary_rays=40000  18.14 kray/s
+RESULT total_sec=2.205510 loops=4 ms_per_frame=551.3774 krays_per_sec=18.1364 kernel=sphere_shadow
+UPSTREAM raytrace — kernel=sphere_shadow (scalar sphere arithmetic + shadow-ray reuse only)
+resolution=100x100 loops=4
+elapsed=2.210355 s  552.589 ms/frame
+primary_rays=40000  18.10 kray/s
+RESULT total_sec=2.210355 loops=4 ms_per_frame=552.5888 krays_per_sec=18.0966 kernel=sphere_shadow
+UPSTREAM raytrace — kernel=sphere_shadow (scalar sphere arithmetic + shadow-ray reuse only)
+resolution=100x100 loops=4
+elapsed=2.154407 s  538.602 ms/frame
+primary_rays=40000  18.57 kray/s
+RESULT total_sec=2.154407 loops=4 ms_per_frame=538.6019 krays_per_sec=18.5666 kernel=sphere_shadow

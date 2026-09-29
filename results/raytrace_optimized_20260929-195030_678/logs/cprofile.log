@@ -1,0 +1,5 @@
+UPSTREAM raytrace — kernel=sphere_shadow (scalar sphere arithmetic + shadow-ray reuse only)
+resolution=100x100 loops=1
+elapsed=1.096367 s  1096.367 ms/frame
+primary_rays=10000  9.12 kray/s
+RESULT total_sec=1.096367 loops=1 ms_per_frame=1096.3671 krays_per_sec=9.1210 kernel=sphere_shadow

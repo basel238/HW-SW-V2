@@ -1,0 +1,2 @@
+elapsed=1.278098 s  1278.098 ms/frame
+RESULT total_sec=1.278098 loops=1 ms_per_frame=1278.0978 krays_per_sec=7.8241 kernel=sphere_shadow
